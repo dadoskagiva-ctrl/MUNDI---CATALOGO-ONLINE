@@ -3,6 +3,8 @@ services:
     name: mundi-tkr-sports
     env: static
     staticPublishPath: .
+    branch: main
+    autoDeploy: true
     pullRequestPreviewsEnabled: true
     headers:
       - path: /*
