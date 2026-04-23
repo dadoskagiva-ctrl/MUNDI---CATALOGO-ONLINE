@@ -599,7 +599,8 @@ input,select,textarea{font-family:var(--fb)}
     <button class="nav-link" onclick="showPage('catalog-topper')">Bolas Topper</button>
     <button class="nav-link" onclick="showPage('catalog-kagiva')">Bolas Kagiva</button>
     <button class="nav-link" onclick="showPage('catalog-rainha')">Bolas Rainha</button>
-    <button class="nav-link" id="nav-login-btn" onclick="showPage('login')">Área do representante</button>
+    <button class="nav-link" id="nav-login-btn" onclick="showLoginAs('rep')">Área do representante</button>
+    <button class="nav-link" id="nav-admin-login-btn" onclick="showLoginAs('admin')" style="color:var(--orange)">Acesso ADM</button>
     <button class="nav-link" id="nav-rep-btn" onclick="showPage('rep')" style="display:none">Área do representante</button>
     <button class="nav-link" id="nav-admin-btn" onclick="showPage('admin')" style="display:none">Admin Panel</button>
   </div>
@@ -630,7 +631,8 @@ input,select,textarea{font-family:var(--fb)}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <button onclick="showPage('catalog-topper')" style="font-family:var(--fb);font-size:.8rem;font-weight:600;padding:9px 18px;border-radius:10px;border:1.5px solid #222;background:transparent;color:#111;cursor:pointer;transition:all .2s">Catálogos</button>
-      <button onclick="showPage('login')" style="font-family:var(--fb);font-size:.8rem;font-weight:700;padding:9px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;cursor:pointer;box-shadow:0 0 16px var(--glow2);transition:all .2s">Área do representante</button>
+      <button onclick="showLoginAs('rep')" style="font-family:var(--fb);font-size:.8rem;font-weight:700;padding:9px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;cursor:pointer;box-shadow:0 0 16px var(--glow2);transition:all .2s">Área do representante</button>
+      <button onclick="showLoginAs('admin')" style="font-family:var(--fb);font-size:.8rem;font-weight:700;padding:9px 16px;border-radius:10px;border:1.5px solid #333;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">ADM</button>
     </div>
   </header>
 
@@ -643,7 +645,7 @@ input,select,textarea{font-family:var(--fb)}
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
         <button class="btn btn-primary" onclick="showPage('catalog-topper')">Catálogo Topper + Rainha</button>
         <button class="btn btn-secondary" onclick="showPage('catalog-kagiva')">Catálogo Kagiva</button>
-        <button class="btn btn-ghost" onclick="showPage('login')">Área do representante</button>
+        <button class="btn btn-ghost" onclick="showLoginAs('rep')">Área do representante</button>
       </div>
     </div>
 
@@ -664,7 +666,7 @@ input,select,textarea{font-family:var(--fb)}
             <span class="home-tag">Campo</span><span class="home-tag">Society</span><span class="home-tag">Futsal</span><span class="home-tag">Rainha</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" target="_blank" class="btn btn-outline btn-sm">👁 Visualizar</a>
+            <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf','CA.RO TOPPER 2026')" class="btn btn-outline btn-sm">👁 Visualizar</button>
             <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" download="CA.RO TOPPER 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
           </div>
         </div>
@@ -676,7 +678,7 @@ input,select,textarea{font-family:var(--fb)}
             <span class="home-tag">Campo</span><span class="home-tag">Futsal</span><span class="home-tag">Basquete</span><span class="home-tag">Luvas</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" target="_blank" class="btn btn-outline btn-sm">👁 Visualizar</a>
+            <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026')" class="btn btn-outline btn-sm">👁 Visualizar</button>
             <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
           </div>
         </div>
@@ -749,7 +751,7 @@ input,select,textarea{font-family:var(--fb)}
         <div style="font-size:.8rem;color:#666;margin-top:2px">Campo · Society · Futsal · Vôlei · Handebol · Beach</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</a>
+        <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf','CA.RO TOPPER 2026')" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</button>
         <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" download="CA.RO TOPPER 2026.pdf" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;box-shadow:0 0 14px rgba(255,106,0,.3);transition:all .2s">⬇ Download PDF</a>
       </div>
     </div>
@@ -783,7 +785,7 @@ input,select,textarea{font-family:var(--fb)}
         <div style="font-size:.8rem;color:#666;margin-top:2px">Campo · Society · Futsal · Vôlei · Handebol · Basquete · Luvas</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</a>
+        <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026')" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</button>
         <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;box-shadow:0 0 14px rgba(255,106,0,.3);transition:all .2s">⬇ Download PDF</a>
       </div>
     </div>
@@ -1185,6 +1187,15 @@ input,select,textarea{font-family:var(--fb)}
 
 </div><!-- /content-area -->
 </div><!-- /shell -->
+
+<!-- PDF VIEWER MODAL -->
+<div id="pdf-viewer-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#111;border-bottom:1px solid #222;flex-shrink:0">
+    <div id="pdf-viewer-title" style="font-family:var(--fb);font-weight:800;color:#fff;font-size:.95rem;letter-spacing:.05em"></div>
+    <button onclick="closePdfViewer()" style="background:rgba(255,255,255,.08);border:1px solid #333;color:#ccc;cursor:pointer;font-size:1.1rem;line-height:1;padding:6px 14px;border-radius:8px;font-family:var(--fb);font-weight:700;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.16)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">✕ Fechar</button>
+  </div>
+  <iframe id="pdf-viewer-frame" src="" style="flex:1;width:100%;border:none;background:#fff"></iframe>
+</div>
 
 <!-- MODAL PRODUTO -->
 <div class="modal-ov" id="prod-modal" onclick="closeModal(event)">
@@ -1616,6 +1627,22 @@ function shareWA(id){
 }
 
 // ══════════════════════════════════════════════
+// PDF VIEWER
+// ══════════════════════════════════════════════
+function openPdfViewer(url, title){
+  const modal = document.getElementById('pdf-viewer-modal');
+  document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
+  document.getElementById('pdf-viewer-frame').src = 'https://docs.google.com/viewer?url='+encodeURIComponent(url)+'&embedded=true';
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closePdfViewer(){
+  document.getElementById('pdf-viewer-modal').style.display = 'none';
+  document.getElementById('pdf-viewer-frame').src = '';
+  document.body.style.overflow = '';
+}
+
+// ══════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════
 let loginType='rep';
@@ -1625,6 +1652,10 @@ function setLoginType(t){
   document.getElementById('form-admin').style.display=t==='admin'?'':'none';
   document.getElementById('tab-rep').classList.toggle('active',t==='rep');
   document.getElementById('tab-admin').classList.toggle('active',t==='admin');
+}
+function showLoginAs(type){
+  showPage('login');
+  setLoginType(type||'rep');
 }
 
 function maskCPF(el){

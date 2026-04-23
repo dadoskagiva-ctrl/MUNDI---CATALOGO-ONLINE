@@ -4,10 +4,11 @@
   "description": "Catálogos Topper, Kagiva e Rainha — fichas técnicas, fotos e downloads",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0d0d",
-  "theme_color": "#ff6a00",
+  "background_color": "#111111",
+  "theme_color": "#e06020",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "logo-mundi.png", "sizes": "any", "type": "image/png", "purpose": "any" }
   ]
 }

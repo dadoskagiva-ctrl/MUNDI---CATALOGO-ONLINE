@@ -1,24 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#111111"/>
-      <stop offset="100%" style="stop-color:#0a0a0a"/>
-    </linearGradient>
-    <linearGradient id="og" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff6a00"/>
-      <stop offset="100%" style="stop-color:#ff9500"/>
+      <stop offset="0%" style="stop-color:#2a2a2a"/>
+      <stop offset="100%" style="stop-color:#111111"/>
     </linearGradient>
   </defs>
   <!-- background rounded square -->
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- orange accent bar left -->
-  <rect x="48" y="48" width="6" height="160" rx="3" fill="url(#og)"/>
-  <!-- MUNDI text -->
-  <text x="74" y="198" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="126" fill="#ffffff" letter-spacing="-4">MUNDI</text>
-  <!-- divider line -->
-  <rect x="74" y="218" width="380" height="4" rx="2" fill="url(#og)" opacity="0.9"/>
-  <!-- TKR text -->
-  <text x="74" y="340" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="136" fill="url(#og)" letter-spacing="28">TKR</text>
-  <!-- small label -->
-  <text x="74" y="400" font-family="Arial, sans-serif" font-weight="400" font-size="36" fill="#555555" letter-spacing="8">SPORTS</text>
+  <!-- MUNDI in orange (matches logo) -->
+  <text x="32" y="248" font-family="Arial Black, Impact, Arial, sans-serif" font-weight="900" font-size="158" fill="#e06020" letter-spacing="-6">MUNDI</text>
+  <!-- TKR in white, right-aligned offset below -->
+  <text x="480" y="420" text-anchor="end" font-family="Arial Black, Impact, Arial, sans-serif" font-weight="900" font-size="158" fill="#f0ece4" letter-spacing="-4">TKR</text>
 </svg>
