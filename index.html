@@ -591,7 +591,7 @@ input,select,textarea{font-family:var(--fb)}
   <div style="margin-top:28px;width:40px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden"><div style="height:100%;background:#e06020;border-radius:2px;animation:splashBar 1.2s ease-in-out infinite"></div></div>
 </div>
 <style>@keyframes splashBar{0%{width:0;margin-left:0}60%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}</style>
-<script>window.addEventListener('load',function(){var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none'},420);}});</script>
+<script>setTimeout(function(){var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},420);}},700);</script>
 
 <div class="shell">
 
@@ -1401,25 +1401,22 @@ function updateNavState(page){
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   const sess = getSession();
   const loginBtn = document.getElementById('nav-login-btn');
+  const adminLoginBtn = document.getElementById('nav-admin-login-btn');
   const repBtn = document.getElementById('nav-rep-btn');
   const adminBtn = document.getElementById('nav-admin-btn');
   const logoutBtn = document.getElementById('nav-logout-btn');
   const homeBtn = document.getElementById('nav-home-btn');
-  const mobAcc = document.getElementById('mob-nav-acc');
-  const mobOut = document.getElementById('mob-nav-logout');
   if(homeBtn && page==='home') homeBtn.classList.add('active');
   if(sess){
     if(loginBtn) loginBtn.style.display='none';
+    if(adminLoginBtn) adminLoginBtn.style.display='none';
     if(logoutBtn) logoutBtn.style.display='';
-    if(mobAcc) mobAcc.style.display='none';
-    if(mobOut) mobOut.style.display='';
     if(sess.role==='admin'){if(adminBtn)adminBtn.style.display='';if(repBtn)repBtn.style.display='none';}
     else{if(repBtn)repBtn.style.display='';if(adminBtn)adminBtn.style.display='none';}
   } else {
     if(loginBtn) loginBtn.style.display='';
+    if(adminLoginBtn) adminLoginBtn.style.display='';
     if(logoutBtn) logoutBtn.style.display='none';
-    if(mobAcc) mobAcc.style.display='';
-    if(mobOut) mobOut.style.display='none';
     if(repBtn) repBtn.style.display='none';
     if(adminBtn) adminBtn.style.display='none';
   }
@@ -1688,9 +1685,24 @@ function setLoginType(t){
   document.getElementById('tab-admin').classList.toggle('active',t==='admin');
 }
 function showLoginAs(type){
-  showPage('login');
-  setLoginType(type||'rep');
+  // Standalone: doesn't rely on showPage chain or setLoginType being available
+  const t = type||'rep';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const lp = document.getElementById('page-login');
+  if(lp) lp.classList.add('active');
+  window.scrollTo(0,0);
+  const fr=document.getElementById('form-rep');
+  const fa=document.getElementById('form-admin');
+  const tr=document.getElementById('tab-rep');
+  const ta=document.getElementById('tab-admin');
+  if(fr) fr.style.display=t==='rep'?'':'none';
+  if(fa) fa.style.display=t==='admin'?'':'none';
+  if(tr) tr.classList.toggle('active',t==='rep');
+  if(ta) ta.classList.toggle('active',t==='admin');
+  try{updateNavState('login');}catch(e){}
+  try{mobNavActive('login');}catch(e){}
 }
+window.showLoginAs=showLoginAs;
 
 function maskCPF(el){
   let v=el.value.replace(/\D/g,'');
@@ -2415,11 +2427,11 @@ mobNavActive('home');
   <button class="mob-nav-btn mn-cat-rainha" onclick="showPage('catalog-rainha')">
     <span class="mn-ico">⚽</span>Rainha
   </button>
-  <button class="mob-nav-btn mn-login mn-rep mn-admin" id="mob-nav-acc" onclick="(function(){const s=getSession();showPage(s?s.role==='admin'?'admin':'rep':'login')})()">
-    <span class="mn-ico">⚽</span>Acesso
+  <button class="mob-nav-btn mn-login mn-rep" id="mob-nav-rep" onclick="(function(){const s=getSession();s&&s.role!=='admin'?showPage('rep'):showLoginAs('rep')})()">
+    <span class="mn-ico">⚽</span>Rep
   </button>
-  <button class="mob-nav-btn" onclick="doLogout();showPage('home')" id="mob-nav-logout" style="display:none">
-    <span class="mn-ico">⚽</span>Sair
+  <button class="mob-nav-btn mn-login mn-admin" id="mob-nav-adm" onclick="(function(){const s=getSession();s&&s.role==='admin'?showPage('admin'):showLoginAs('admin')})()">
+    <span class="mn-ico">⚽</span>ADM
   </button>
 </nav>
 </body>
