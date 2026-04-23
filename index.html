@@ -1220,7 +1220,7 @@ const clearSession = () => sessionStorage.removeItem(K.session);
 function ensureAdmin(){
   const reps = getData(K.reps);
   if(!reps.find(r=>r.role==='admin')){
-    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'Admin@2026',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@CARO26',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
     setData(K.reps,reps);
   }
 }
