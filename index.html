@@ -11,6 +11,20 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg"/>
 <link rel="apple-touch-icon" href="icon.svg"/>
 <title>Mundi TKR Sports</title>
+<!-- OneSignal Web Push SDK -->
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  const _osAppId = localStorage.getItem('mundi:os_id');
+  if(_osAppId){
+    const s = document.createElement('script');
+    s.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    s.defer = true;
+    document.head.appendChild(s);
+    OneSignalDeferred.push(function(OneSignal){
+      OneSignal.init({appId: _osAppId, serviceWorkerPath: 'sw.js', notifyButton:{enable:false}});
+    });
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -868,6 +882,7 @@ input,select,textarea{font-family:var(--fb)}
       <button class="dash-tab" onclick="setAdminTab('videos')">Vídeos</button>
       <button class="dash-tab" onclick="setAdminTab('links')">Links Drive</button>
       <button class="dash-tab" onclick="setAdminTab('logs')">Logs</button>
+      <button class="dash-tab" onclick="setAdminTab('notifs')">📲 Notificações</button>
     </div>
     <div id="admin-tab-reps"><div class="card-panel"><div class="card-panel-title">Representantes Cadastrados</div><div id="admin-reps-list"></div></div></div>
     <div id="admin-tab-add-rep" style="display:none">
@@ -1077,6 +1092,36 @@ input,select,textarea{font-family:var(--fb)}
     </div>
     <div id="admin-tab-logs" style="display:none">
       <div class="card-panel"><div class="card-panel-title">Log de Acessos e Downloads</div><div id="admin-logs-list"></div></div>
+    </div>
+
+    <!-- ── NOTIFICAÇÕES ── -->
+    <div id="admin-tab-notifs" style="display:none">
+      <div class="card-panel">
+        <div class="card-panel-title">⚙️ Configuração OneSignal</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">
+          Crie uma conta gratuita em <strong style="color:var(--orange)">onesignal.com</strong>, crie um app Web Push e cole o App ID e a REST API Key abaixo.
+        </p>
+        <div class="form-grid">
+          <div class="field"><label>App ID</label><input id="os-app-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/></div>
+          <div class="field"><label>REST API Key</label><input id="os-api-key" type="password" placeholder="REST API Key do OneSignal"/></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveOSConfig()">Salvar Configuração</button>
+        <div id="os-cfg-fb" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card-panel" style="margin-top:0">
+        <div class="card-panel-title">📲 Enviar Notificação para Todos</div>
+        <div class="field"><label>Título</label><input id="notif-title" placeholder="Ex: Novo catálogo disponível!"/></div>
+        <div class="field"><label>Mensagem</label><textarea id="notif-body" rows="3" placeholder="Digite a mensagem que todos os representantes vão receber..." style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:11px 14px;font-size:.95rem;outline:none;resize:vertical"></textarea></div>
+        <div class="field"><label>Link ao clicar (opcional)</label><input id="notif-url" placeholder="https://..."/></div>
+        <button class="btn btn-primary" onclick="sendPushNotif()">📲 Enviar para todos agora</button>
+        <div id="notif-fb" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card-panel" style="margin-top:0">
+        <div class="card-panel-title">📋 Histórico de Notificações</div>
+        <div id="notif-history"><p style="color:#666;font-size:.82rem">Nenhuma notificação enviada ainda.</p></div>
+      </div>
     </div>
   </div>
   <footer class="footer"><div class="footer-brand">MUNDI<em>TKR</em></div><p class="footer-copy">© 2026 Mundi TKR Sports</p></footer>
@@ -1684,7 +1729,7 @@ function updateAdminStats(){
 }
 
 function setAdminTab(tab){
-  const tabs=['reps','add-rep','products','videos','links','logs'];
+  const tabs=['reps','add-rep','products','videos','links','logs','notifs'];
   tabs.forEach(t=>document.getElementById('admin-tab-'+t).style.display=t===tab?'':'none');
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
@@ -1692,6 +1737,81 @@ function setAdminTab(tab){
   if(tab==='videos'){renderAdminVideos();loadVideoForm();}
   if(tab==='links') loadLinks();
   if(tab==='logs') renderLogs();
+  if(tab==='notifs') loadNotifTab();
+}
+
+// ══════════════════════════════════════════════
+// WEB PUSH — ONESIGNAL
+// ══════════════════════════════════════════════
+function loadNotifTab(){
+  const id = localStorage.getItem('mundi:os_id')||'';
+  const key = localStorage.getItem('mundi:os_key')||'';
+  document.getElementById('os-app-id').value = id;
+  document.getElementById('os-api-key').value = key;
+  renderNotifHistory();
+}
+
+function saveOSConfig(){
+  const id = document.getElementById('os-app-id').value.trim();
+  const key = document.getElementById('os-api-key').value.trim();
+  if(!id||!key){toast('Preencha App ID e REST API Key','err');return;}
+  localStorage.setItem('mundi:os_id', id);
+  localStorage.setItem('mundi:os_key', key);
+  document.getElementById('os-cfg-fb').innerHTML='<div class="fb-msg fb-ok">✅ Configuração salva! Recarregue o app para ativar as notificações.</div>';
+  toast('OneSignal configurado!','ok');
+}
+
+async function sendPushNotif(){
+  const title = document.getElementById('notif-title').value.trim();
+  const body  = document.getElementById('notif-body').value.trim();
+  const url   = document.getElementById('notif-url').value.trim();
+  const appId = localStorage.getItem('mundi:os_id');
+  const apiKey= localStorage.getItem('mundi:os_key');
+  const fb    = document.getElementById('notif-fb');
+  if(!title||!body){toast('Preencha título e mensagem','err');return;}
+  if(!appId||!apiKey){fb.innerHTML='<div class="fb-msg fb-err">❌ Configure o OneSignal primeiro (App ID + REST API Key)</div>';return;}
+  fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Enviando...</div>';
+  const payload = {
+    app_id: appId,
+    included_segments: ['All'],
+    headings: {en: title, pt: title},
+    contents: {en: body,  pt: body},
+  };
+  if(url) payload.url = url;
+  try{
+    const res = await fetch('https://onesignal.com/api/v1/notifications',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Basic '+apiKey},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data.id){
+      fb.innerHTML='<div class="fb-msg fb-ok">✅ Enviado! ID: '+data.id+'</div>';
+      const hist=JSON.parse(localStorage.getItem('mundi:notif_hist')||'[]');
+      hist.unshift({id:data.id,title,body,url,ts:new Date().toISOString()});
+      localStorage.setItem('mundi:notif_hist',JSON.stringify(hist.slice(0,30)));
+      renderNotifHistory();
+      document.getElementById('notif-title').value='';
+      document.getElementById('notif-body').value='';
+      document.getElementById('notif-url').value='';
+      addLog('Admin enviou notificação push: '+title);
+    } else {
+      fb.innerHTML='<div class="fb-msg fb-err">❌ Erro: '+(data.errors?data.errors.join(', '):JSON.stringify(data))+'</div>';
+    }
+  }catch(e){
+    fb.innerHTML='<div class="fb-msg fb-err">❌ Erro de rede: '+e.message+'</div>';
+  }
+}
+
+function renderNotifHistory(){
+  const el=document.getElementById('notif-history');
+  if(!el) return;
+  const hist=JSON.parse(localStorage.getItem('mundi:notif_hist')||'[]');
+  if(!hist.length){el.innerHTML='<p style="color:#666;font-size:.82rem">Nenhuma notificação enviada ainda.</p>';return;}
+  el.innerHTML=hist.map(n=>`<div class="log-item">
+    <span class="log-time">${new Date(n.ts).toLocaleString('pt-BR')}</span>
+    <div><strong>${n.title}</strong><br><span style="color:var(--muted);font-size:.78rem">${n.body}</span></div>
+  </div>`).join('');
 }
 
 function renderAdminReps(){
