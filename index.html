@@ -399,6 +399,77 @@ input,select,textarea{font-family:var(--fb)}
 .footer-brand em{color:var(--orange);font-style:normal}
 .footer-copy{font-size:.75rem;color:var(--muted2)}
 
+/* ── ADMIN PRODUCT MANAGER ── */
+.admin-prod-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.admin-prod-toolbar input,.admin-prod-toolbar select{
+  background:var(--panel2);border:1px solid var(--line2);color:var(--text);
+  border-radius:10px;padding:9px 14px;font-size:.85rem;outline:none;flex:1;min-width:170px;
+  font-family:var(--fb)}
+.admin-prod-toolbar input:focus,.admin-prod-toolbar select:focus{border-color:var(--orange)}
+.prod-table{width:100%;border-collapse:collapse}
+.prod-table th{font-family:var(--fc);font-size:.6rem;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.prod-table td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.prod-table tr:hover td{background:rgba(255,255,255,.02);cursor:pointer}
+.prod-table tr:last-child td{border-bottom:none}
+.prod-thumb-sm{width:44px;height:44px;border-radius:8px;object-fit:contain;
+  background:#0d0d0d;border:1px solid var(--line);padding:3px;display:block}
+.prod-editor-wrap{display:none}
+.prod-editor-grid{display:grid;grid-template-columns:300px 1fr;gap:24px}
+.prod-img-zone{background:#0d0d0d;border:2px dashed var(--line2);border-radius:18px;
+  min-height:240px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;text-align:center;padding:20px;flex-direction:column;gap:8px;position:relative}
+.prod-img-zone:hover{border-color:var(--orange);background:rgba(255,106,0,.04)}
+.prod-img-zone img{max-width:100%;max-height:220px;object-fit:contain;border-radius:12px;display:block}
+.prod-img-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.prod-img-row{display:flex;gap:10px;margin-top:10px}
+.prod-img-thumb{width:80px;height:80px;border-radius:10px;object-fit:contain;
+  background:#0d0d0d;border:2px solid var(--line);padding:4px;cursor:pointer;transition:border-color .2s}
+.prod-img-thumb:hover,.prod-img-thumb.active{border-color:var(--orange)}
+.prod-img-add{width:80px;height:80px;border-radius:10px;border:2px dashed var(--line2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:1.6rem;color:var(--muted);transition:all .2s}
+.prod-img-add:hover{border-color:var(--orange);color:var(--orange)}
+.pe-section{font-family:var(--fc);font-size:.65rem;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--orange);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+
+/* ── CATALOG LIST (magussy style) ── */
+.catalog-list{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.prod-row{display:grid;grid-template-columns:340px 1fr;border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;background:var(--panel);cursor:pointer;transition:all .25s}
+.prod-row:hover{border-color:var(--orange);box-shadow:0 8px 32px rgba(255,106,0,.12)}
+.prod-row-left{display:flex;flex-direction:column}
+.prod-row-header{background:#080808;padding:13px 17px;border-bottom:1px solid var(--line)}
+.prod-row-num{font-family:var(--fc);font-size:.6rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
+.prod-row-name{font-family:var(--fd);font-size:1.15rem;letter-spacing:2px;color:var(--text);text-transform:uppercase;line-height:1.1}
+.prod-row-tags{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.prod-row-tag{font-family:var(--fc);font-size:.58rem;font-weight:800;letter-spacing:1.5px;
+  text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid rgba(255,106,0,.3);
+  background:rgba(255,106,0,.08);color:var(--orange)}
+.prod-row-tag-sport{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--muted)}
+.prod-row-body{padding:13px 17px;flex:1}
+.spec-list{display:grid;gap:4px}
+.spec-item{display:flex;gap:8px;font-size:.8rem;line-height:1.3}
+.spec-k{color:var(--muted);min-width:118px;flex-shrink:0;font-weight:600}
+.spec-v{color:var(--text);font-weight:500}
+.prod-row-footer{padding:10px 17px;border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between}
+.prod-row-view{font-family:var(--fc);font-size:.65rem;font-weight:800;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--orange);background:none;border:none;cursor:pointer;padding:0;transition:opacity .2s}
+.prod-row-view:hover{opacity:.7}
+.prod-row-right{background:#0d0d0d;display:flex;align-items:center;justify-content:center;
+  gap:8px;padding:16px;flex-wrap:wrap}
+.prod-row-photo{flex:1;min-width:80px;max-width:160px;aspect-ratio:1;object-fit:contain;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.6));transition:transform .3s}
+.prod-row:hover .prod-row-photo{transform:scale(1.04)}
+.prod-row-emoji{font-size:5rem;opacity:.1;user-select:none}
+.prod-row-badge{font-family:var(--fc);font-size:.54rem;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;padding:2px 7px;background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#000;border-radius:999px}
+.cat-counter{font-family:var(--fc);font-size:.72rem;font-weight:700;letter-spacing:1.5px;
+  color:var(--muted);text-transform:uppercase;padding:4px 0}
+
 /* ── ANIMATIONS ── */
 @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 @keyframes flicker{0%,100%{opacity:1}96%{opacity:1}97%{opacity:.85}98%{opacity:1}99%{opacity:.9}}
@@ -674,7 +745,8 @@ input,select,textarea{font-family:var(--fb)}
     </div>
     <div class="dash-tabs">
       <button class="dash-tab active" onclick="setAdminTab('reps')">Representantes</button>
-      <button class="dash-tab" onclick="setAdminTab('add-rep')">+ Cadastrar</button>
+      <button class="dash-tab" onclick="setAdminTab('add-rep')">+ Cadastrar Rep</button>
+      <button class="dash-tab" onclick="setAdminTab('products')">📦 Produtos</button>
       <button class="dash-tab" onclick="setAdminTab('videos')">Vídeos</button>
       <button class="dash-tab" onclick="setAdminTab('links')">Links Drive</button>
       <button class="dash-tab" onclick="setAdminTab('logs')">Logs</button>
@@ -699,7 +771,163 @@ input,select,textarea{font-family:var(--fb)}
         <button class="btn btn-primary" onclick="saveRep()">Salvar Representante</button>
       </div>
     </div>
-    <div id="admin-tab-videos" style="display:none">
+    <!-- PRODUTOS TAB -->
+    <div id="admin-tab-products" style="display:none">
+      <!-- LIST VIEW -->
+      <div id="admin-prod-list-view">
+        <div class="card-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div class="card-panel-title" style="margin:0;border:none;padding:0">Gerenciar Produtos</div>
+            <button class="btn btn-primary btn-sm" onclick="openProdEditor(null)">+ Novo Produto</button>
+          </div>
+          <div class="admin-prod-toolbar">
+            <input id="adm-ps" placeholder="🔍 Buscar por nome, código, EAN..." oninput="renderAdminProducts()"/>
+            <select id="adm-pb" onchange="renderAdminProducts()">
+              <option value="">Todas as marcas</option>
+              <option value="Topper">Topper</option>
+              <option value="Kagiva">Kagiva</option>
+              <option value="Rainha">Rainha</option>
+            </select>
+            <select id="adm-psp" onchange="renderAdminProducts()">
+              <option value="">Todos os esportes</option>
+              <option value="Campo">⚽ Campo</option>
+              <option value="Society">🏟 Society</option>
+              <option value="Futsal">🏃 Futsal</option>
+              <option value="Vôlei">🏐 Vôlei</option>
+              <option value="Handebol">🤾 Handebol</option>
+              <option value="Basquete">🏀 Basquete</option>
+              <option value="Beach Soccer">🏖 Beach Soccer</option>
+              <option value="Acessório">🛠 Acessório</option>
+            </select>
+          </div>
+          <div id="adm-prod-count" style="font-family:var(--fc);font-size:.72rem;color:var(--muted);letter-spacing:1px;margin-bottom:10px"></div>
+          <div style="overflow-x:auto">
+            <table class="prod-table">
+              <thead><tr>
+                <th>Foto</th><th>Nome</th><th>Código</th><th>EAN</th>
+                <th>Marca</th><th>Esporte</th><th>Família</th><th>Status</th><th>Ação</th>
+              </tr></thead>
+              <tbody id="adm-prod-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- EDITOR VIEW -->
+      <div id="admin-prod-editor" class="prod-editor-wrap">
+        <div class="card-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+            <div class="card-panel-title" style="margin:0;border:none;padding:0" id="pe-title-label">Editar Produto</div>
+            <button class="btn btn-ghost btn-sm" onclick="closeProdEditor()">← Voltar à lista</button>
+          </div>
+          <div class="prod-editor-grid">
+            <!-- FOTOS -->
+            <div>
+              <div class="pe-section">Fotos do Produto</div>
+              <div class="prod-img-zone" id="pe-img-zone-1" onclick="triggerImgPick(1)">
+                <img id="pe-preview-1" style="display:none"/>
+                <div class="prod-img-placeholder" id="pe-ph-1">
+                  <div style="font-size:2.5rem;opacity:.25">📷</div>
+                  <div style="font-family:var(--fc);font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:6px">Foto Principal</div>
+                  <div style="font-size:.72rem;color:var(--muted2);margin-top:2px">Clique para fazer upload</div>
+                </div>
+              </div>
+              <div class="prod-img-row">
+                <div class="prod-img-add" onclick="triggerImgPick(2)" id="pe-img-add-2" title="Adicionar foto 2">
+                  <img id="pe-preview-2" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:8px"/>
+                  <span id="pe-add-icon-2">+</span>
+                </div>
+                <div class="prod-img-add" onclick="triggerImgPick(3)" id="pe-img-add-3" title="Adicionar foto 3">
+                  <img id="pe-preview-3" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:8px"/>
+                  <span id="pe-add-icon-3">+</span>
+                </div>
+                <div class="prod-img-add" onclick="triggerImgPick(4)" id="pe-img-add-4" title="Adicionar foto 4">
+                  <img id="pe-preview-4" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:8px"/>
+                  <span id="pe-add-icon-4">+</span>
+                </div>
+              </div>
+              <input type="file" id="pe-file-1" accept="image/*" style="display:none" onchange="handleImgFile(event,1)"/>
+              <input type="file" id="pe-file-2" accept="image/*" style="display:none" onchange="handleImgFile(event,2)"/>
+              <input type="file" id="pe-file-3" accept="image/*" style="display:none" onchange="handleImgFile(event,3)"/>
+              <input type="file" id="pe-file-4" accept="image/*" style="display:none" onchange="handleImgFile(event,4)"/>
+              <div style="margin-top:12px">
+                <div class="pe-section" style="margin-top:0">Ou cole URLs</div>
+                <div class="field"><label>URL Foto 1 (principal)</label><input id="pe-url-1" placeholder="https://..." oninput="applyUrlPreview(1,this.value)"/></div>
+                <div class="field"><label>URL Foto 2</label><input id="pe-url-2" placeholder="https://..." oninput="applyUrlPreview(2,this.value)"/></div>
+                <div class="field"><label>URL Foto 3</label><input id="pe-url-3" placeholder="https://..." oninput="applyUrlPreview(3,this.value)"/></div>
+                <div class="field"><label>URL Foto 4</label><input id="pe-url-4" placeholder="https://..." oninput="applyUrlPreview(4,this.value)"/></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-ghost btn-sm btn-full" onclick="clearAllImgs()">🗑 Limpar Fotos</button>
+              </div>
+            </div>
+            <!-- CAMPOS -->
+            <div>
+              <div class="pe-section" style="margin-top:0">Identificação</div>
+              <div class="form-grid">
+                <div class="field"><label>Nome do Produto *</label><input id="pe-name" placeholder="Samba Pro"/></div>
+                <div class="field"><label>Código *</label><input id="pe-code" placeholder="7750"/></div>
+                <div class="field"><label>EAN / Código de Barras</label><input id="pe-ean" placeholder="7897660052585"/></div>
+                <div class="field"><label>Família</label><input id="pe-family" placeholder="Samba"/></div>
+                <div class="field"><label>Marca *</label>
+                  <select id="pe-brand">
+                    <option value="Topper">Topper</option>
+                    <option value="Kagiva">Kagiva</option>
+                    <option value="Rainha">Rainha</option>
+                  </select>
+                </div>
+                <div class="field"><label>Esporte / Categoria *</label>
+                  <select id="pe-sport">
+                    <option value="Campo">Campo</option>
+                    <option value="Society">Society</option>
+                    <option value="Futsal">Futsal</option>
+                    <option value="Vôlei">Vôlei</option>
+                    <option value="Handebol">Handebol</option>
+                    <option value="Basquete">Basquete</option>
+                    <option value="Beach Soccer">Beach Soccer</option>
+                    <option value="Futevôlei">Futevôlei</option>
+                    <option value="Acessório">Acessório</option>
+                  </select>
+                </div>
+              </div>
+              <div class="pe-section">Ficha Técnica</div>
+              <div class="form-grid">
+                <div class="field"><label>Laminado</label><input id="pe-laminado" placeholder="PU-HS / 1.1mm"/></div>
+                <div class="field"><label>Peso</label><input id="pe-peso" placeholder="410–440g"/></div>
+                <div class="field"><label>Gomos</label><input id="pe-gomos" placeholder="12"/></div>
+                <div class="field"><label>Circunferência</label><input id="pe-circ" placeholder="68,5–69,5cm"/></div>
+                <div class="field"><label>Calibragem</label><input id="pe-calib" placeholder="10–12 LBS"/></div>
+                <div class="field"><label>Tecnologia</label><input id="pe-tecnologia" placeholder="TecnoFusion"/></div>
+                <div class="field"><label>Câmara</label><input id="pe-camara" placeholder="Butil"/></div>
+                <div class="field"><label>Tamanho (luvas/mini)</label><input id="pe-tamanho" placeholder="11"/></div>
+                <div class="field"><label>Selos / Certificações</label><input id="pe-selos" placeholder="CBF / Federações Estaduais"/></div>
+                <div class="field"><label>Composição</label><input id="pe-composicao" placeholder="PU Soft"/></div>
+                <div class="field"><label>Câmara Interna</label><input id="pe-camara-int" placeholder="Butil / Látex"/></div>
+                <div class="field"><label>Miolo</label><input id="pe-miolo" placeholder="Dupla Camagem"/></div>
+                <div class="field" style="grid-column:1/-1"><label>Observação</label><input id="pe-obs" placeholder="Informação adicional..."/></div>
+              </div>
+              <div class="pe-section">Descrição</div>
+              <div class="field"><textarea id="pe-desc" rows="4" placeholder="Descrição completa do produto para o catálogo..."></textarea></div>
+              <div class="pe-section">Configurações</div>
+              <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;font-weight:600">
+                  <input type="checkbox" id="pe-destaque" style="width:16px;height:16px;accent-color:var(--orange)"/> Produto em destaque
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;font-weight:600">
+                  <input type="checkbox" id="pe-importado" style="width:16px;height:16px;accent-color:var(--orange)"/> Produto importado
+                </label>
+              </div>
+              <div id="pe-fb"></div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" style="flex:1" onclick="saveProdEditor()">💾 Salvar Produto</button>
+                <button class="btn btn-danger" id="pe-del-btn" onclick="deleteProdEditor()" style="display:none">🗑 Excluir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <div id="admin-tab-videos" style="display:none">
       <div class="card-panel">
         <div class="card-panel-title">Gerenciar Vídeos de Treinamento</div>
         <div class="form-grid">
@@ -808,6 +1036,15 @@ function ensureAdmin(){
   }
 }
 ensureAdmin();
+
+// Load custom products from localStorage if available
+(function(){
+  try{
+    const saved=localStorage.getItem('mundi:products');
+    if(saved){const arr=JSON.parse(saved);if(arr&&arr.length){PRODUCTS.length=0;arr.forEach(p=>PRODUCTS.push(p));}}
+  }catch(e){}
+})();
+
 // Set home logo images
 setTimeout(()=>{
   const lt=document.getElementById('logo-topper-home');
@@ -823,7 +1060,7 @@ setTimeout(()=>{
 // ══════════════════════════════════════════════
 const SPORT_E = {Campo:'⚽',Society:'🏟',Futsal:'🏃',Vôlei:'🏐','Beach Soccer':'🏖',Futevôlei:'🌊',Handebol:'🤾',Basquete:'🏀',Acessório:'🛠'};
 
-const PRODUCTS = [
+let PRODUCTS = [
   // ── TOPPER CAMPO ──
   {id:'t-7750',name:'Samba Pro',brand:'Topper',sport:'Campo',family:'Samba',code:'7750',ean:'7897660052585',laminado:'PU-HS/1.1mm',peso:'410–440g',gomos:'12',circ:'68,5–69,5cm',calib:'10–12 LBS',selos:'CBF / Federações Estaduais',destaque:true,img:'',desc:'Bola oficial das competições de base CBF. A bola das principais federações estaduais do Brasil. Alta performance para campo profissional.'},
   {id:'t-7807',name:'Samba Oficial',brand:'Topper',sport:'Campo',family:'Samba',code:'7807',ean:'7897660052790',laminado:'PU',peso:'410–440g',gomos:'12',circ:'68,5–69,5cm',calib:'10–12 LBS',destaque:false,img:'',desc:'Bola oficial campo Topper. Referência técnica para treinamentos e partidas de alto nível.'},
@@ -947,46 +1184,65 @@ function getImgLinks(){ return getObj(K.imglinks); }
 // ══ REAL IMAGE MAPPING ══
 const IMG_MAP = {"t-7750": "imgs/topper/1.jpg", "t-7807": "imgs/topper/2.jpg", "t-7849": "imgs/topper/3.jpg", "t-7805": "imgs/topper/3.jpg", "t-7793": "imgs/topper/4.jpg", "t-7884": "imgs/topper/8.jpg", "t-7432": "imgs/topper/6.jpg", "t-6973": "imgs/topper/11.jpg", "t-7872": "imgs/topper/9.jpg", "t-strike": "imgs/topper/7.jpg", "t-slick-r": "imgs/topper/10.jpg", "t-7762": "imgs/topper/12.jpg", "t-soc-bol": "imgs/topper/13.jpg", "t-soc-b": "imgs/topper/14.jpg", "t-soc-y": "imgs/topper/15.jpg", "t-soc-r": "imgs/topper/16.jpg", "t-soc-90": "imgs/topper/18.jpg", "t-7810": "imgs/topper/19.jpg", "t-fs-dom": "imgs/topper/20.jpg", "t-7758": "imgs/topper/21.jpg", "t-7759": "imgs/topper/22.jpg", "t-fs-kick": "imgs/topper/17.jpg", "t-fs-s": "imgs/topper/23.jpg", "t-fs-s2": "imgs/topper/25.jpg", "t-mini": "imgs/topper/27.jpg", "t-7840": "imgs/topper/45.jpg", "t-7830": "imgs/topper/26.jpg", "t-7820": "imgs/topper/24.jpg", "r-vl8pro": "imgs/rainha/1.jpg", "r-vl-of": "imgs/rainha/2.jpg", "r-vl-35": "imgs/rainha/3.jpg", "r-9001": "imgs/rainha/1.jpg", "r-9003": "imgs/rainha/2.jpg", "r-9010": "imgs/rainha/4.jpg", "r-9020": "imgs/rainha/5.jpg", "r-9030": "imgs/rainha/13.jpg", "r-hb2": "imgs/rainha/14.jpg", "r-hb3": "imgs/rainha/15.jpg", "k-7749": "imgs/kagiva/1.jpg", "k-7368": "imgs/kagiva/2.jpg", "k-7819": "imgs/kagiva/3.jpg", "k-7820": "imgs/kagiva/4.jpg", "k-7812": "imgs/kagiva/5.jpg", "k-7408": "imgs/kagiva/6.jpg", "k-7421": "imgs/kagiva/7.jpg", "k-7477": "imgs/kagiva/8.jpg", "k-7478": "imgs/kagiva/9.jpg", "k-7806": "imgs/kagiva/10.jpg", "k-7814": "imgs/kagiva/11.jpg", "k-7409": "imgs/kagiva/12.jpg", "k-7422": "imgs/kagiva/13.jpg", "k-7752": "imgs/kagiva/14.jpg", "k-7758": "imgs/kagiva/15.jpg", "k-7759": "imgs/kagiva/16.jpg", "k-7760": "imgs/kagiva/17.jpg", "k-7761": "imgs/kagiva/18.jpg", "k-7665": "imgs/kagiva/19.jpg", "k-7668": "imgs/kagiva/20.jpg", "k-7667": "imgs/kagiva/21.jpg", "k-7804": "imgs/kagiva/22.jpg", "k-7410": "imgs/kagiva/23.jpg", "k-7453": "imgs/kagiva/24.jpg", "k-7392": "imgs/kagiva/25.jpg", "k-1153": "imgs/kagiva/26.jpg", "k-178": "imgs/kagiva/27.jpg", "k-1152": "imgs/kagiva/28.jpg", "k-131": "imgs/kagiva/29.jpg", "k-132": "imgs/kagiva/30.jpg", "k-133": "imgs/kagiva/31.jpg", "k-bk7": "imgs/kagiva/32.jpg", "k-6322": "imgs/kagiva/33.jpg", "k-7340": "imgs/kagiva/34.jpg", "k-7341": "imgs/kagiva/35.jpg", "k-7337": "imgs/kagiva/36.jpg", "k-7126": "imgs/kagiva/37.jpg", "k-7131": "imgs/kagiva/37.jpg"};
 
-function getProductImg(p) {
-  return IMG_MAP[p.id] || p.img || '';
+function getProductImg(p,slot) {
+  const il = getObj(K.imglinks);
+  const key = slot && slot>1 ? p.id+'_'+slot : p.id;
+  const keyDefault = p.id;
+  if(slot && slot>1) return il[key]||'';
+  return il[keyDefault] || IMG_MAP[p.id] || p.img || '';
+}
+function getProdImgs(p){
+  const il=getObj(K.imglinks);
+  const imgs=[];
+  const m=il[p.id]||IMG_MAP[p.id]||p.img||'';
+  if(m) imgs.push(m);
+  for(let i=2;i<=4;i++){const k=p.id+'_'+i;if(il[k])imgs.push(il[k]);}
+  return imgs;
 }
 
 
-function prodCard(p){
-  const e = SPORT_E[p.sport]||'⚽';
-  const img = getProductImg(p);
-  const logoSrc = LOGO_MAP[p.brand]||'';
-  const specs = [
-    ['Código',p.code],['Laminado',p.laminado],['Peso',p.peso],
-    [p.tamanho?'Tamanho':'Gomos', p.tamanho ? p.tamanho : (p.gomos ? p.gomos+' gomos' : null)],
-    ['Circunferência',p.circ],['Calibragem',p.calib],
-    ['Tecnologia',p.tecnologia],['Câmara',p.camara],['Selos',p.selos],['Observação',p.observacao]
+function prodCard(p,idx,total){
+  const e=SPORT_E[p.sport]||'⚽';
+  const imgs=getProdImgs(p);
+  const specs=[
+    ['Peso',p.peso],['Gomos',p.gomos?(p.gomos+' gomos'):null],
+    ['Circunferência',p.circ],['Laminado',p.laminado],
+    ['Calibragem',p.calib],['Tecnologia',p.tecnologia],
+    ['Câmara',p.camara],['Tamanho',p.tamanho],
+    ['Selos',p.selos],['Composição',p.composicao],
+    ['Observação',p.obs||p.observacao]
   ].filter(([,v])=>v);
-  return `<article class="panel prod-card" onclick="openProductModal('${p.id}')">
-    <div class="prod-inner">
-      <div class="prod-media">
-        <span class="prod-sport-tag">${p.sport}</span>
-        ${p.destaque?'<span class="prod-badge">★ Destaque</span>':''}
-        ${p.importado?'<span class="prod-import">Importado</span>':''}
-        ${img?`<img src="${img}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.opacity='1'">`:''}
-        <div class="prod-emoji-bg" ${img?'style="opacity:0"':''}>${e}</div>
-      </div>
-      <div class="prod-info">
-        <div class="prod-brand-row">
-          <img src="${logoSrc}" class="prod-brand-logo" style="height:${LOGO_H[p.brand]||'16px'};filter:${LOGO_FILTER[p.brand]||'none'}" alt="${p.brand}"/>
-          <span class="prod-brand-chip">${p.brand} · ${p.sport}</span>
-          ${p.destaque?'<span class="prod-chip-dest">Destaque</span>':''}
-          ${p.importado?'<span class="prod-chip-imp">Importado</span>':''}
+  const num=idx!=null?`<div class="prod-row-num">${idx+1} de ${total}</div>`:'';
+  return `<div class="prod-row" onclick="openProductModal('${p.id}')">
+    <div class="prod-row-left">
+      <div class="prod-row-header">
+        ${num}
+        <div class="prod-row-name">${p.name}</div>
+        <div class="prod-row-tags">
+          <span class="prod-row-tag-sport prod-row-tag">${e} ${p.sport}</span>
+          <span class="prod-row-tag">${p.brand} · Código: ${p.code}</span>
+          ${p.destaque?'<span class="prod-row-tag" style="background:rgba(255,106,0,.18);border-color:var(--orange)">★ Destaque</span>':''}
+          ${p.importado?'<span class="prod-row-tag" style="background:rgba(124,58,237,.15);border-color:#7c3aed;color:#c4b5fd">Importado</span>':''}
         </div>
-        <h3 class="prod-name">${p.name}</h3>
-        <div class="prod-sub">Código ${p.code}${p.ean?' · EAN '+p.ean:''}</div>
-        <div class="spec-box"><div class="spec-table">
-          ${specs.map(([k,v])=>`<div class="spec-row"><div class="spec-label">${k}</div><div class="spec-value">${v}</div></div>`).join('')}
-        </div></div>
-        <button class="prod-view-btn-new">Ver ficha completa →</button>
+      </div>
+      <div class="prod-row-body">
+        ${p.ean?`<div class="spec-item" style="margin-bottom:4px"><span class="spec-k">EAN</span><span class="spec-v" style="color:var(--muted);font-size:.75rem">${p.ean}</span></div>`:''}
+        <div class="spec-list">
+          ${specs.map(([k,v])=>`<div class="spec-item"><span class="spec-k">${k}</span><span class="spec-v">${v}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="prod-row-footer">
+        <span class="prod-row-view">Ver ficha completa →</span>
+        ${p.family?`<span style="font-family:var(--fc);font-size:.6rem;color:var(--muted2);letter-spacing:1px;text-transform:uppercase">${p.family}</span>`:''}
       </div>
     </div>
-  </article>`;
+    <div class="prod-row-right">
+      ${imgs.length
+        ? imgs.map(src=>`<img class="prod-row-photo" src="${src}" alt="${p.name}" onerror="this.style.display='none'">`).join('')
+        : `<div class="prod-row-emoji">${e}</div>`
+      }
+    </div>
+  </div>`;
 }
 function renderCatalog(cat){
   const brands = cat==='topper' ? TOPPER_BRANDS : KAGIVA_BRANDS;
@@ -1023,20 +1279,22 @@ function renderCatalog(cat){
     return ia-ib || a.family.localeCompare(b.family);
   });
 
-  let html='', currentBrand='';
+  let html='', currentBrand='', globalIdx=0;
   sortedGroups.forEach(g=>{
     if(g.brand!==currentBrand){
-      if(currentBrand) html+='</div>'; // close brand section
+      if(currentBrand) html+='</div>';
       currentBrand=g.brand;
       html+=`<div class="brand-group-wrap" style="margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:2px solid var(--orange);margin-bottom:16px">
           <img src="${LOGO_MAP[g.brand]}" style="height:${g.brand==='Kagiva'?'28px':'18px'};filter:${LOGO_FILTER[g.brand]};object-fit:contain" alt="${g.brand}"/>
-          <span style="font-family:var(--fd);font-size:1.2rem;letter-spacing:3px;color:var(--white)">${g.brand.toUpperCase()}</span>
+          <span style="font-family:var(--fd);font-size:1.2rem;letter-spacing:3px;color:var(--text)">${g.brand.toUpperCase()}</span>
         </div>`;
     }
+    const startIdx=globalIdx;
+    globalIdx+=g.items.length;
     html+=`<div class="family-group-wrap" style="margin-bottom:20px">
       <div class="family-header">${g.family}</div>
-      <div class="catalog-products">${g.items.map(prodCard).join('')}</div>
+      <div class="catalog-list">${g.items.map((p,i)=>prodCard(p,startIdx+i,prods.length)).join('')}</div>
     </div>`;
   });
   if(currentBrand) html+='</div>';
@@ -1266,10 +1524,11 @@ function updateAdminStats(){
 }
 
 function setAdminTab(tab){
-  const tabs=['reps','add-rep','videos','links','logs'];
+  const tabs=['reps','add-rep','products','videos','links','logs'];
   tabs.forEach(t=>document.getElementById('admin-tab-'+t).style.display=t===tab?'':'none');
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
+  if(tab==='products') renderAdminProducts();
   if(tab==='videos'){renderAdminVideos();loadVideoForm();}
   if(tab==='links') loadLinks();
   if(tab==='logs') renderLogs();
@@ -1421,6 +1680,224 @@ function addLog(action){
   logs.push({action,at:new Date().toISOString(),who:getSession()?.name||'anon'});
   if(logs.length>200) logs.splice(0,logs.length-200);
   setData(K.logs,logs);
+}
+
+// ══════════════════════════════════════════════
+// ADMIN — PRODUCT MANAGEMENT
+// ══════════════════════════════════════════════
+let _peId = null; // current editing product id
+
+function renderAdminProducts(){
+  const q=(document.getElementById('adm-ps')?.value||'').toLowerCase().trim();
+  const br=document.getElementById('adm-pb')?.value||'';
+  const sp=document.getElementById('adm-psp')?.value||'';
+  let prods=PRODUCTS.filter(p=>{
+    if(br && p.brand!==br) return false;
+    if(sp && p.sport!==sp) return false;
+    if(q && !((p.name+p.code+(p.ean||'')+(p.family||'')).toLowerCase().includes(q))) return false;
+    return true;
+  });
+  const countEl=document.getElementById('adm-prod-count');
+  if(countEl) countEl.textContent=prods.length+' produto'+(prods.length!==1?'s':'');
+  const tbody=document.getElementById('adm-prod-tbody');
+  if(!tbody) return;
+  if(!prods.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">Nenhum produto encontrado.</td></tr>`;return;}
+  tbody.innerHTML=prods.map(p=>{
+    const img=getProductImg(p);
+    return `<tr onclick="openProdEditor('${p.id}')" style="cursor:pointer">
+      <td>${img?`<img src="${img}" class="prod-thumb-sm" alt="${p.name}">`:`<div class="prod-thumb-sm" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem">${SPORT_E[p.sport]||'⚽'}</div>`}</td>
+      <td style="font-weight:700;max-width:180px">${p.name}</td>
+      <td style="font-family:var(--fc);font-weight:800;color:var(--orange)">${p.code}</td>
+      <td style="font-size:.75rem;color:var(--muted2)">${p.ean||'—'}</td>
+      <td><span class="badge badge-admin">${p.brand}</span></td>
+      <td style="font-size:.8rem">${p.sport}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${p.family||'—'}</td>
+      <td>${p.destaque?'<span class="badge badge-on">Destaque</span>':''} ${p.importado?'<span class="badge" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);color:#c4b5fd">Import.</span>':''}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProdEditor('${p.id}')">✏️ Editar</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openProdEditor(id){
+  _peId = id;
+  const isNew = !id;
+  const p = isNew ? {id:'',name:'',code:'',ean:'',family:'',brand:'Topper',sport:'Campo',laminado:'',peso:'',gomos:'',circ:'',calib:'',tecnologia:'',camara:'',tamanho:'',selos:'',composicao:'',obs:'',desc:'',destaque:false,importado:false} : PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+
+  document.getElementById('pe-title-label').textContent = isNew ? '+ Novo Produto' : 'Editar: '+p.name;
+  document.getElementById('pe-name').value=p.name||'';
+  document.getElementById('pe-code').value=p.code||'';
+  document.getElementById('pe-ean').value=p.ean||'';
+  document.getElementById('pe-family').value=p.family||'';
+  document.getElementById('pe-brand').value=p.brand||'Topper';
+  document.getElementById('pe-sport').value=p.sport||'Campo';
+  document.getElementById('pe-laminado').value=p.laminado||'';
+  document.getElementById('pe-peso').value=p.peso||'';
+  document.getElementById('pe-gomos').value=p.gomos||'';
+  document.getElementById('pe-circ').value=p.circ||'';
+  document.getElementById('pe-calib').value=p.calib||'';
+  document.getElementById('pe-tecnologia').value=p.tecnologia||'';
+  document.getElementById('pe-camara').value=p.camara||'';
+  document.getElementById('pe-tamanho').value=p.tamanho||'';
+  document.getElementById('pe-selos').value=p.selos||'';
+  document.getElementById('pe-composicao').value=p.composicao||'';
+  document.getElementById('pe-camara-int').value=p.camaraInt||'';
+  document.getElementById('pe-miolo').value=p.miolo||'';
+  document.getElementById('pe-obs').value=p.obs||p.observacao||'';
+  document.getElementById('pe-desc').value=p.desc||'';
+  document.getElementById('pe-destaque').checked=!!p.destaque;
+  document.getElementById('pe-importado').checked=!!p.importado;
+  document.getElementById('pe-del-btn').style.display=isNew?'none':'';
+  document.getElementById('pe-fb').innerHTML='';
+
+  // Load images
+  const il=getObj(K.imglinks);
+  for(let i=1;i<=4;i++){
+    const src=i===1?(il[p.id]||IMG_MAP[p.id]||p.img||''):(il[p.id+'_'+i]||'');
+    applyUrlPreview(i,src);
+    const urlEl=document.getElementById('pe-url-'+i);
+    if(urlEl) urlEl.value=src;
+  }
+
+  document.getElementById('admin-prod-list-view').style.display='none';
+  document.getElementById('admin-prod-editor').style.display='';
+  document.getElementById('admin-prod-editor').classList.add('prod-editor-wrap');
+  document.getElementById('admin-prod-editor').style.display='block';
+  window.scrollTo(0,0);
+}
+
+function closeProdEditor(){
+  document.getElementById('admin-prod-list-view').style.display='';
+  document.getElementById('admin-prod-editor').style.display='none';
+  _peId=null;
+  renderAdminProducts();
+}
+
+function triggerImgPick(slot){
+  document.getElementById('pe-file-'+slot).click();
+}
+
+function handleImgFile(event,slot){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    applyUrlPreview(slot,e.target.result);
+    const urlEl=document.getElementById('pe-url-'+slot);
+    if(urlEl) urlEl.value='[imagem carregada]';
+    _pendingImgs=_pendingImgs||{};
+    _pendingImgs[slot]=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+let _pendingImgs={};
+
+function applyUrlPreview(slot,src){
+  const prev=document.getElementById('pe-preview-'+slot);
+  const ph=document.getElementById('pe-ph-'+slot);
+  const addIcon=document.getElementById('pe-add-icon-'+slot);
+  if(!prev) return;
+  if(src && src!='[imagem carregada]'){
+    prev.src=src; prev.style.display='block';
+    if(ph) ph.style.display='none';
+    if(addIcon) addIcon.style.display='none';
+    if(slot===1){const zone=document.getElementById('pe-img-zone-1');if(zone)zone.style.minHeight='auto';}
+  } else if(src!='[imagem carregada]'){
+    prev.style.display='none';
+    if(ph) ph.style.display='flex';
+    if(addIcon) addIcon.style.display='';
+  }
+}
+
+function clearAllImgs(){
+  for(let i=1;i<=4;i++){
+    applyUrlPreview(i,'');
+    const u=document.getElementById('pe-url-'+i);
+    if(u) u.value='';
+  }
+  _pendingImgs={};
+}
+
+function saveProdEditor(){
+  const name=document.getElementById('pe-name').value.trim();
+  const code=document.getElementById('pe-code').value.trim();
+  if(!name||!code){
+    document.getElementById('pe-fb').innerHTML='<div class="fb-msg fb-err">Nome e Código são obrigatórios.</div>';
+    return;
+  }
+  const isNew=!_peId;
+  const id=isNew?('p-'+Date.now()):_peId;
+
+  const updated={
+    id,
+    name,code,
+    ean:document.getElementById('pe-ean').value.trim(),
+    family:document.getElementById('pe-family').value.trim(),
+    brand:document.getElementById('pe-brand').value,
+    sport:document.getElementById('pe-sport').value,
+    laminado:document.getElementById('pe-laminado').value.trim(),
+    peso:document.getElementById('pe-peso').value.trim(),
+    gomos:document.getElementById('pe-gomos').value.trim(),
+    circ:document.getElementById('pe-circ').value.trim(),
+    calib:document.getElementById('pe-calib').value.trim(),
+    tecnologia:document.getElementById('pe-tecnologia').value.trim(),
+    camara:document.getElementById('pe-camara').value.trim(),
+    tamanho:document.getElementById('pe-tamanho').value.trim(),
+    selos:document.getElementById('pe-selos').value.trim(),
+    composicao:document.getElementById('pe-composicao').value.trim(),
+    camaraInt:document.getElementById('pe-camara-int').value.trim(),
+    miolo:document.getElementById('pe-miolo').value.trim(),
+    obs:document.getElementById('pe-obs').value.trim(),
+    desc:document.getElementById('pe-desc').value.trim(),
+    destaque:document.getElementById('pe-destaque').checked,
+    importado:document.getElementById('pe-importado').checked,
+    img:'',
+  };
+
+  // Save images to imglinks
+  const il=getObj(K.imglinks);
+  for(let i=1;i<=4;i++){
+    const urlVal=document.getElementById('pe-url-'+i).value.trim();
+    const pending=(_pendingImgs||{})[i];
+    const src=pending||urlVal;
+    const key=i===1?id:id+'_'+i;
+    if(src && src!='[imagem carregada]') il[key]=src;
+    else if(!src) delete il[key];
+  }
+  setData(K.imglinks,il);
+  _pendingImgs={};
+
+  // Save product
+  if(isNew){
+    PRODUCTS.push(updated);
+  } else {
+    const idx=PRODUCTS.findIndex(p=>p.id===id);
+    if(idx>=0) PRODUCTS[idx]=updated;
+  }
+  localStorage.setItem('mundi:products',JSON.stringify(PRODUCTS));
+
+  document.getElementById('pe-fb').innerHTML='<div class="fb-msg fb-ok">✅ Produto salvo com sucesso!</div>';
+  addLog((isNew?'Admin criou produto: ':'Admin editou produto: ')+name+' ('+code+')');
+  updateAdminStats();
+  toast('Produto salvo!','ok');
+  setTimeout(()=>{ document.getElementById('stat-prods').textContent=PRODUCTS.length; },100);
+}
+
+function deleteProdEditor(){
+  if(!_peId) return;
+  const p=PRODUCTS.find(x=>x.id===_peId);
+  if(!p) return;
+  if(!confirm('Remover produto '+p.name+'? Esta ação não pode ser desfeita.')) return;
+  const idx=PRODUCTS.findIndex(x=>x.id===_peId);
+  if(idx>=0) PRODUCTS.splice(idx,1);
+  localStorage.setItem('mundi:products',JSON.stringify(PRODUCTS));
+  // Remove images
+  const il=getObj(K.imglinks);
+  for(let i=1;i<=4;i++){delete il[_peId+(i>1?'_'+i:'')];}
+  setData(K.imglinks,il);
+  addLog('Admin removeu produto: '+p.name);
+  toast('Produto removido.');
+  closeProdEditor();
 }
 
 function logDownload(item){
