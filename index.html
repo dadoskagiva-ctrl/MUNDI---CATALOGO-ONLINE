@@ -91,10 +91,10 @@ input,select,textarea{font-family:var(--fb)}
 
 /* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;
-  align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid #e2e2e2;
-  background:#ffffff}
-.topbar-title{font-family:var(--fb);font-size:1rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#111}
-.topbar-sub{color:#777;font-size:.78rem;margin-top:2px;font-weight:400}
+  align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line);
+  background:var(--bg)}
+.topbar-title{font-family:var(--fb);font-size:1rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+.topbar-sub{color:var(--muted);font-size:.78rem;margin-top:2px;font-weight:400}
 
 /* ── PANEL ── */
 .panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
@@ -630,9 +630,9 @@ input,select,textarea{font-family:var(--fb)}
       <div class="topbar-sub">Catálogos Topper e Kagiva inseridos. Busca por modalidade, marca e código.</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <button onclick="showPage('catalog-topper')" style="font-family:var(--fb);font-size:.8rem;font-weight:600;padding:9px 18px;border-radius:10px;border:1.5px solid #222;background:transparent;color:#111;cursor:pointer;transition:all .2s">Catálogos</button>
+      <button onclick="showPage('catalog-topper')" style="font-family:var(--fb);font-size:.8rem;font-weight:600;padding:9px 18px;border-radius:10px;border:1.5px solid var(--line2);background:transparent;color:var(--text);cursor:pointer;transition:all .2s">Catálogos</button>
       <button onclick="showLoginAs('rep')" style="font-family:var(--fb);font-size:.8rem;font-weight:700;padding:9px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;cursor:pointer;box-shadow:0 0 16px var(--glow2);transition:all .2s">Área do representante</button>
-      <button onclick="showLoginAs('admin')" style="font-family:var(--fb);font-size:.8rem;font-weight:700;padding:9px 16px;border-radius:10px;border:1.5px solid #333;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">ADM</button>
+      <button onclick="showLoginAs('admin')" style="font-family:var(--fb);font-size:.8rem;font-weight:700;padding:9px 16px;border-radius:10px;border:1.5px solid var(--line2);background:var(--panel2);color:var(--text);cursor:pointer;transition:all .2s">ADM</button>
     </div>
   </header>
 
@@ -666,7 +666,7 @@ input,select,textarea{font-family:var(--fb)}
             <span class="home-tag">Campo</span><span class="home-tag">Society</span><span class="home-tag">Futsal</span><span class="home-tag">Rainha</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf','CA.RO TOPPER 2026')" class="btn btn-outline btn-sm">👁 Visualizar</button>
+            <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf','CA.RO TOPPER 2026','link-topper')" class="btn btn-outline btn-sm">👁 Visualizar</button>
             <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" download="CA.RO TOPPER 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
           </div>
         </div>
@@ -678,7 +678,7 @@ input,select,textarea{font-family:var(--fb)}
             <span class="home-tag">Campo</span><span class="home-tag">Futsal</span><span class="home-tag">Basquete</span><span class="home-tag">Luvas</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026')" class="btn btn-outline btn-sm">👁 Visualizar</button>
+            <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026','link-kagiva')" class="btn btn-outline btn-sm">👁 Visualizar</button>
             <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
           </div>
         </div>
@@ -751,7 +751,7 @@ input,select,textarea{font-family:var(--fb)}
         <div style="font-size:.8rem;color:#666;margin-top:2px">Campo · Society · Futsal · Vôlei · Handebol · Beach</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf','CA.RO TOPPER 2026')" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</button>
+        <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf','CA.RO TOPPER 2026','link-topper')" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</button>
         <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" download="CA.RO TOPPER 2026.pdf" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;box-shadow:0 0 14px rgba(255,106,0,.3);transition:all .2s">⬇ Download PDF</a>
       </div>
     </div>
@@ -785,7 +785,7 @@ input,select,textarea{font-family:var(--fb)}
         <div style="font-size:.8rem;color:#666;margin-top:2px">Campo · Society · Futsal · Vôlei · Handebol · Basquete · Luvas</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026')" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</button>
+        <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026','link-kagiva')" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</button>
         <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;box-shadow:0 0 14px rgba(255,106,0,.3);transition:all .2s">⬇ Download PDF</a>
       </div>
     </div>
@@ -1132,10 +1132,11 @@ input,select,textarea{font-family:var(--fb)}
     </div>
     <div id="admin-tab-links" style="display:none">
       <div class="card-panel">
-        <div class="card-panel-title">Links do Google Drive — PDFs dos Catálogos</div>
-        <p style="color:var(--muted);font-size:.82rem;margin-bottom:16px">Cole os links públicos do Google Drive para os PDFs.</p>
-        <div class="field"><label>PDF Topper + Rainha 2026</label><input id="link-topper" placeholder="https://drive.google.com/uc?id=..." oninput="saveLinks()"/></div>
-        <div class="field"><label>PDF Kagiva 2026</label><input id="link-kagiva" placeholder="https://drive.google.com/uc?id=..." oninput="saveLinks()"/></div>
+        <div class="card-panel-title">Links de Visualização — PDFs dos Catálogos</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-bottom:4px">Cole o link de <strong style="color:var(--orange)">visualização</strong> do Google Drive (botão "Visualizar" abre dentro do app).</p>
+        <p style="color:#555;font-size:.78rem;margin-bottom:16px">Formato correto: <span style="color:#aaa">https://drive.google.com/file/d/SEU_ID_AQUI/preview</span></p>
+        <div class="field"><label>Link Visualizar — Topper 2026</label><input id="link-topper" placeholder="https://drive.google.com/file/d/SEU_ID/preview" oninput="saveLinks()"/></div>
+        <div class="field"><label>Link Visualizar — Kagiva 2026</label><input id="link-kagiva" placeholder="https://drive.google.com/file/d/SEU_ID/preview" oninput="saveLinks()"/></div>
         <div class="card-panel-title" style="margin-top:20px">Páginas do Catálogo (PNG)</div>
         <p style="color:var(--muted);font-size:.82rem;margin-bottom:12px">Cole URLs de imagens PNG das páginas do catálogo, separadas por vírgula.</p>
         <div class="field"><label>Páginas PNG — Catálogo Topper (separadas por vírgula)</label><textarea id="link-cat-pages-topper" rows="3" oninput="saveLinks()" style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px 14px;font-size:.85rem;outline:none;resize:vertical" placeholder="https://link-pg1.png, https://link-pg2.png ..."></textarea></div>
@@ -1192,9 +1193,16 @@ input,select,textarea{font-family:var(--fb)}
 <div id="pdf-viewer-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);flex-direction:column">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#111;border-bottom:1px solid #222;flex-shrink:0">
     <div id="pdf-viewer-title" style="font-family:var(--fb);font-weight:800;color:#fff;font-size:.95rem;letter-spacing:.05em"></div>
-    <button onclick="closePdfViewer()" style="background:rgba(255,255,255,.08);border:1px solid #333;color:#ccc;cursor:pointer;font-size:1.1rem;line-height:1;padding:6px 14px;border-radius:8px;font-family:var(--fb);font-weight:700;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.16)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">✕ Fechar</button>
+    <button onclick="closePdfViewer()" style="background:rgba(255,255,255,.08);border:1px solid #333;color:#ccc;cursor:pointer;font-size:1rem;padding:7px 16px;border-radius:8px;font-family:var(--fb);font-weight:700">✕ Fechar</button>
   </div>
   <iframe id="pdf-viewer-frame" src="" style="flex:1;width:100%;border:none;background:#fff"></iframe>
+  <div id="pdf-viewer-msg" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center">
+    <div style="font-size:2.5rem">📄</div>
+    <div style="font-family:var(--fb);font-weight:800;color:#fff;font-size:1.1rem">Visualização não configurada</div>
+    <p style="color:#888;font-size:.88rem;max-width:420px;line-height:1.7">Para visualizar o PDF dentro do app, vá em <strong style="color:var(--orange)">Admin Panel → Links Drive</strong> e cole o link de visualização do Google Drive no campo correspondente.</p>
+    <p style="color:#666;font-size:.8rem;max-width:380px">Exemplo: <span style="color:#aaa;word-break:break-all">https://drive.google.com/file/d/SEU_ID/preview</span></p>
+    <a id="pdf-viewer-dl-link" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.85rem;font-weight:700;padding:12px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;margin-top:8px">⬇ Baixar PDF</a>
+  </div>
 </div>
 
 <!-- MODAL PRODUTO -->
@@ -1629,10 +1637,26 @@ function shareWA(id){
 // ══════════════════════════════════════════════
 // PDF VIEWER
 // ══════════════════════════════════════════════
-function openPdfViewer(url, title){
+function openPdfViewer(fallbackUrl, title, adminKey){
   const modal = document.getElementById('pdf-viewer-modal');
+  const frame = document.getElementById('pdf-viewer-frame');
+  const msg = document.getElementById('pdf-viewer-msg');
   document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
-  document.getElementById('pdf-viewer-frame').src = 'https://docs.google.com/viewer?url='+encodeURIComponent(url)+'&embedded=true';
+  // Prefer admin-configured Google Drive URL
+  const links = getObj(K.links);
+  const adminUrl = adminKey ? (links[adminKey]||'') : '';
+  if(adminUrl){
+    frame.style.display='';
+    if(msg) msg.style.display='none';
+    frame.src = adminUrl;
+  } else {
+    // No admin URL: show instructions
+    frame.style.display='none';
+    if(msg){
+      msg.style.display='flex';
+      document.getElementById('pdf-viewer-dl-link').href = fallbackUrl;
+    }
+  }
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
