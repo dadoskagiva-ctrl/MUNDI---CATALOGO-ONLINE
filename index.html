@@ -663,7 +663,10 @@ input,select,textarea{font-family:var(--fb)}
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <span class="home-tag">Campo</span><span class="home-tag">Society</span><span class="home-tag">Futsal</span><span class="home-tag">Rainha</span>
           </div>
-          <button class="btn btn-primary" style="width:max-content" onclick="openCatPdf('topper')">Baixar catálogo PDF</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" target="_blank" class="btn btn-outline btn-sm">👁 Visualizar</a>
+            <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" download="CA.RO TOPPER 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
+          </div>
         </div>
         <div class="panel" style="padding:24px;display:grid;gap:14px">
           <div style="font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#888;font-family:var(--fb)">Kagiva 2026</div>
@@ -672,7 +675,10 @@ input,select,textarea{font-family:var(--fb)}
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <span class="home-tag">Campo</span><span class="home-tag">Futsal</span><span class="home-tag">Basquete</span><span class="home-tag">Luvas</span>
           </div>
-          <button class="btn btn-primary" style="width:max-content" onclick="openCatPdf('kagiva')">Baixar catálogo PDF</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" target="_blank" class="btn btn-outline btn-sm">👁 Visualizar</a>
+            <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
+          </div>
         </div>
       </div>
     </section>
@@ -728,14 +734,26 @@ input,select,textarea{font-family:var(--fb)}
   <div class="catalog-wrap">
     <div class="cat-header">
       <button class="btn btn-ghost btn-sm" onclick="showPage('home')">←</button>
-      <div class="cat-title">TOPPER <span>Bolas</span></div>
+      <div class="cat-title">TOPPER + <span>RAINHA</span></div>
       <span id="topper-count" style="font-family:var(--fc);font-size:.72rem;color:var(--muted);font-weight:700;letter-spacing:1px;margin-left:auto"></span>
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
         <input id="search-topper" type="text" placeholder="Buscar produto..." oninput="filterCatalog('topper')"/>
       </div>
     </div>
-    <!-- Catálogo PDF / Páginas PNG -->
+    <!-- BLOCO DO CATÁLOGO PDF -->
+    <div style="margin:16px 24px 0;background:#111;border:1px solid var(--line);border-radius:18px;padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#888;margin-bottom:4px">Catálogo Oficial</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#fff">CA.RO TOPPER 2026</div>
+        <div style="font-size:.8rem;color:#666;margin-top:2px">Campo · Society · Futsal · Vôlei · Handebol · Beach</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</a>
+        <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-topper-2026.pdf" download="CA.RO TOPPER 2026.pdf" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;box-shadow:0 0 14px rgba(255,106,0,.3);transition:all .2s">⬇ Download PDF</a>
+      </div>
+    </div>
+    <!-- Páginas PNG do catálogo (admin-configurável) -->
     <div id="cat-pages-topper-wrap" style="display:none;padding:16px 24px 0">
       <div style="font-family:var(--fc);font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">Páginas do Catálogo</div>
       <div id="cat-pages-topper" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
@@ -755,6 +773,18 @@ input,select,textarea{font-family:var(--fb)}
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
         <input id="search-kagiva" type="text" placeholder="Buscar produto..." oninput="filterCatalog('kagiva')"/>
+      </div>
+    </div>
+    <!-- BLOCO DO CATÁLOGO PDF -->
+    <div style="margin:16px 24px 0;background:#111;border:1px solid var(--line);border-radius:18px;padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#888;margin-bottom:4px">Catálogo Oficial</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#fff">CA.RO KAGIVA 2026</div>
+        <div style="font-size:.8rem;color:#666;margin-top:2px">Campo · Society · Futsal · Vôlei · Handebol · Basquete · Luvas</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(255,106,0,.18)'" onmouseout="this.style.background='rgba(255,106,0,.08)'">👁 Visualizar</a>
+        <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fb);font-size:.8rem;font-weight:700;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;text-decoration:none;box-shadow:0 0 14px rgba(255,106,0,.3);transition:all .2s">⬇ Download PDF</a>
       </div>
     </div>
     <div id="cat-pages-kagiva-wrap" style="display:none;padding:16px 24px 0">
@@ -1216,13 +1246,14 @@ const getSession = () => { try{return JSON.parse(sessionStorage.getItem(K.sessio
 const setSession = u => sessionStorage.setItem(K.session,JSON.stringify(u));
 const clearSession = () => sessionStorage.removeItem(K.session);
 
-// Seed admin
+// Seed admin — always ensures correct password
 function ensureAdmin(){
   const reps = getData(K.reps);
-  if(!reps.find(r=>r.role==='admin')){
-    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@CARO26',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
-    setData(K.reps,reps);
-  }
+  const adminData = {id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@CARO26',role:'admin',brands:'todas',status:'ativo'};
+  const idx = reps.findIndex(r=>r.id==='admin-001');
+  if(idx>=0){ reps[idx]={...reps[idx],...adminData}; }
+  else { reps.push({...adminData,createdAt:new Date().toISOString()}); }
+  setData(K.reps,reps);
 }
 ensureAdmin();
 
