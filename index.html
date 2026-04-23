@@ -583,6 +583,16 @@ input,select,textarea{font-family:var(--fb)}
 </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN — shown instantly, hidden by JS after load -->
+<div id="app-splash" style="position:fixed;inset:0;z-index:99999;background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .4s">
+  <div style="font-family:'Arial Black',Arial,sans-serif;font-weight:900;font-size:3.2rem;line-height:1;color:#e06020;letter-spacing:-.02em">MUNDI</div>
+  <div style="font-family:'Arial Black',Arial,sans-serif;font-weight:900;font-size:1.8rem;line-height:1;color:#f0ece4;letter-spacing:.15em;margin-top:4px">TKR</div>
+  <div style="margin-top:28px;width:40px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden"><div style="height:100%;background:#e06020;border-radius:2px;animation:splashBar 1.2s ease-in-out infinite"></div></div>
+</div>
+<style>@keyframes splashBar{0%{width:0;margin-left:0}60%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}</style>
+<script>window.addEventListener('load',function(){var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none'},420);}});</script>
+
 <div class="shell">
 
 <!-- ══ SIDEBAR ══ -->
