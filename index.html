@@ -44,16 +44,16 @@ input,select,textarea{font-family:var(--fb)}
 }
 .sidebar::after{content:'';position:absolute;top:0;right:-1px;bottom:0;width:1px;
   background:linear-gradient(180deg,transparent,var(--orange) 40%,var(--orange2) 60%,transparent);opacity:.35}
-.sb-brand{display:flex;align-items:flex-end;gap:6px;padding:4px 8px 16px;
-  border-bottom:1px solid var(--line);cursor:pointer}
-.sb-brand-main{font-family:var(--fd);font-size:2rem;line-height:1;letter-spacing:3px}
-.sb-brand-sub{font-family:var(--fd);font-size:1.4rem;line-height:1;color:var(--orange);text-shadow:0 0 16px var(--glow)}
+.sb-brand{display:flex;align-items:flex-end;gap:8px;padding:6px 10px 18px;
+  border-bottom:1px solid var(--line);cursor:pointer;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.sb-brand-main{font-size:2rem;line-height:1}
+.sb-brand-sub{font-size:1.3rem;line-height:1;color:var(--orange)}
 .sb-section-title{padding:0 8px;color:var(--muted2);font-size:.66rem;letter-spacing:.18em;
   text-transform:uppercase;font-weight:700;font-family:var(--fc)}
 .sb-nav{display:grid;gap:5px}
-.sb-link,.nav-link{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;
-  border:1px solid var(--line);background:transparent;color:var(--text);border-radius:14px;
-  cursor:pointer;font-weight:600;font-size:.88rem;transition:all .2s;width:100%;text-align:left}
+.sb-link,.nav-link{display:inline-flex;align-items:center;gap:10px;padding:13px 14px;
+  border:1px solid var(--line);background:#121212;color:#fff;border-radius:18px;
+  cursor:pointer;font-weight:800;font-size:.94rem;transition:all .2s ease;width:100%;text-align:left}
 .sb-link:hover,.nav-link:hover{border-color:var(--orange);color:var(--orange)}
 .sb-link.active,.nav-link.active{border-color:transparent;color:#090909;
   background:linear-gradient(135deg,var(--orange),var(--orange2));box-shadow:0 0 20px var(--glow2)}
@@ -73,7 +73,7 @@ input,select,textarea{font-family:var(--fb)}
 .topbar-sub{color:var(--muted);font-size:.8rem;margin-top:2px}
 
 /* ── PANEL ── */
-.panel{background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
   border:1px solid var(--line);border-radius:24px;box-shadow:0 20px 40px rgba(0,0,0,.28)}
 
 /* ── BTNS ── */
@@ -218,9 +218,8 @@ input,select,textarea{font-family:var(--fb)}
   background:#7c3aed;color:#fff;border-radius:999px}
 .prod-info{display:grid;gap:10px;align-content:start}
 .prod-brand-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.prod-brand-chip{font-family:var(--fc);font-size:.72rem;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;padding:4px 11px;border-radius:999px;
-  background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.2);color:#ffd2b2}
+.prod-brand-chip{padding:8px 12px;border-radius:999px;background:rgba(255,106,0,.08);
+  border:1px solid rgba(255,106,0,.2);color:#ffd2b2;font-size:.82rem;font-weight:900;text-transform:uppercase}
 .prod-chip-dest{font-family:var(--fc);font-size:.6rem;font-weight:800;letter-spacing:1px;
   text-transform:uppercase;padding:3px 9px;border-radius:999px;
   background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000}
@@ -514,71 +513,100 @@ input,select,textarea{font-family:var(--fb)}
 <div class="page active" id="page-home">
   <header class="topbar">
     <div>
-      <div class="topbar-title">Mundi TKR Sports</div>
-      <div class="topbar-sub">Catálogos Topper, Kagiva e Rainha — Linha 2026</div>
+      <div class="topbar-title" style="font-size:1.05rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em">Mundi TKR · Catálogos 2026</div>
+      <div class="topbar-sub">Topper, Kagiva e Rainha — fichas técnicas, fotos e downloads para representantes.</div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="showPage('catalog-topper')">Ver Catálogos</button>
-      <button class="btn btn-primary btn-sm" onclick="showPage('login')">Acesso Rep.</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('catalog-topper')">Ver área do representante</button>
     </div>
   </header>
+
   <div class="hero-wrap">
-    <div class="hero-grid">
+    <!-- HERO -->
+    <div class="hero-grid" style="margin-bottom:32px">
       <div class="panel hero-card">
-        <div class="eyebrow">Linha Completa 2026</div>
-        <h1 class="hero-h1">Mundi<em>TKR</em></h1>
-        <p class="hero-copy">Catálogos completos Topper, Kagiva e Rainha. Fichas técnicas, imagens PNG e vídeos de treinamento para representantes autorizados.</p>
-        <div class="hero-btns">
+        <div class="eyebrow" style="color:var(--orange);font-size:.76rem;letter-spacing:.22em;text-transform:uppercase;font-weight:900">Pronto para apresentação</div>
+        <h1 class="hero-h1" style="font-family:Inter,system-ui,sans-serif;font-weight:900;font-size:clamp(2.5rem,6.5vw,4.8rem);line-height:.9;text-transform:uppercase;margin:10px 0 14px">Mundi<em class="hero-h1" style="color:var(--orange);font-style:normal;display:block;font-size:.84em;transform:translateX(20px)">TKR</em></h1>
+        <p style="color:#b8b8b8;line-height:1.72;font-size:1.03rem">Catálogos completos Topper, Kagiva e Rainha inseridos com foto do produto, características técnicas completas, download de imagem PNG e catálogo PDF por marca.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
           <button class="btn btn-primary" onclick="showPage('catalog-topper')">⚽ Topper + Rainha</button>
           <button class="btn btn-secondary" onclick="showPage('catalog-kagiva')">🏅 Kagiva</button>
         </div>
       </div>
       <div class="panel hero-card">
-        <div class="section-head"><h2 class="section-h2">Linha <span>2026</span></h2></div>
+        <div class="section-head"><h2 class="section-h2">O que entra <span>agora</span></h2></div>
         <div class="stat-grid">
-          <div class="stat"><strong>63+</strong><small>Produtos</small></div>
-          <div class="stat"><strong>3</strong><small>Marcas</small></div>
-          <div class="stat"><strong>PNG</strong><small>Imagem produto</small></div>
-          <div class="stat"><strong>PDF</strong><small>Catálogo marca</small></div>
+          <div class="stat"><strong>2</strong><small>Catálogos completos</small></div>
+          <div class="stat"><strong>63+</strong><small>Produtos com ficha</small></div>
+          <div class="stat"><strong>PNG</strong><small>Imagem do produto</small></div>
+          <div class="stat"><strong>PDF</strong><small>Catálogo por marca</small></div>
         </div>
       </div>
     </div>
-    <div class="section-head"><h2 class="section-h2">Marcas <span>Disponíveis</span></h2></div>
-    <div class="brands-grid">
-      <div class="panel brand-card" onclick="showPage('catalog-topper')">
-        <img id="logo-topper-home" class="brand-card-logo" src="" alt="Topper"/>
-        <div class="brand-card-name">TOPPER</div>
-        <div class="brand-card-desc">Campo, Society, Futsal, Vôlei, Beach Soccer e Handebol</div>
-        <span class="brand-card-tag">Ver Catálogo →</span>
+
+    <!-- CATÁLOGOS -->
+    <section style="display:grid;gap:16px;margin-bottom:32px" id="catalogos">
+      <div class="section-head">
+        <div>
+          <h2 class="section-h2">Catálogos <span>disponíveis</span></h2>
+          <p class="section-sub">Download direto dos PDFs por marca.</p>
+        </div>
       </div>
-      <div class="panel brand-card" onclick="showPage('catalog-kagiva')">
-        <img id="logo-kagiva-home" class="brand-card-logo" src="" alt="Kagiva"/>
-        <div class="brand-card-name">KAGIVA</div>
-        <div class="brand-card-desc">Campo, Society, Futsal, Vôlei, Handebol, Basquete e Acessórios</div>
-        <span class="brand-card-tag">Ver Catálogo →</span>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+        <div class="panel" style="padding:24px;display:grid;gap:12px">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.2);color:#ffd2b2;font-size:.82rem;font-weight:900;text-transform:uppercase;width:max-content">Topper 2026</div>
+          <h3 style="margin:0;font-size:1.5rem;font-weight:900;text-transform:uppercase">Catálogo Topper + Rainha</h3>
+          <p style="color:#b8b8b8;line-height:1.72;font-size:1.03rem">Campo, society, futsal, vôlei, handebol, basquete e acessórios.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Campo</span>
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Society</span>
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Futsal</span>
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Rainha</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="showPage('catalog-topper')">Ver catálogo Topper</button>
+          </div>
+        </div>
+        <div class="panel" style="padding:24px;display:grid;gap:12px">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.2);color:#ffd2b2;font-size:.82rem;font-weight:900;text-transform:uppercase;width:max-content">Kagiva 2026</div>
+          <h3 style="margin:0;font-size:1.5rem;font-weight:900;text-transform:uppercase">Catálogo Kagiva</h3>
+          <p style="color:#b8b8b8;line-height:1.72;font-size:1.03rem">Campo, society, futsal, vôlei, handebol, basquete, luvas e acessórios.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Campo</span>
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Futsal</span>
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Basquete</span>
+            <span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:#c8c8c8">Luvas</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="showPage('catalog-kagiva')">Ver catálogo Kagiva</button>
+          </div>
+        </div>
       </div>
-      <div class="panel brand-card" onclick="showPage('catalog-topper')">
-        <img id="logo-rainha-home" class="brand-card-logo" src="" alt="Rainha"/>
-        <div class="brand-card-name">RAINHA</div>
-        <div class="brand-card-desc">Vôlei, Futevôlei, Campo e Handebol</div>
-        <span class="brand-card-tag">Ver Catálogo →</span>
+    </section>
+
+    <!-- REPRESENTANTE -->
+    <section style="display:grid;gap:16px" id="representante">
+      <div class="section-head">
+        <div>
+          <h2 class="section-h2">Área do <span>representante</span></h2>
+          <p class="section-sub">Foto, características e download rápido. Login necessário para baixar arquivos.</p>
+        </div>
       </div>
-    </div>
-    <div class="section-head"><h2 class="section-h2">Catálogos <span>PDF</span></h2></div>
-    <div class="dl-grid" style="margin-bottom:40px">
-      <div class="dl-card">
-        <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">Topper + Rainha + QI 2026</div></div>
-        <div class="dl-card-desc">Catálogo completo. Campo, Society, Futsal, Vôlei, Handebol e Beach Soccer.</div>
-        <div class="dl-card-meta"><span class="dl-tag">Campo</span><span class="dl-tag">Futsal</span><span class="dl-tag">Vôlei</span><span class="dl-tag">Society</span></div>
-        <a class="dl-btn" href="#" onclick="showPage('login');return false">🔑 Login para baixar</a>
+      <div class="panel" style="padding:22px;display:grid;gap:14px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <select id="home-brand-filter" onchange="homeFilterBrand(this.value)" style="background:#121212;border:1px solid #2a2a2a;color:#fff;border-radius:16px;padding:14px 16px;outline:none;min-width:190px;font-family:inherit;font-size:.9rem">
+            <option value="Todos">Todas as marcas</option>
+            <option value="Topper">Topper</option>
+            <option value="Kagiva">Kagiva</option>
+            <option value="Rainha">Rainha</option>
+          </select>
+          <input id="home-search" type="text" placeholder="Buscar por nome, código ou categoria" oninput="homeSearchProds()" style="background:#121212;border:1px solid #2a2a2a;color:#fff;border-radius:16px;padding:14px 16px;outline:none;flex:1;min-width:200px;font-family:inherit;font-size:.9rem"/>
+        </div>
+        <p style="font-size:.88rem;color:var(--muted)">Clique no produto para ver a ficha completa, baixar PNG ou compartilhar.</p>
       </div>
-      <div class="dl-card">
-        <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">Kagiva 2026</div></div>
-        <div class="dl-card-desc">Catálogo completo Kagiva. Campo, Society, Futsal, Vôlei, Handebol, Basquete, Luvas e Acessórios.</div>
-        <div class="dl-card-meta"><span class="dl-tag">Campo</span><span class="dl-tag">Futsal</span><span class="dl-tag">Basquete</span><span class="dl-tag">Luvas</span></div>
-        <a class="dl-btn" href="#" onclick="showPage('login');return false">🔑 Login para baixar</a>
-      </div>
-    </div>
+      <div id="home-products-grid" style="display:grid;gap:12px"></div>
+    </section>
   </div>
   <footer class="footer"><div class="footer-brand">MUNDI<em>TKR</em></div><p class="footer-copy">© 2026 Mundi TKR Sports</p></footer>
 </div>
@@ -1045,15 +1073,7 @@ ensureAdmin();
   }catch(e){}
 })();
 
-// Set home logo images
-setTimeout(()=>{
-  const lt=document.getElementById('logo-topper-home');
-  const lk=document.getElementById('logo-kagiva-home');
-  const lr=document.getElementById('logo-rainha-home');
-  if(lt) lt.src=LOGO_MAP['Topper']||'';
-  if(lk) lk.src=LOGO_MAP['Kagiva']||'';
-  if(lr) lr.src=LOGO_MAP['Rainha']||'';
-},0);
+
 
 // ══════════════════════════════════════════════
 // PRODUCTS DATABASE (from real catalogs)
@@ -1148,6 +1168,7 @@ function showPage(name){
   document.getElementById('page-'+name)?.classList.add('active');
   window.scrollTo(0,0);
   updateNavState(name);
+  if(name==='home') renderHomeGrid();
   if(name==='catalog-topper') renderCatalog('topper');
   if(name==='catalog-kagiva') renderCatalog('kagiva');
   if(name==='rep') renderRepDash();
@@ -1286,8 +1307,7 @@ function renderCatalog(cat){
       currentBrand=g.brand;
       html+=`<div class="brand-group-wrap" style="margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:2px solid var(--orange);margin-bottom:16px">
-          <img src="${LOGO_MAP[g.brand]}" style="height:${g.brand==='Kagiva'?'28px':'18px'};filter:${LOGO_FILTER[g.brand]};object-fit:contain" alt="${g.brand}"/>
-          <span style="font-family:var(--fd);font-size:1.2rem;letter-spacing:3px;color:var(--text)">${g.brand.toUpperCase()}</span>
+          <span style="font-family:var(--fd);font-size:1.4rem;letter-spacing:4px;color:var(--text);text-shadow:0 0 20px rgba(255,106,0,.2)">${g.brand.toUpperCase()}</span>
         </div>`;
     }
     const startIdx=globalIdx;
@@ -1433,6 +1453,46 @@ function doLogout(){
   clearSession();
   showPage('home');
   toast('Até logo!');
+}
+
+// ══════════════════════════════════════════════
+// HOME PAGE GRID
+// ══════════════════════════════════════════════
+let _homeAllProds = [];
+function renderHomeGrid(){
+  _homeAllProds = PRODUCTS.slice();
+  const bf = document.getElementById('home-brand-filter');
+  const sv = bf ? bf.value : '';
+  homeFilterBrand(sv, false);
+}
+function homeFilterBrand(brand, doSearch){
+  const search = document.getElementById('home-search')?.value?.toLowerCase().trim()||'';
+  let list = _homeAllProds;
+  if(brand) list = list.filter(p=>(p.brand||'').toLowerCase()===brand.toLowerCase());
+  if(search) list = list.filter(p=>(p.name||'').toLowerCase().includes(search)||(p.id||'').toLowerCase().includes(search)||(p.category||'').toLowerCase().includes(search));
+  _renderHomeCards(list);
+}
+function homeSearchProds(){
+  const bf = document.getElementById('home-brand-filter');
+  homeFilterBrand(bf ? bf.value : '');
+}
+function _renderHomeCards(list){
+  const grid = document.getElementById('home-products-grid');
+  if(!grid) return;
+  if(!list.length){ grid.innerHTML='<p style="color:#888;padding:24px">Nenhum produto encontrado.</p>'; return; }
+  grid.innerHTML = list.map(p=>{
+    const img = getProductImg(p,1);
+    const imgHtml = img ? `<img src="${img}" alt="${p.name}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;flex-shrink:0">` : `<div style="width:80px;height:80px;border-radius:12px;background:#1a1a1a;flex-shrink:0"></div>`;
+    return `<div onclick="openProductModal('${p.id}')" style="display:flex;align-items:center;gap:16px;background:#111;border-radius:16px;padding:14px 18px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='#111'">
+      ${imgHtml}
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:.95rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:.8rem;color:#888;margin-top:2px">${p.brand||''} ${p.category?'· '+p.category:''}</div>
+        <div style="font-size:.8rem;color:#aaa;margin-top:2px">${p.id}</div>
+      </div>
+      <span style="color:#666;font-size:1.2rem">›</span>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════════
@@ -1920,6 +1980,7 @@ function toast(msg,type=''){
 // ══════════════════════════════════════════════
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalBtn();});
 updateNavState('home');
+renderHomeGrid();
 
 // Redirect if logged in
 const _sess=getSession();
