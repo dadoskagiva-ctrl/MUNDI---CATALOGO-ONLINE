@@ -1385,7 +1385,15 @@ setTimeout(_hideSplash,6000);
               <option value="annual">Anual</option>
             </select>
           </div>
-          <div class="field"><label>Válido até</label><input id="sub-expires" type="date" style="color-scheme:dark"/></div>
+          <div class="field">
+            <label>Válido até</label>
+            <input id="sub-expires" type="date" style="color-scheme:dark"/>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <button type="button" onclick="ativarPlano(30)" style="flex:1;min-width:100px;padding:8px 6px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:8px;color:#4ade80;font-family:var(--fb);font-size:.72rem;font-weight:700;cursor:pointer">✅ Ativar 30 dias</button>
+              <button type="button" onclick="ativarPlano(365)" style="flex:1;min-width:100px;padding:8px 6px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:8px;color:#4ade80;font-family:var(--fb);font-size:.72rem;font-weight:700;cursor:pointer">✅ Ativar 1 ano</button>
+              <button type="button" onclick="ativarPlano(0)" style="flex:1;min-width:100px;padding:8px 6px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;color:#f87171;font-family:var(--fb);font-size:.72rem;font-weight:700;cursor:pointer">🚫 Desativar</button>
+            </div>
+          </div>
           <div class="field"><label>Link Kiwify — Essencial Mensal</label><input id="sub-kiwify-url" placeholder="https://kiwify.app/..."/></div>
           <div class="field"><label>Link Kiwify — Essencial Anual</label><input id="sub-kiwify-url-ea" placeholder="https://kiwify.app/..."/></div>
           <div class="field"><label>Link Kiwify — Pro Mensal</label><input id="sub-kiwify-url-pro" placeholder="https://kiwify.app/..."/></div>
@@ -2080,6 +2088,27 @@ function renderSubscriptionTab(){
       <div style="font-weight:700;font-size:1rem;color:${active?'#4ade80':'#f87171'}">${active?'✅ ATIVA':'❌ EXPIRADA'}</div>
       <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Válido até: <strong>${exp}</strong></div>
     </div>`;
+}
+
+function ativarPlano(dias){
+  const sub = getObj('mundi:subscription');
+  const plan = document.getElementById('sub-plan')?.value || sub.plan || 'essencial';
+  let expiresAt = '';
+  if(dias > 0){
+    const d = new Date();
+    d.setDate(d.getDate() + dias);
+    expiresAt = d.toISOString().slice(0,10);
+  }
+  const newSub = {...sub, plan, expiresAt, activatedAt: new Date().toISOString(), activatedBy: 'admin'};
+  const exp = document.getElementById('sub-expires');
+  if(exp) exp.value = expiresAt;
+  setData('mundi:subscription', newSub);
+  updatePlansLinks(newSub);
+  renderSubscriptionTab();
+  applySubscriptionGate();
+  const msg = dias > 0 ? `✅ Ativado por ${dias} dias — até ${expiresAt}` : '🚫 Acesso desativado';
+  document.getElementById('sub-admin-fb').innerHTML=`<div class="fb-msg ${dias>0?'fb-ok':'fb-err'}">${msg}</div>`;
+  setTimeout(()=>{document.getElementById('sub-admin-fb').innerHTML='';},4000);
 }
 
 function saveSubscription(){

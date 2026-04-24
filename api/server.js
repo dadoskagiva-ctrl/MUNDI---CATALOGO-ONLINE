@@ -26,8 +26,14 @@ function auth(req, res, next) {
   next();
 }
 
+function addDays(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
 app.get('/health', (_req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
-app.get('/api/version', (_req, res) => res.json({ version: 'v3-notify-ok' }));
+app.get('/api/version', (_req, res) => res.json({ version: 'v4-webhook' }));
 
 // GET /api/kv?keys=key1,key2
 app.get('/api/kv', auth, async (req, res) => {
@@ -60,7 +66,7 @@ app.put('/api/kv/:key', auth, async (req, res) => {
   }
 });
 
-// POST /api/notify  body: { title, body, url?, apiKey }
+// POST /api/notify  body: { title, body, url? }
 app.post('/api/notify', auth, async (req, res) => {
   const { title, body, url } = req.body;
   const osAppId  = process.env.OS_APP_ID  || 'e7024ef4-2ee4-4fd4-bc99-dbe3b981e64b';
@@ -72,12 +78,12 @@ app.post('/api/notify', auth, async (req, res) => {
       app_id: osAppId,
       included_segments: ['All'],
       headings: { pt: title, en: title },
-      contents: { pt: body,  en: body  },
+      contents: { pt: body, en: body },
     };
     if (url) payload.url = url;
     const r = await fetch('https://onesignal.com/api/v1/notifications', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Basic ' + osApiKey },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Key ' + osApiKey },
       body: JSON.stringify(payload)
     });
     const data = await r.json();
@@ -89,5 +95,59 @@ app.post('/api/notify', auth, async (req, res) => {
   }
 });
 
+// POST /api/kiwify-webhook  — chamado pelo Kiwify quando pagamento é confirmado
+// Configura no Kiwify: Produto → Configurações → Webhook → URL desta rota
+app.post('/api/kiwify-webhook', async (req, res) => {
+  try {
+    const body = req.body || {};
+    // Kiwify envia: body.data.purchase ou body.purchase
+    const purchase = body.data?.purchase || body.purchase || body;
+    const productName = (
+      purchase?.product?.name ||
+      purchase?.order?.product_name ||
+      body?.product?.name || ''
+    ).toLowerCase();
+    const status = (purchase?.status || body?.status || '').toLowerCase();
+
+    // Só processa pagamentos aprovados
+    if (!['paid', 'approved', 'complete', 'completed'].includes(status) && status !== '') {
+      return res.json({ ok: true, skipped: true, status });
+    }
+
+    // Detecta plano e duração pelo nome do produto
+    const isAnual = productName.includes('anual') || productName.includes('ano');
+    const isPro   = productName.includes('pro');
+    const days    = isAnual ? 365 : 30;
+    const plan    = isPro ? 'pro' : 'essencial';
+
+    // Lê subscription atual e atualiza apenas expiresAt e plan
+    const { rows } = await pool.query(
+      "SELECT value FROM kv_store WHERE key = 'mundi:subscription'"
+    );
+    const current = rows[0]?.value || {};
+    const newSub = {
+      ...current,
+      plan,
+      expiresAt: addDays(days),
+      activatedAt: new Date().toISOString(),
+      activatedBy: 'kiwify',
+      buyerEmail: purchase?.buyer?.email || purchase?.customer?.email || '',
+      buyerName:  purchase?.buyer?.name  || purchase?.customer?.name  || '',
+    };
+
+    await pool.query(
+      `INSERT INTO kv_store (key, value, updated_at) VALUES ('mundi:subscription', $1::jsonb, NOW())
+       ON CONFLICT (key) DO UPDATE SET value=$1::jsonb, updated_at=NOW()`,
+      [JSON.stringify(newSub)]
+    );
+
+    console.log(`Kiwify webhook: plano ${plan} ativado por ${days} dias — ${newSub.buyerEmail}`);
+    res.json({ ok: true, plan, days, expiresAt: newSub.expiresAt });
+  } catch (e) {
+    console.error('Kiwify webhook error:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Mundi TKR API v2 running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Mundi TKR API v4 running on port ${PORT}`));
