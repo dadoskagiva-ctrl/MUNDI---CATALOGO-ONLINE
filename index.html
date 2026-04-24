@@ -1046,25 +1046,16 @@ setTimeout(_hideSplash,6000);
     </div>
     <div class="dash-tabs" id="rep-tabs">
       <button class="dash-tab active" onclick="setRepTab('catalogs')">Catálogos PDF</button>
+      <button class="dash-tab" onclick="setRepTab('tabelas')">Tabelas de Prazo</button>
       <button class="dash-tab" onclick="setRepTab('downloads')">Downloads PNG</button>
       <button class="dash-tab" onclick="setRepTab('videos')">Vídeos</button>
       <button class="dash-tab" onclick="setRepTab('ficha')">Fichas Técnicas</button>
     </div>
     <div id="rep-tab-catalogs">
-      <div class="dl-grid">
-        <div class="dl-card">
-          <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">Topper + Rainha + Kagiva 2026</div></div>
-          <div class="dl-card-desc">Catálogo completo. Campo, Society, Futsal, Vôlei, Handebol e Beach Soccer.</div>
-          <div class="dl-card-meta"><span class="dl-tag">Campo</span><span class="dl-tag">Futsal</span><span class="dl-tag">Vôlei</span><span class="dl-tag">Society</span></div>
-          <a class="dl-btn" href="#" onclick="logDownload('PDF Topper 2026');toast('Download registrado!','ok');return false">⬇ Baixar Catálogo PDF</a>
-        </div>
-        <div class="dl-card">
-          <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">Kagiva 2026</div></div>
-          <div class="dl-card-desc">Catálogo completo Kagiva. Campo, Society, Futsal, Vôlei, Handebol, Basquete, Luvas e Acessórios.</div>
-          <div class="dl-card-meta"><span class="dl-tag">Campo</span><span class="dl-tag">Futsal</span><span class="dl-tag">Basquete</span><span class="dl-tag">Luvas</span></div>
-          <a class="dl-btn" href="#" onclick="logDownload('PDF Kagiva 2026');toast('Download registrado!','ok');return false">⬇ Baixar Catálogo PDF</a>
-        </div>
-      </div>
+      <div id="rep-catalogs-grid"></div>
+    </div>
+    <div id="rep-tab-tabelas" style="display:none">
+      <div id="rep-tabelas-grid"></div>
     </div>
     <div id="rep-tab-downloads" style="display:none">
       <!-- toolbar -->
@@ -1332,7 +1323,25 @@ setTimeout(_hideSplash,6000);
         <div class="field"><label>Páginas PNG — Catálogo Kagiva (separadas por vírgula)</label><textarea id="link-cat-pages-kagiva" rows="3" oninput="saveLinks()" style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px 14px;font-size:.85rem;outline:none;resize:vertical" placeholder="https://link-pg1.png, https://link-pg2.png ..."></textarea></div>
         <div class="field"><label>Páginas PNG — Catálogo Rainha (separadas por vírgula)</label><textarea id="link-cat-pages-rainha" rows="3" oninput="saveLinks()" style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px 14px;font-size:.85rem;outline:none;resize:vertical" placeholder="https://link-pg1.png, https://link-pg2.png ..."></textarea></div>
         <p class="fb-ok fb-msg" style="display:none" id="links-saved-msg">✅ Links salvos!</p>
-        <div class="card-panel-title" style="margin-top:20px">Imagens PNG dos Produtos</div>
+        <div class="card-panel-title" style="margin-top:24px">📅 Tabelas de Prazo</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">Adicione tabelas de prazo, listas de preço ou qualquer documento com validade para os representantes.</p>
+        <div class="form-grid">
+          <div class="field"><label>Título *</label><input id="tab-title" placeholder="Ex: Tabela Topper — Maio 2026"/></div>
+          <div class="field"><label>Marca</label>
+            <select id="tab-brand" style="background:var(--panel2);color:var(--text);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;width:100%">
+              <option value="Todas">Todas as marcas</option>
+              <option value="Topper">Topper</option>
+              <option value="Kagiva">Kagiva</option>
+              <option value="Rainha">Rainha</option>
+            </select>
+          </div>
+          <div class="field"><label>Validade (opcional)</label><input id="tab-valid" type="date" style="color-scheme:dark"/></div>
+          <div class="field" style="grid-column:1/-1"><label>Link do documento (Canva, Drive ou URL direta)</label><input id="tab-url" placeholder="https://www.canva.com/design/... ou https://drive.google.com/file/d/.../view"/></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveTabela()" style="margin-bottom:20px">+ Adicionar Tabela</button>
+        <div id="admin-tabelas-list"></div>
+
+        <div class="card-panel-title" style="margin-top:24px">Imagens PNG dos Produtos</div>
         <p style="color:var(--muted);font-size:.82rem;margin-bottom:12px">Cole o link público da imagem PNG de cada produto.</p>
         <div id="admin-product-links"></div>
         <button class="btn btn-primary btn-sm" onclick="saveProductLinks()">Salvar Links de Imagens</button>
@@ -1486,13 +1495,13 @@ const K = {
   reps:'mundi:reps', session:'mundi:session',
   logs:'mundi:logs', downloads:'mundi:downloads',
   videos:'mundi:videos', links:'mundi:links',
-  imglinks:'mundi:imglinks'
+  imglinks:'mundi:imglinks', tabelas:'mundi:tabelas'
 };
 
 // ── Neon sync ──
 const _API = 'https://mundi-tkr-api.onrender.com';
 const _AK  = 'mundi_tkr_api_2026';
-const _SK  = ['mundi:reps','mundi:products','mundi:subscription'];
+const _SK  = ['mundi:reps','mundi:products','mundi:subscription','mundi:links','mundi:tabelas'];
 const KIWIFY_EM = 'https://pay.kiwify.com.br/Fg3dOU7';
 const KIWIFY_EA = 'https://pay.kiwify.com.br/nUrBLSj';
 const KIWIFY_PM = 'https://pay.kiwify.com.br/Y4ESS1y';
@@ -2237,12 +2246,127 @@ function renderRepDash(){
 }
 
 function setRepTab(tab){
-  const tabs=['catalogs','downloads','videos','ficha'];
+  const tabs=['catalogs','tabelas','downloads','videos','ficha'];
   tabs.forEach(t=>document.getElementById('rep-tab-'+t).style.display=t===tab?'':'none');
   document.querySelectorAll('#rep-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
+  if(tab==='catalogs') renderRepCatalogs();
+  if(tab==='tabelas') renderRepTabelas();
   if(tab==='downloads') renderRepPNGs();
   if(tab==='videos') renderRepVideos();
   if(tab==='ficha') renderRepFicha();
+}
+
+function renderRepCatalogs(){
+  const links=getObj(K.links);
+  const sess=getSession();
+  const allowed=sess?.brands==='kagiva'?['kagiva']:sess?.brands==='topper'?['topper','rainha']:['topper','kagiva','rainha'];
+  const catalogs=[
+    {key:'topper', label:'Topper + Rainha 2026', desc:'Catálogo completo. Campo, Society, Futsal, Vôlei, Handebol e Beach Soccer.', tags:['Campo','Futsal','Vôlei','Society']},
+    {key:'kagiva', label:'Kagiva 2026', desc:'Catálogo completo Kagiva. Campo, Society, Futsal, Vôlei, Handebol, Basquete, Luvas e Acessórios.', tags:['Campo','Futsal','Basquete','Luvas']}
+  ].filter(c=>allowed.includes(c.key));
+  const grid=document.getElementById('rep-catalogs-grid');
+  if(!grid)return;
+  if(!catalogs.length){grid.innerHTML='<p style="color:var(--muted);padding:20px">Nenhum catálogo disponível para sua conta.</p>';return;}
+  grid.innerHTML='<div class="dl-grid">'+catalogs.map(c=>{
+    const url=links[c.key]||CATALOG_VIEWER_URLS['link-'+c.key]||'';
+    return `<div class="dl-card">
+      <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">${c.label}</div></div>
+      <div class="dl-card-desc">${c.desc}</div>
+      <div class="dl-card-meta">${c.tags.map(t=>`<span class="dl-tag">${t}</span>`).join('')}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        ${url?`<button class="dl-btn" style="flex:1" onclick="openPdfViewer('','${c.label}','link-${c.key}')">👁 Visualizar</button>`:'<span style="color:var(--muted);font-size:.8rem">Catálogo não configurado ainda.</span>'}
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function renderRepTabelas(){
+  const tabelas=getData(K.tabelas);
+  const grid=document.getElementById('rep-tabelas-grid');
+  if(!grid)return;
+  if(!tabelas.length){
+    grid.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:2.5rem;margin-bottom:12px">📅</div><p>Nenhuma tabela de prazo disponível ainda.</p></div>';
+    return;
+  }
+  const today=new Date().toISOString().slice(0,10);
+  grid.innerHTML='<div class="dl-grid">'+tabelas.map(t=>{
+    const expired=t.valid&&t.valid<today;
+    return `<div class="dl-card" style="${expired?'opacity:.55':''}">
+      <div class="dl-card-header">
+        <span class="dl-card-icon">📅</span>
+        <div>
+          <div class="dl-card-title">${t.title}</div>
+          ${t.brand&&t.brand!=='Todas'?`<span class="dl-tag" style="margin-top:4px;display:inline-block">${t.brand}</span>`:''}
+        </div>
+      </div>
+      ${t.valid?`<div style="font-size:.78rem;color:${expired?'#f87171':'var(--muted)'};margin-bottom:6px">${expired?'Expirada em':'Válida até'} ${new Date(t.valid+'T12:00:00').toLocaleDateString('pt-BR')}</div>`:''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        ${t.url?`<button class="dl-btn" style="flex:1" onclick="openPdfViewer('','${t.title.replace(/'/g,"\\'")}','');" data-tabela-url="${t.url}">👁 Visualizar</button>`:'<span style="color:var(--muted);font-size:.8rem">Link não disponível.</span>'}
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+  // patch viewer buttons to use tabela URL directly
+  grid.querySelectorAll('[data-tabela-url]').forEach(btn=>{
+    const url=btn.dataset.tabelaUrl;
+    const title=btn.closest('.dl-card').querySelector('.dl-card-title').textContent;
+    btn.onclick=()=>{
+      const modal=document.getElementById('pdf-viewer-modal');
+      const frame=document.getElementById('pdf-viewer-frame');
+      const msg=document.getElementById('pdf-viewer-msg');
+      const extLink=document.getElementById('pdf-viewer-ext');
+      document.getElementById('pdf-viewer-title').textContent=title;
+      const embedUrl=catalogEmbedUrl(url);
+      if(extLink) extLink.href=url;
+      if(embedUrl){frame.style.display='';frame.style.flex='1';if(msg)msg.style.display='none';frame.src=embedUrl;}
+      else{frame.style.display='none';if(msg){msg.style.display='flex';msg.innerHTML=`<div style="text-align:center"><p style="color:var(--muted);margin-bottom:14px">Não foi possível carregar o documento.</p><a href="${url}" target="_blank" class="dl-btn">↗ Abrir link externo</a></div>`;}}
+      modal.style.display='flex';document.body.style.overflow='hidden';
+    };
+  });
+}
+
+function saveTabela(){
+  const title=document.getElementById('tab-title')?.value.trim();
+  if(!title){toast('Informe o título da tabela','err');return;}
+  const url=document.getElementById('tab-url')?.value.trim();
+  if(!url){toast('Informe o link do documento','err');return;}
+  const tabelas=getData(K.tabelas);
+  tabelas.unshift({
+    id:Date.now().toString(),
+    title,
+    brand:document.getElementById('tab-brand')?.value||'Todas',
+    valid:document.getElementById('tab-valid')?.value||'',
+    url
+  });
+  setData(K.tabelas,tabelas);
+  document.getElementById('tab-title').value='';
+  document.getElementById('tab-url').value='';
+  document.getElementById('tab-valid').value='';
+  renderAdminTabelas();
+  toast('Tabela adicionada!','ok');
+}
+
+function deleteTabela(id){
+  if(!confirm('Remover esta tabela?'))return;
+  setData(K.tabelas,getData(K.tabelas).filter(t=>t.id!==id));
+  renderAdminTabelas();
+  toast('Tabela removida.','ok');
+}
+
+function renderAdminTabelas(){
+  const tabelas=getData(K.tabelas);
+  const el=document.getElementById('admin-tabelas-list');
+  if(!el)return;
+  if(!tabelas.length){el.innerHTML='<p style="color:var(--muted);font-size:.82rem">Nenhuma tabela cadastrada.</p>';return;}
+  const today=new Date().toISOString().slice(0,10);
+  el.innerHTML=tabelas.map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:.88rem">${t.title}</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:2px">${t.brand||'Todas'} ${t.valid?'· Válida até '+new Date(t.valid+'T12:00:00').toLocaleDateString('pt-BR'):''} ${t.valid&&t.valid<today?'<span style="color:#f87171">(expirada)</span>':''}</div>
+        <div style="font-size:.72rem;color:#555;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.url}</div>
+      </div>
+      <button onclick="deleteTabela('${t.id}')" style="flex-shrink:0;padding:6px 10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;color:#f87171;font-size:.75rem;cursor:pointer">🗑</button>
+    </div>`).join('');
 }
 
 let _pngBrand='';
@@ -2569,6 +2693,7 @@ function loadLinks(){
       <input data-pid="${p.id}" placeholder="https://drive.google.com/uc?id=..." value="${imgLinks[p.id]||''}" style="font-size:.78rem;padding:7px 10px"/>
     </div>`).join('');
   if(PRODUCTS.length>20) wrap.innerHTML+=`<p style="color:var(--muted);font-size:.8rem;margin-top:8px">Mostrando 20 de ${PRODUCTS.length} produtos. Adicione os links dos principais.</p>`;
+  renderAdminTabelas();
 }
 
 let linkSaveTimer=null;
