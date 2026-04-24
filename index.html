@@ -1644,20 +1644,27 @@ function shareWA(id){
 // ══════════════════════════════════════════════
 // PDF VIEWER
 // ══════════════════════════════════════════════
+function drivePreviewUrl(url){
+  if(!url) return '';
+  // Convert any Google Drive share/view link to /preview embed URL
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+  if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  // Already a preview URL or non-Drive URL — return as-is
+  return url;
+}
 function openPdfViewer(fallbackUrl, title, adminKey){
   const modal = document.getElementById('pdf-viewer-modal');
   const frame = document.getElementById('pdf-viewer-frame');
   const msg = document.getElementById('pdf-viewer-msg');
   document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
-  // Prefer admin-configured Google Drive URL
   const links = getObj(K.links);
-  const adminUrl = adminKey ? (links[adminKey]||'') : '';
+  const rawUrl = adminKey ? (links[adminKey]||'') : '';
+  const adminUrl = drivePreviewUrl(rawUrl);
   if(adminUrl){
     frame.style.display='';
     if(msg) msg.style.display='none';
     frame.src = adminUrl;
   } else {
-    // No admin URL: show instructions
     frame.style.display='none';
     if(msg){
       msg.style.display='flex';
