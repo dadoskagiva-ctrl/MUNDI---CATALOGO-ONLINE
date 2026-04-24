@@ -1451,6 +1451,9 @@ function ensureAdmin(){
   try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
   applySubscriptionGate();
   updatePlansLinks();
+  // Navega direto para página pelo parâmetro URL: ?p=plans
+  const _urlP = new URLSearchParams(location.search).get('p');
+  if(_urlP) try{ showPage(_urlP); }catch(e){}
   _hideSplash();
 })();
 
