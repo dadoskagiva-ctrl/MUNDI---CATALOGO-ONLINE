@@ -699,6 +699,7 @@ setTimeout(_hideSplash,6000);
         <button class="btn btn-primary" onclick="showPage('catalog-topper')">Catálogo Topper + Rainha</button>
         <button class="btn btn-secondary" onclick="showPage('catalog-kagiva')">Catálogo Kagiva</button>
         <button class="btn btn-ghost" onclick="showLoginAs('rep')">Área do representante</button>
+        <button class="btn btn-ghost" onclick="showPage('plans')" style="border-color:rgba(212,160,23,.4);color:#d4a017">💳 Ver Planos</button>
       </div>
     </div>
 
@@ -873,6 +874,59 @@ setTimeout(_hideSplash,6000);
 </div>
 
 
+
+<!-- PLANOS -->
+<div class="page" id="page-plans">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">MUNDI <span style="color:var(--orange)">TKR</span></div>
+      <div class="topbar-sub">Planos e Preços</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showPage('home')">← Voltar</button>
+  </header>
+  <div style="max-width:900px;margin:0 auto;padding:40px 20px">
+    <div style="text-align:center;margin-bottom:48px">
+      <div style="font-size:.68rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#d4a017;font-family:var(--fb);margin-bottom:12px">PLANOS DISPONÍVEIS</div>
+      <h2 style="font-family:var(--fb);font-weight:900;font-size:clamp(2rem,5vw,3.2rem);text-transform:uppercase;line-height:.95;margin-bottom:16px">ESCOLHA SEU <span style="color:var(--orange)">PLANO</span></h2>
+      <p style="color:var(--muted);font-size:.95rem;max-width:480px;margin:0 auto;line-height:1.7">Plataforma completa de catálogos digitais para sua equipe de representantes</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <!-- ESSENCIAL -->
+      <div style="background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:0">
+        <div style="font-family:var(--fb);font-size:.7rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">ESSENCIAL</div>
+        <div style="font-family:var(--fb);font-weight:900;font-size:2.6rem;line-height:1;color:var(--text)">R$&nbsp;249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span></div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:24px">ou R$ 2.490/ano <span style="color:#4ade80;font-weight:600">16% off</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;flex:1">
+          <div style="font-size:.82rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">INCLUI</div>
+          ${['✅ Catálogo digital das 3 marcas','✅ Fichas técnicas completas','✅ Download de PNG por produto','✅ Catálogos PDF','✅ Até 10 representantes','✅ 1 administrador','✅ Notificações push','✅ App instalável (PWA)','✅ Acesso mobile e desktop'].map(f=>`<div style="display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:var(--text);line-height:1.4">${f}</div>`).join('')}
+        </div>
+        <a id="plans-link-essencial" href="#" target="_blank" style="margin-top:28px;display:block;text-align:center;padding:14px;background:var(--panel2);border:1.5px solid var(--line2);border-radius:10px;color:var(--text);text-decoration:none;font-family:var(--fb);font-weight:700;font-size:.88rem;letter-spacing:.04em;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--line2)'">CONTRATAR ESSENCIAL</a>
+      </div>
+
+      <!-- PRO -->
+      <div style="background:var(--panel);border:2px solid var(--orange);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:0;position:relative;box-shadow:0 0 40px rgba(224,96,32,.12)">
+        <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--orange);color:#000;font-family:var(--fb);font-size:.65rem;font-weight:900;letter-spacing:.12em;padding:4px 14px;border-radius:20px">RECOMENDADO</div>
+        <div style="font-family:var(--fb);font-size:.7rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">PRO</div>
+        <div style="font-family:var(--fb);font-weight:900;font-size:2.6rem;line-height:1;color:var(--text)">R$&nbsp;449<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span></div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:24px">ou R$ 3.990/ano <span style="color:#4ade80;font-weight:600">25% off</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;flex:1">
+          <div style="font-size:.82rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">TUDO DO ESSENCIAL +</div>
+          ${['🚀 Gerador de proposta PDF','🚀 Compartilhamento via WhatsApp','🚀 Tabela de preços para reps','🚀 Relatórios de acesso e downloads','🚀 Representantes ilimitados','🚀 Até 3 administradores','🚀 Notificações segmentadas por marca','🚀 White-label (logo e cores da empresa)','🚀 Suporte prioritário via WhatsApp'].map(f=>`<div style="display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:var(--text);line-height:1.4">${f}</div>`).join('')}
+        </div>
+        <a id="plans-link-pro" href="#" target="_blank" style="margin-top:28px;display:block;text-align:center;padding:14px;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;border-radius:10px;color:#000;text-decoration:none;font-family:var(--fb);font-weight:900;font-size:.88rem;letter-spacing:.04em;transition:all .2s">CONTRATAR PRO</a>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:40px;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:12px">
+      <div style="font-size:.85rem;color:var(--muted);line-height:1.7">Dúvidas? Fale com a gente:<br>
+        <a id="plans-whatsapp" href="#" target="_blank" style="color:var(--orange);font-weight:600;text-decoration:none">WhatsApp Mundi TKR</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div class="page" id="page-login">
@@ -1269,7 +1323,9 @@ setTimeout(_hideSplash,6000);
             </select>
           </div>
           <div class="field"><label>Válido até</label><input id="sub-expires" type="date" style="color-scheme:dark"/></div>
-          <div class="field"><label>Link Kiwify (renovação)</label><input id="sub-kiwify-url" placeholder="https://pay.kiwify.com.br/..."/></div>
+          <div class="field"><label>Link Kiwify — Plano Essencial</label><input id="sub-kiwify-url" placeholder="https://pay.kiwify.com.br/..."/></div>
+          <div class="field"><label>Link Kiwify — Plano Pro</label><input id="sub-kiwify-url-pro" placeholder="https://pay.kiwify.com.br/..."/></div>
+          <div class="field"><label>WhatsApp (com DDI, ex: 5511999999999)</label><input id="sub-whatsapp" placeholder="5511999999999"/></div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="saveSubscription()">Salvar</button>
         <div id="sub-admin-fb" style="margin-top:8px"></div>
@@ -1394,6 +1450,7 @@ function ensureAdmin(){
   // Reload PRODUCTS from localStorage (now synced from server)
   try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
   applySubscriptionGate();
+  updatePlansLinks();
   _hideSplash();
 })();
 
@@ -1493,6 +1550,7 @@ function showPage(name){
   window.scrollTo(0,0);
   updateNavState(name);
   if(name==='home'){ renderHomeGrid(); homeSearch(); }
+  if(name==='plans') updatePlansLinks();
   if(name==='catalog-topper') renderCatalog('topper');
   if(name==='catalog-kagiva') renderCatalog('kagiva');
   if(name==='catalog-rainha') renderCatalog('rainha');
@@ -1898,6 +1956,8 @@ function renderSubscriptionTab(){
   if(sub.plan) document.getElementById('sub-plan').value=sub.plan;
   if(sub.expiresAt) document.getElementById('sub-expires').value=sub.expiresAt;
   if(sub.kiwifyUrl) document.getElementById('sub-kiwify-url').value=sub.kiwifyUrl;
+  if(sub.kiwifyUrlPro) document.getElementById('sub-kiwify-url-pro').value=sub.kiwifyUrlPro;
+  if(sub.whatsapp) document.getElementById('sub-whatsapp').value=sub.whatsapp;
   const active=checkSubscription();
   const exp=sub.expiresAt?new Date(sub.expiresAt+'T12:00:00').toLocaleDateString('pt-BR'):'Não definida';
   document.getElementById('sub-status-display').innerHTML=`
@@ -1913,13 +1973,26 @@ function saveSubscription(){
     plan:document.getElementById('sub-plan').value,
     expiresAt:document.getElementById('sub-expires').value,
     kiwifyUrl:document.getElementById('sub-kiwify-url').value.trim(),
+    kiwifyUrlPro:document.getElementById('sub-kiwify-url-pro').value.trim(),
+    whatsapp:document.getElementById('sub-whatsapp').value.trim(),
   };
   if(!sub.expiresAt){toast('Defina a data de validade','err');return;}
   setData('mundi:subscription',sub);
+  updatePlansLinks(sub);
   renderSubscriptionTab();
   applySubscriptionGate();
   document.getElementById('sub-admin-fb').innerHTML='<div class="fb-msg fb-ok">✅ Salvo e sincronizado!</div>';
   setTimeout(()=>{document.getElementById('sub-admin-fb').innerHTML='';},3000);
+}
+
+function updatePlansLinks(sub){
+  sub=sub||getObj('mundi:subscription');
+  const el=document.getElementById('plans-link-essencial');
+  const ep=document.getElementById('plans-link-pro');
+  const ew=document.getElementById('plans-whatsapp');
+  if(el&&sub.kiwifyUrl) el.href=sub.kiwifyUrl;
+  if(ep&&sub.kiwifyUrlPro) ep.href=sub.kiwifyUrlPro;
+  if(ew&&sub.whatsapp) ew.href=`https://wa.me/${sub.whatsapp}`;
 }
 
 // ══════════════════════════════════════════════
