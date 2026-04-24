@@ -1381,8 +1381,8 @@ setTimeout(_hideSplash,6000);
           <div class="field"><label>Nome do Cliente</label><input id="sub-client-name" placeholder="Ex: Mundi TKR Sports"/></div>
           <div class="field"><label>Plano</label>
             <select id="sub-plan" style="background:var(--panel2);color:var(--text);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;width:100%">
-              <option value="monthly">Mensal</option>
-              <option value="annual">Anual</option>
+              <option value="essencial">Essencial</option>
+              <option value="pro">Pro</option>
             </select>
           </div>
           <div class="field">
@@ -2093,13 +2093,14 @@ function renderSubscriptionTab(){
 function ativarPlano(dias){
   const sub = getObj('mundi:subscription');
   const plan = document.getElementById('sub-plan')?.value || sub.plan || 'essencial';
+  const clientName = document.getElementById('sub-client-name')?.value.trim() || sub.clientName || '';
   let expiresAt = '';
   if(dias > 0){
     const d = new Date();
     d.setDate(d.getDate() + dias);
     expiresAt = d.toISOString().slice(0,10);
   }
-  const newSub = {...sub, plan, expiresAt, activatedAt: new Date().toISOString(), activatedBy: 'admin'};
+  const newSub = {...sub, plan, clientName, expiresAt, activatedAt: new Date().toISOString(), activatedBy: 'admin'};
   const exp = document.getElementById('sub-expires');
   if(exp) exp.value = expiresAt;
   setData('mundi:subscription', newSub);
