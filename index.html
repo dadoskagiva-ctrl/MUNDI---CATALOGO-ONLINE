@@ -864,8 +864,8 @@ input,select,textarea{font-family:var(--fb)}
         <div id="form-admin" style="display:none">
           <h2 class="login-h">ADMIN</h2>
           <p class="login-sub">Acesso administrativo restrito</p>
-          <div class="field"><label>Usuário</label><input id="admin-user" type="text" placeholder="admin" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
-          <div class="field"><label>Senha</label><input id="admin-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
+          <div class="field"><label>Usuário</label><input id="admin-user" type="text" placeholder="admin" value="admin" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
+          <div class="field"><label>Senha</label><input id="admin-pass" type="password" placeholder="@CARO26" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
           <div id="login-admin-feedback"></div>
           <button class="btn-login-full" onclick="doAdminLogin()">Entrar como Admin</button>
         </div>
@@ -1283,10 +1283,16 @@ const clearSession = () => sessionStorage.removeItem(K.session);
 // Seed admin — always ensures correct password
 function ensureAdmin(){
   const reps = getData(K.reps);
+  // Admin record
   const adminData = {id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@CARO26',role:'admin',brands:'todas',status:'ativo'};
   const idx = reps.findIndex(r=>r.id==='admin-001');
   if(idx>=0){ reps[idx]={...reps[idx],...adminData}; }
   else { reps.push({...adminData,createdAt:new Date().toISOString()}); }
+  // Test representative
+  const testCPF = '05941417101';
+  if(!reps.find(r=>r.cpf.replace(/\D/g,'')=== testCPF)){
+    reps.push({id:'rep-teste-001',name:'Representante Teste',cpf:'059.414.171.01',role:'rep',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+  }
   setData(K.reps,reps);
 }
 ensureAdmin();
@@ -1751,6 +1757,7 @@ function doAdminLogin(){
   const user=document.getElementById('admin-user').value.trim();
   const pass=document.getElementById('admin-pass').value;
   const fb=document.getElementById('login-admin-feedback');
+  ensureAdmin(); // always refresh admin record before checking
   const reps=getData(K.reps);
   const admin=reps.find(r=>r.role==='admin'&&r.user===user&&r.pass===pass);
   if(!admin){fb.innerHTML='<div class="form-err">Usuário ou senha incorretos.</div>';return;}
