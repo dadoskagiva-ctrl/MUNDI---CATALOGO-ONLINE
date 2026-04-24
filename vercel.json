@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "routes": [
     { "src": "/api/kiwify-webhook", "dest": "/api/kiwify-webhook.js" },
     { "src": "/api/notify",         "dest": "/api/notify.js" },

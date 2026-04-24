@@ -1,0 +1,5 @@
+*.pdf
+node_modules
+neon
+render.yaml
+README.md
