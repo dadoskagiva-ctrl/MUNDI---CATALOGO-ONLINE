@@ -921,7 +921,19 @@ input,select,textarea{font-family:var(--fb)}
       </div>
     </div>
     <div id="rep-tab-downloads" style="display:none">
-      <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Todas as imagens PNG oficiais por produto.</p>
+      <!-- toolbar -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+        <input id="rep-png-search" type="text" placeholder="🔍 Buscar modelo..." oninput="renderRepPNGs()" style="flex:1;min-width:180px;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:9px 14px;font-size:.85rem;outline:none"/>
+        <button onclick="downloadAllPNGs()" style="font-family:var(--fb);font-size:.75rem;font-weight:800;padding:9px 16px;border-radius:10px;border:1.5px solid var(--orange);color:var(--orange);background:rgba(255,106,0,.08);cursor:pointer;white-space:nowrap">⬇ Baixar Tudo</button>
+      </div>
+      <!-- brand tabs -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="adm-brand-tab active" data-brand="" onclick="setPngBrand(this)">Todas</button>
+        <button class="adm-brand-tab" data-brand="Topper" onclick="setPngBrand(this)">⚽ Topper</button>
+        <button class="adm-brand-tab" data-brand="Kagiva" onclick="setPngBrand(this)">⚽ Kagiva</button>
+        <button class="adm-brand-tab" data-brand="Rainha" onclick="setPngBrand(this)">⚽ Rainha</button>
+      </div>
+      <div id="rep-png-count" style="font-family:var(--fc);font-size:.72rem;color:var(--muted);margin-bottom:10px"></div>
       <div class="rep-dl-grid" id="rep-png-grid"></div>
     </div>
     <div id="rep-tab-videos" style="display:none">
@@ -929,8 +941,14 @@ input,select,textarea{font-family:var(--fb)}
       <div class="video-grid" id="rep-video-grid"></div>
     </div>
     <div id="rep-tab-ficha" style="display:none">
-      <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Fichas técnicas completas por produto.</p>
-      <div class="catalog-products" id="rep-ficha-grid"></div>
+      <!-- Brand tabs -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="adm-brand-tab active" data-brand="" onclick="setFichaBrand(this)">Todas</button>
+        <button class="adm-brand-tab" data-brand="Topper" onclick="setFichaBrand(this)">⚽ Topper</button>
+        <button class="adm-brand-tab" data-brand="Kagiva" onclick="setFichaBrand(this)">⚽ Kagiva</button>
+        <button class="adm-brand-tab" data-brand="Rainha" onclick="setFichaBrand(this)">⚽ Rainha</button>
+      </div>
+      <div id="rep-ficha-grid"></div>
     </div>
   </div>
   <footer class="footer"><div class="footer-brand">MUNDI<em>TKR</em></div><p class="footer-copy">© 2026 Mundi TKR Sports</p></footer>
@@ -1871,12 +1889,26 @@ function setRepTab(tab){
   if(tab==='ficha') renderRepFicha();
 }
 
+let _pngBrand='';
+function setPngBrand(el){
+  _pngBrand=el.dataset.brand||'';
+  document.querySelectorAll('#rep-tab-downloads .adm-brand-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderRepPNGs();
+}
+
 function renderRepPNGs(){
   const sess=getSession();
-  const brands=sess?.brands==='kagiva'?['Kagiva']:sess?.brands==='topper'?['Topper','Rainha']:['Topper','Rainha','Kagiva'];
-  const prods=PRODUCTS.filter(p=>brands.includes(p.brand));
+  const allowed=sess?.brands==='kagiva'?['Kagiva']:sess?.brands==='topper'?['Topper','Rainha']:['Topper','Rainha','Kagiva'];
+  const brandFilter=_pngBrand && allowed.includes(_pngBrand)?[_pngBrand]:allowed;
+  const q=(document.getElementById('rep-png-search')?.value||'').toLowerCase().trim();
+  let prods=PRODUCTS.filter(p=>brandFilter.includes(p.brand));
+  if(q) prods=prods.filter(p=>(p.name+p.code+(p.family||'')).toLowerCase().includes(q));
+  const countEl=document.getElementById('rep-png-count');
+  if(countEl) countEl.textContent=prods.length+' produto'+(prods.length!==1?'s':'');
   const grid=document.getElementById('rep-png-grid');
   if(!grid)return;
+  if(!prods.length){grid.innerHTML='<p style="color:var(--muted);padding:20px">Nenhum resultado.</p>';return;}
   grid.innerHTML=prods.map(p=>{
     const img=getProductImg(p);
     const e=SPORT_E[p.sport]||'⚽';
@@ -1885,13 +1917,29 @@ function renderRepPNGs(){
         ${img?`<img src="${img}" alt="${p.name}" onerror="this.style.display='none'"/>`:`<span style="font-size:3rem;opacity:.2">${e}</span>`}
       </div>
       <div class="rep-dl-body">
-        <div class="rep-dl-brand">${p.brand}</div>
+        <div class="rep-dl-brand">${p.brand} · ${p.sport}</div>
         <div class="rep-dl-name">${p.name}</div>
         <div class="rep-dl-code">Cód. ${p.code}</div>
         <a class="rep-dl-btn" href="${img||'#'}" download="${p.name.replace(/ /g,'-')}.png" onclick="logDownload('PNG ${p.brand} ${p.name}')">⬇ Baixar PNG</a>
       </div>
     </div>`;
   }).join('');
+}
+
+async function downloadAllPNGs(){
+  const sess=getSession();
+  const allowed=sess?.brands==='kagiva'?['Kagiva']:sess?.brands==='topper'?['Topper','Rainha']:['Topper','Rainha','Kagiva'];
+  const brandFilter=_pngBrand && allowed.includes(_pngBrand)?[_pngBrand]:allowed;
+  const prods=PRODUCTS.filter(p=>brandFilter.includes(p.brand));
+  const imgs=prods.map(p=>({url:getProductImg(p),name:p.name})).filter(x=>x.url);
+  if(!imgs.length){toast('Nenhuma imagem disponível','err');return;}
+  toast(`Iniciando ${imgs.length} downloads...`,'ok');
+  for(const {url,name} of imgs){
+    const a=document.createElement('a');
+    a.href=url; a.download=name.replace(/ /g,'-')+'.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    await new Promise(r=>setTimeout(r,300));
+  }
 }
 
 function renderRepVideos(){
@@ -1914,12 +1962,44 @@ function renderRepVideos(){
   </div>`).join('');
 }
 
+let _fichaBrand = '';
+function setFichaBrand(el){
+  _fichaBrand = el.dataset.brand||'';
+  document.querySelectorAll('#rep-tab-ficha .adm-brand-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderRepFicha();
+}
+
 function renderRepFicha(){
   const sess=getSession();
-  const brands=sess?.brands==='kagiva'?['Kagiva']:sess?.brands==='topper'?['Topper','Rainha']:['Topper','Rainha','Kagiva'];
-  const prods=PRODUCTS.filter(p=>brands.includes(p.brand));
+  const allowedBrands=sess?.brands==='kagiva'?['Kagiva']:sess?.brands==='topper'?['Topper','Rainha']:['Topper','Rainha','Kagiva'];
+  const brandFilter=_fichaBrand && allowedBrands.includes(_fichaBrand) ? [_fichaBrand] : allowedBrands;
+  const prods=PRODUCTS.filter(p=>brandFilter.includes(p.brand));
   const grid=document.getElementById('rep-ficha-grid');
-  if(grid) grid.innerHTML=prods.map(prodCard).join('');
+  if(!grid) return;
+
+  let html='';
+  brandFilter.forEach(brand=>{
+    const brandProds=prods.filter(p=>p.brand===brand);
+    if(!brandProds.length) return;
+    if(!_fichaBrand){
+      html+=`<div style="font-family:var(--fb);font-size:.8rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);padding:8px 4px 4px;border-bottom:1px solid var(--line);margin-bottom:12px;margin-top:8px">${brand} <span style="color:var(--muted);font-weight:400">(${brandProds.length})</span></div>`;
+    }
+    const sports=[...new Set(brandProds.map(p=>p.sport||'Outros'))];
+    sports.forEach(sport=>{
+      const sportProds=brandProds.filter(p=>(p.sport||'Outros')===sport);
+      const ico=SPORT_E[sport]||'⚽';
+      html+=`<div class="adm-cat-section">
+        <div class="adm-cat-header" onclick="const b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none'">
+          <span style="font-size:1.1rem">${ico}</span>
+          <span class="adm-cat-header-title">${sport}</span>
+          <span class="adm-cat-header-count">${sportProds.length} produto${sportProds.length!==1?'s':''} ▾</span>
+        </div>
+        <div class="catalog-products" style="margin-bottom:8px">${sportProds.map(p=>prodCard(p)).join('')}</div>
+      </div>`;
+    });
+  });
+  grid.innerHTML=html;
 }
 
 // ══════════════════════════════════════════════
