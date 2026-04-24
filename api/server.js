@@ -89,4 +89,4 @@ app.post('/api/notify', auth, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Mundi TKR API running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Mundi TKR API v2 running on port ${PORT}`));
