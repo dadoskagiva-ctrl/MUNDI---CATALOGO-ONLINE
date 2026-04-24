@@ -32,3 +32,16 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  - type: web
+    name: mundi-tkr-api
+    env: node
+    branch: main
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    envVars:
+      - key: API_KEY
+        value: mundi_tkr_api_2026
+      - key: DATABASE_URL
+        sync: false

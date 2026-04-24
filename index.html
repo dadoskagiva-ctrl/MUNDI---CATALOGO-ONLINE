@@ -89,8 +89,9 @@ input,select,textarea{font-family:var(--fb)}
 
 /* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;
-  align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line);
-  background:var(--bg)}
+  align-items:center;gap:16px;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 24px 14px;
+  border-bottom:1px solid var(--line);background:var(--bg)}
 .topbar-title{font-family:var(--fb);font-size:1rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
 .topbar-sub{color:var(--muted);font-size:.78rem;margin-top:2px;font-weight:400}
 
@@ -630,7 +631,11 @@ input,select,textarea{font-family:var(--fb)}
   <div style="margin-top:28px;width:40px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden"><div style="height:100%;background:#e06020;border-radius:2px;animation:splashBar 1.2s ease-in-out infinite"></div></div>
 </div>
 <style>@keyframes splashBar{0%{width:0;margin-left:0}60%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}</style>
-<script>setTimeout(function(){var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},420);}},700);</script>
+<script>
+var _splashHidden=false;
+function _hideSplash(){if(_splashHidden)return;_splashHidden=true;var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},420);}}
+setTimeout(_hideSplash,6000);
+</script>
 
 <div class="shell">
 
@@ -1329,9 +1334,18 @@ const K = {
   videos:'mundi:videos', links:'mundi:links',
   imglinks:'mundi:imglinks'
 };
+
+// ── Neon sync ──
+const _API = 'https://mundi-tkr-api.onrender.com';
+const _AK  = 'mundi_tkr_api_2026';
+const _SK  = ['mundi:reps','mundi:products'];
+function _push(k,v){fetch(`${_API}/api/kv/${encodeURIComponent(k)}`,{method:'PUT',headers:{'Content-Type':'application/json','x-api-key':_AK},body:JSON.stringify({value:v})}).catch(()=>{});}
+async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(7000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]!=null)localStorage.setItem(k,JSON.stringify(d[k]));});}catch(e){}}
+// ── end sync ──
+
 const getData = k => { try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]} };
 const getObj  = k => { try{return JSON.parse(localStorage.getItem(k)||'{}')}catch{return{}} };
-const setData = (k,v) => localStorage.setItem(k,JSON.stringify(v));
+const setData = (k,v) => { localStorage.setItem(k,JSON.stringify(v)); if(_SK.includes(k)) _push(k,v); };
 const getSession = () => { try{return JSON.parse(sessionStorage.getItem(K.session)||'null')}catch{return null} };
 const setSession = u => sessionStorage.setItem(K.session,JSON.stringify(u));
 const clearSession = () => sessionStorage.removeItem(K.session);
@@ -1351,14 +1365,13 @@ function ensureAdmin(){
   }
   setData(K.reps,reps);
 }
-ensureAdmin();
-
-// Load custom products from localStorage if available
-(function(){
-  try{
-    const saved=localStorage.getItem('mundi:products');
-    if(saved){const arr=JSON.parse(saved);if(arr&&arr.length){PRODUCTS.length=0;arr.forEach(p=>PRODUCTS.push(p));}}
-  }catch(e){}
+// Async init: pull fresh data from Neon, then init app
+(async()=>{
+  await Promise.race([_pull(), new Promise(r=>setTimeout(r,5000))]);
+  ensureAdmin();
+  // Reload PRODUCTS from localStorage (now synced from server)
+  try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
+  _hideSplash();
 })();
 
 
