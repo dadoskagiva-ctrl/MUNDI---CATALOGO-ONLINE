@@ -27,6 +27,7 @@ function auth(req, res, next) {
 }
 
 app.get('/health', (_req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
+app.get('/api/version', (_req, res) => res.json({ version: 'v3-notify-ok' }));
 
 // GET /api/kv?keys=key1,key2
 app.get('/api/kv', auth, async (req, res) => {
