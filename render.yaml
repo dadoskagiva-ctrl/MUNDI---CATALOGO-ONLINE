@@ -46,3 +46,5 @@ services:
         value: mundi_tkr_api_2026
       - key: DATABASE_URL
         sync: false
+      - key: OS_API_KEY
+        sync: false

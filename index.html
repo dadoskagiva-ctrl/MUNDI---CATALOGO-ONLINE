@@ -2336,27 +2336,18 @@ async function sendPushNotif(){
   const title = document.getElementById('notif-title').value.trim();
   const body  = document.getElementById('notif-body').value.trim();
   const url   = document.getElementById('notif-url').value.trim();
-  const apiKey= localStorage.getItem('mundi:os_key');
   const fb    = document.getElementById('notif-fb');
   if(!title||!body){toast('Preencha título e mensagem','err');return;}
-  if(!apiKey){fb.innerHTML='<div class="fb-msg fb-err">❌ Configure a REST API Key do OneSignal</div>';return;}
   fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Enviando...</div>';
-  const payload = {
-    app_id: _osAppId,
-    included_segments: ['All'],
-    headings: {en: title, pt: title},
-    contents: {en: body,  pt: body},
-  };
-  if(url) payload.url = url;
   try{
-    const res = await fetch('https://onesignal.com/api/v1/notifications',{
+    const res = await fetch(_API+'/api/notify',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Basic '+apiKey},
-      body: JSON.stringify(payload)
+      headers:{'Content-Type':'application/json','x-api-key':_AK},
+      body: JSON.stringify({title,body,url})
     });
     const data = await res.json();
-    if(data.id){
-      fb.innerHTML='<div class="fb-msg fb-ok">✅ Enviado! ID: '+data.id+'</div>';
+    if(data.ok){
+      fb.innerHTML='<div class="fb-msg fb-ok">✅ Enviado para '+( data.recipients||'todos')+'! ID: '+data.id+'</div>';
       const hist=JSON.parse(localStorage.getItem('mundi:notif_hist')||'[]');
       hist.unshift({id:data.id,title,body,url,ts:new Date().toISOString()});
       localStorage.setItem('mundi:notif_hist',JSON.stringify(hist.slice(0,30)));
@@ -2366,7 +2357,7 @@ async function sendPushNotif(){
       document.getElementById('notif-url').value='';
       addLog('Admin enviou notificação push: '+title);
     } else {
-      fb.innerHTML='<div class="fb-msg fb-err">❌ Erro: '+(data.errors?data.errors.join(', '):JSON.stringify(data))+'</div>';
+      fb.innerHTML='<div class="fb-msg fb-err">❌ Erro: '+(data.error||JSON.stringify(data))+'</div>';
     }
   }catch(e){
     fb.innerHTML='<div class="fb-msg fb-err">❌ Erro de rede: '+e.message+'</div>';

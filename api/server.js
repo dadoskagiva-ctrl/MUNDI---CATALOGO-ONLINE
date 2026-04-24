@@ -59,5 +59,34 @@ app.put('/api/kv/:key', auth, async (req, res) => {
   }
 });
 
+// POST /api/notify  body: { title, body, url?, apiKey }
+app.post('/api/notify', auth, async (req, res) => {
+  const { title, body, url } = req.body;
+  const osAppId  = process.env.OS_APP_ID  || 'e7024ef4-2ee4-4fd4-bc99-dbe3b981e64b';
+  const osApiKey = process.env.OS_API_KEY;
+  if (!osApiKey) return res.status(500).json({ error: 'OS_API_KEY não configurada no servidor' });
+  if (!title || !body) return res.status(400).json({ error: 'title e body são obrigatórios' });
+  try {
+    const payload = {
+      app_id: osAppId,
+      included_segments: ['All'],
+      headings: { pt: title, en: title },
+      contents: { pt: body,  en: body  },
+    };
+    if (url) payload.url = url;
+    const r = await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Basic ' + osApiKey },
+      body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if (data.errors) return res.status(400).json({ error: data.errors.join(', ') });
+    res.json({ ok: true, id: data.id, recipients: data.recipients });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Mundi TKR API running on port ${PORT}`));
