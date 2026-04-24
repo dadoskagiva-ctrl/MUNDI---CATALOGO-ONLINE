@@ -1000,7 +1000,8 @@ setTimeout(_hideSplash,6000);
   <div class="dash-body">
     <div class="dash-header">
       <div><div class="dash-title">ÁREA DO <span>REPRESENTANTE</span></div><div class="dash-welcome" id="rep-welcome"></div></div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" id="btn-notif-rep" onclick="ativarNotificacoes()" style="color:#4ade80;border-color:rgba(74,222,128,.3)">🔔 Notificações</button>
         <button class="btn btn-ghost btn-sm" onclick="showPage('home')">← App</button>
         <button class="btn btn-outline btn-sm" onclick="doLogout()">Sair</button>
       </div>
@@ -2772,6 +2773,24 @@ function toast(msg,type=''){
   el.textContent=msg;
   el.className='toast show'+(type?' '+type:'');
   setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+async function ativarNotificacoes(){
+  const btn=document.getElementById('btn-notif-rep');
+  try{
+    if(typeof OneSignal==='undefined'||!window.OneSignalDeferred){
+      toast('Notificações não disponíveis neste navegador','err'); return;
+    }
+    window.OneSignalDeferred.push(async function(OS){
+      const perm = await Notification.requestPermission();
+      if(perm==='granted'){
+        toast('Notificações ativadas! ✅','ok');
+        if(btn) btn.textContent='🔔 Ativado';
+      } else {
+        toast('Permissão negada. Ative nas configurações do iPhone.','err');
+      }
+    });
+  }catch(e){ toast('Erro ao ativar notificações','err'); }
 }
 
 // ══════════════════════════════════════════════
