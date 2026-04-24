@@ -1205,7 +1205,12 @@ input,select,textarea{font-family:var(--fb)}
     <div id="pdf-viewer-title" style="font-family:var(--fb);font-weight:800;color:#fff;font-size:.95rem;letter-spacing:.05em"></div>
     <button onclick="closePdfViewer()" style="background:rgba(255,255,255,.08);border:1px solid #333;color:#ccc;cursor:pointer;font-size:1rem;padding:7px 16px;border-radius:8px;font-family:var(--fb);font-weight:700">✕ Fechar</button>
   </div>
-  <iframe id="pdf-viewer-frame" src="" style="flex:1;width:100%;border:none;background:#fff"></iframe>
+  <div id="pdf-viewer-loading" style="display:none;position:absolute;top:56px;left:0;right:0;bottom:0;background:#0d0d0d;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none">
+    <div style="width:44px;height:44px;border:3px solid #222;border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite"></div>
+    <div style="font-family:var(--fb);font-size:.8rem;color:#666;letter-spacing:.1em">Carregando catálogo...</div>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+  <iframe id="pdf-viewer-frame" src="" style="flex:1;width:100%;border:none;background:#fff" onload="document.getElementById('pdf-viewer-loading').style.display='none'"></iframe>
   <div id="pdf-viewer-msg" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center">
     <div style="font-size:2.5rem">📄</div>
     <div style="font-family:var(--fb);font-weight:800;color:#fff;font-size:1.1rem">Visualização não configurada</div>
@@ -1646,14 +1651,17 @@ function shareWA(id){
 // ══════════════════════════════════════════════
 // Default Google Drive preview URLs (hardcoded — admin panel can override)
 const CATALOG_VIEWER_URLS = {
-  'link-kagiva': 'https://drive.google.com/file/d/1SipozEXPw9MV7Xekx_iaHzWmOzdK8Xyq/preview',
-  'link-topper': 'https://drive.google.com/file/d/1h439Yk9mqe1qWJ-avhPoX0KwCe85SXOD/preview'
+  'link-kagiva': '1SipozEXPw9MV7Xekx_iaHzWmOzdK8Xyq',
+  'link-topper': '1h439Yk9mqe1qWJ-avhPoX0KwCe85SXOD'
 };
-function drivePreviewUrl(url){
-  if(!url) return '';
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
-  if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
-  return url;
+function driveEmbedUrl(input){
+  if(!input) return '';
+  // Extract file ID from any Drive URL, or use raw ID if already an ID
+  const m = input.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+  const id = m ? m[1] : (input.match(/^[a-zA-Z0-9_-]{20,}$/) ? input : '');
+  if(!id) return input; // not a Drive link — use as-is
+  // Use Google Docs embedded viewer — no Drive chrome, just the document
+  return 'https://docs.google.com/viewer?srcid='+id+'&pid=explorer&efh=false&a=v&chrome=false&embedded=true';
 }
 function openPdfViewer(downloadUrl, title, adminKey){
   const modal = document.getElementById('pdf-viewer-modal');
@@ -1663,10 +1671,13 @@ function openPdfViewer(downloadUrl, title, adminKey){
   // Priority: admin panel URL > hardcoded default > nothing
   const links = getObj(K.links);
   const adminRaw = adminKey ? (links[adminKey]||'') : '';
-  const viewUrl = drivePreviewUrl(adminRaw) || (adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '');
+  const defaultId = adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '';
+  const viewUrl = driveEmbedUrl(adminRaw) || driveEmbedUrl(defaultId);
   if(viewUrl){
     frame.style.display='';
     if(msg) msg.style.display='none';
+    const loader = document.getElementById('pdf-viewer-loading');
+    if(loader) loader.style.display='flex';
     frame.src = viewUrl;
   } else {
     frame.style.display='none';
