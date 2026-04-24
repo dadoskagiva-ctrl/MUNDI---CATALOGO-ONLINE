@@ -1008,6 +1008,7 @@ setTimeout(_hideSplash,6000);
       <button class="dash-tab" onclick="setAdminTab('links')">Links Drive</button>
       <button class="dash-tab" onclick="setAdminTab('logs')">Logs</button>
       <button class="dash-tab" onclick="setAdminTab('notifs')">📲 Notificações</button>
+      <button class="dash-tab" onclick="setAdminTab('subscription')">💳 Assinatura</button>
     </div>
     <div id="admin-tab-reps"><div class="card-panel"><div class="card-panel-title">Representantes Cadastrados</div><div id="admin-reps-list"></div></div></div>
     <div id="admin-tab-add-rep" style="display:none">
@@ -1253,6 +1254,27 @@ setTimeout(_hideSplash,6000);
         <div id="notif-history"><p style="color:#666;font-size:.82rem">Nenhuma notificação enviada ainda.</p></div>
       </div>
     </div>
+
+    <!-- ── ASSINATURA ── -->
+    <div id="admin-tab-subscription" style="display:none">
+      <div class="card-panel">
+        <div class="card-panel-title">💳 Controle de Assinatura</div>
+        <div id="sub-status-display"></div>
+        <div class="form-grid">
+          <div class="field"><label>Nome do Cliente</label><input id="sub-client-name" placeholder="Ex: Mundi TKR Sports"/></div>
+          <div class="field"><label>Plano</label>
+            <select id="sub-plan" style="background:var(--panel2);color:var(--text);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;width:100%">
+              <option value="monthly">Mensal</option>
+              <option value="annual">Anual</option>
+            </select>
+          </div>
+          <div class="field"><label>Válido até</label><input id="sub-expires" type="date" style="color-scheme:dark"/></div>
+          <div class="field"><label>Link Kiwify (renovação)</label><input id="sub-kiwify-url" placeholder="https://pay.kiwify.com.br/..."/></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSubscription()">Salvar</button>
+        <div id="sub-admin-fb" style="margin-top:8px"></div>
+      </div>
+    </div>
   </div>
   <footer class="footer"><div class="footer-brand">MUNDI<em>TKR</em></div><p class="footer-copy">© 2026 Mundi TKR Sports</p></footer>
 </div>
@@ -1338,7 +1360,7 @@ const K = {
 // ── Neon sync ──
 const _API = 'https://mundi-tkr-api.onrender.com';
 const _AK  = 'mundi_tkr_api_2026';
-const _SK  = ['mundi:reps','mundi:products'];
+const _SK  = ['mundi:reps','mundi:products','mundi:subscription'];
 function _push(k,v){fetch(`${_API}/api/kv/${encodeURIComponent(k)}`,{method:'PUT',headers:{'Content-Type':'application/json','x-api-key':_AK},body:JSON.stringify({value:v})}).catch(()=>{});}
 async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(7000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]!=null)localStorage.setItem(k,JSON.stringify(d[k]));});}catch(e){}}
 // ── end sync ──
@@ -1371,6 +1393,7 @@ function ensureAdmin(){
   ensureAdmin();
   // Reload PRODUCTS from localStorage (now synced from server)
   try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
+  applySubscriptionGate();
   _hideSplash();
 })();
 
@@ -1820,6 +1843,7 @@ function doRepLogin(){
   setSession(rep);
   addLog(`Login representante: ${rep.name} (CPF: ${rep.cpf})`);
   toast(`Bem-vindo, ${rep.name.split(' ')[0]}!`,'ok');
+  applySubscriptionGate();
   showPage('rep');
 }
 
@@ -1834,14 +1858,68 @@ function doAdminLogin(){
   setSession(admin);
   addLog('Login admin');
   toast('Admin logado!','ok');
+  applySubscriptionGate(); // admin bypasses gate
   showPage('admin');
 }
 
 function doLogout(){
   addLog('Logout: '+(getSession()?.name||'?'));
   clearSession();
+  applySubscriptionGate();
   showPage('home');
   toast('Até logo!');
+}
+
+// ── ASSINATURA ──
+function checkSubscription(){
+  const sub=getObj('mundi:subscription');
+  if(!sub||!sub.expiresAt) return true; // sem data = sem bloqueio (configurar depois)
+  return new Date(sub.expiresAt+'T23:59:59')>new Date();
+}
+
+function applySubscriptionGate(){
+  const el=document.getElementById('sub-expired');
+  if(!el) return;
+  const sess=getSession();
+  if(sess&&sess.role==='admin'){el.style.display='none';return;}
+  if(!checkSubscription()){
+    const sub=getObj('mundi:subscription');
+    const link=document.getElementById('sub-kiwify-link');
+    if(link) link.href=sub.kiwifyUrl||'#';
+    el.style.display='flex';
+  } else {
+    el.style.display='none';
+  }
+}
+
+function renderSubscriptionTab(){
+  const sub=getObj('mundi:subscription');
+  if(sub.clientName) document.getElementById('sub-client-name').value=sub.clientName;
+  if(sub.plan) document.getElementById('sub-plan').value=sub.plan;
+  if(sub.expiresAt) document.getElementById('sub-expires').value=sub.expiresAt;
+  if(sub.kiwifyUrl) document.getElementById('sub-kiwify-url').value=sub.kiwifyUrl;
+  const active=checkSubscription();
+  const exp=sub.expiresAt?new Date(sub.expiresAt+'T12:00:00').toLocaleDateString('pt-BR'):'Não definida';
+  document.getElementById('sub-status-display').innerHTML=`
+    <div style="padding:14px 16px;background:${active?'rgba(74,222,128,.08)':'rgba(248,113,113,.08)'};border:1px solid ${active?'rgba(74,222,128,.25)':'rgba(248,113,113,.25)'};border-radius:10px;margin-bottom:20px">
+      <div style="font-weight:700;font-size:1rem;color:${active?'#4ade80':'#f87171'}">${active?'✅ ATIVA':'❌ EXPIRADA'}</div>
+      <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Válido até: <strong>${exp}</strong></div>
+    </div>`;
+}
+
+function saveSubscription(){
+  const sub={
+    clientName:document.getElementById('sub-client-name').value.trim(),
+    plan:document.getElementById('sub-plan').value,
+    expiresAt:document.getElementById('sub-expires').value,
+    kiwifyUrl:document.getElementById('sub-kiwify-url').value.trim(),
+  };
+  if(!sub.expiresAt){toast('Defina a data de validade','err');return;}
+  setData('mundi:subscription',sub);
+  renderSubscriptionTab();
+  applySubscriptionGate();
+  document.getElementById('sub-admin-fb').innerHTML='<div class="fb-msg fb-ok">✅ Salvo e sincronizado!</div>';
+  setTimeout(()=>{document.getElementById('sub-admin-fb').innerHTML='';},3000);
 }
 
 // ══════════════════════════════════════════════
@@ -2059,7 +2137,7 @@ function updateAdminStats(){
 }
 
 function setAdminTab(tab){
-  const tabs=['reps','add-rep','products','videos','links','logs','notifs'];
+  const tabs=['reps','add-rep','products','videos','links','logs','notifs','subscription'];
   tabs.forEach(t=>document.getElementById('admin-tab-'+t).style.display=t===tab?'':'none');
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
@@ -2068,6 +2146,7 @@ function setAdminTab(tab){
   if(tab==='links') loadLinks();
   if(tab==='logs') renderLogs();
   if(tab==='notifs') loadNotifTab();
+  if(tab==='subscription') renderSubscriptionTab();
 }
 
 // ══════════════════════════════════════════════
@@ -2628,6 +2707,15 @@ mobNavActive('home');
     <span class="mn-ico">⚽</span>ADM
   </button>
 </nav>
+
+<!-- SUBSCRIPTION EXPIRED OVERLAY -->
+<div id="sub-expired" style="display:none;position:fixed;inset:0;z-index:98000;background:#0d0d0d;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center">
+  <div style="font-size:3.5rem">⚠️</div>
+  <div style="font-family:var(--fb);font-size:1.8rem;color:var(--orange);letter-spacing:.04em">ASSINATURA EXPIRADA</div>
+  <p style="color:var(--muted);font-size:.9rem;max-width:320px;line-height:1.6">O acesso ao app Mundi TKR Sports está suspenso. Renove a assinatura para continuar usando.</p>
+  <a id="sub-kiwify-link" href="#" target="_blank" class="btn btn-primary" style="text-decoration:none;padding:14px 32px;font-size:1rem;border-radius:10px">Renovar Assinatura</a>
+  <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.78rem;cursor:pointer;text-decoration:underline;margin-top:4px">Acesso Administrador</button>
+</div>
 
 <!-- PWA INSTALL BANNER -->
 <div id="pwa-install-bar">
