@@ -37,9 +37,8 @@ services:
     name: mundi-tkr-api
     env: node
     branch: main
-    rootDir: api
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: cd api && npm install
+    startCommand: node api/server.js
     autoDeploy: true
     envVars:
       - key: API_KEY
