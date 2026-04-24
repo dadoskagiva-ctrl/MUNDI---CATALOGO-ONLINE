@@ -885,10 +885,15 @@ setTimeout(_hideSplash,6000);
     <button class="btn btn-ghost btn-sm" onclick="showPage('home')">← Voltar</button>
   </header>
   <div style="max-width:900px;margin:0 auto;padding:40px 20px">
-    <div style="text-align:center;margin-bottom:48px">
+    <div style="text-align:center;margin-bottom:36px">
       <div style="font-size:.68rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#d4a017;font-family:var(--fb);margin-bottom:12px">PLANOS DISPONÍVEIS</div>
       <h2 style="font-family:var(--fb);font-weight:900;font-size:clamp(2rem,5vw,3.2rem);text-transform:uppercase;line-height:.95;margin-bottom:16px">ESCOLHA SEU <span style="color:var(--orange)">PLANO</span></h2>
       <p style="color:var(--muted);font-size:.95rem;max-width:480px;margin:0 auto;line-height:1.7">Plataforma completa de catálogos digitais para sua equipe de representantes</p>
+      <!-- TOGGLE MENSAL / ANUAL -->
+      <div style="display:inline-flex;background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:4px;margin-top:28px;gap:4px">
+        <button id="toggle-monthly" onclick="setPlanPeriod('monthly')" style="padding:8px 24px;border-radius:9px;border:none;background:var(--orange);color:#000;font-family:var(--fb);font-weight:800;font-size:.82rem;cursor:pointer;transition:all .2s">MENSAL</button>
+        <button id="toggle-annual" onclick="setPlanPeriod('annual')" style="padding:8px 24px;border-radius:9px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-weight:800;font-size:.82rem;cursor:pointer;transition:all .2s">ANUAL <span style="color:#4ade80;font-size:.72rem">−16%</span></button>
+      </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -896,8 +901,8 @@ setTimeout(_hideSplash,6000);
       <!-- ESSENCIAL -->
       <div style="background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:0">
         <div style="font-family:var(--fb);font-size:.7rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">ESSENCIAL</div>
-        <div style="font-family:var(--fb);font-weight:900;font-size:2.6rem;line-height:1;color:var(--text)">R$&nbsp;249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span></div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:24px">ou R$ 2.490/ano <span style="color:#4ade80;font-weight:600">16% off</span></div>
+        <div id="price-essencial" style="font-family:var(--fb);font-weight:900;font-size:2.6rem;line-height:1;color:var(--text)">R$&nbsp;249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span></div>
+        <div id="price-essencial-sub" style="font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:24px">cobrado mensalmente</div>
         <div style="display:flex;flex-direction:column;gap:10px;flex:1">
           <div style="font-size:.82rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">INCLUI</div>
           <div style="font-size:.85rem;color:var(--text);line-height:1.4">✅ Catálogo digital das 3 marcas</div>
@@ -917,8 +922,8 @@ setTimeout(_hideSplash,6000);
       <div style="background:var(--panel);border:2px solid var(--orange);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:0;position:relative;box-shadow:0 0 40px rgba(224,96,32,.12)">
         <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--orange);color:#000;font-family:var(--fb);font-size:.65rem;font-weight:900;letter-spacing:.12em;padding:4px 14px;border-radius:20px">RECOMENDADO</div>
         <div style="font-family:var(--fb);font-size:.7rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:8px">PRO</div>
-        <div style="font-family:var(--fb);font-weight:900;font-size:2.6rem;line-height:1;color:var(--text)">R$&nbsp;449<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span></div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:24px">ou R$ 3.990/ano <span style="color:#4ade80;font-weight:600">25% off</span></div>
+        <div id="price-pro" style="font-family:var(--fb);font-weight:900;font-size:2.6rem;line-height:1;color:var(--text)">R$&nbsp;449<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span></div>
+        <div id="price-pro-sub" style="font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:24px">cobrado mensalmente</div>
         <div style="display:flex;flex-direction:column;gap:10px;flex:1">
           <div style="font-size:.82rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">TUDO DO ESSENCIAL +</div>
           <div style="font-size:.85rem;color:var(--text);line-height:1.4">🚀 Gerador de proposta PDF</div>
@@ -1339,8 +1344,10 @@ setTimeout(_hideSplash,6000);
             </select>
           </div>
           <div class="field"><label>Válido até</label><input id="sub-expires" type="date" style="color-scheme:dark"/></div>
-          <div class="field"><label>Link Kiwify — Plano Essencial</label><input id="sub-kiwify-url" placeholder="https://pay.kiwify.com.br/..."/></div>
-          <div class="field"><label>Link Kiwify — Plano Pro</label><input id="sub-kiwify-url-pro" placeholder="https://pay.kiwify.com.br/..."/></div>
+          <div class="field"><label>Link Kiwify — Essencial Mensal</label><input id="sub-kiwify-url" placeholder="https://kiwify.app/..."/></div>
+          <div class="field"><label>Link Kiwify — Essencial Anual</label><input id="sub-kiwify-url-ea" placeholder="https://kiwify.app/..."/></div>
+          <div class="field"><label>Link Kiwify — Pro Mensal</label><input id="sub-kiwify-url-pro" placeholder="https://kiwify.app/..."/></div>
+          <div class="field"><label>Link Kiwify — Pro Anual</label><input id="sub-kiwify-url-pa" placeholder="https://kiwify.app/..."/></div>
           <div class="field"><label>WhatsApp (com DDI, ex: 5511999999999)</label><input id="sub-whatsapp" placeholder="5511999999999"/></div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="saveSubscription()">Salvar</button>
@@ -1975,7 +1982,9 @@ function renderSubscriptionTab(){
   if(sub.plan) document.getElementById('sub-plan').value=sub.plan;
   if(sub.expiresAt) document.getElementById('sub-expires').value=sub.expiresAt;
   if(sub.kiwifyUrl) document.getElementById('sub-kiwify-url').value=sub.kiwifyUrl;
+  if(sub.kiwifyUrlEA) document.getElementById('sub-kiwify-url-ea').value=sub.kiwifyUrlEA;
   if(sub.kiwifyUrlPro) document.getElementById('sub-kiwify-url-pro').value=sub.kiwifyUrlPro;
+  if(sub.kiwifyUrlPA) document.getElementById('sub-kiwify-url-pa').value=sub.kiwifyUrlPA;
   if(sub.whatsapp) document.getElementById('sub-whatsapp').value=sub.whatsapp;
   const active=checkSubscription();
   const exp=sub.expiresAt?new Date(sub.expiresAt+'T12:00:00').toLocaleDateString('pt-BR'):'Não definida';
@@ -1992,7 +2001,9 @@ function saveSubscription(){
     plan:document.getElementById('sub-plan').value,
     expiresAt:document.getElementById('sub-expires').value,
     kiwifyUrl:document.getElementById('sub-kiwify-url').value.trim(),
+    kiwifyUrlEA:document.getElementById('sub-kiwify-url-ea').value.trim(),
     kiwifyUrlPro:document.getElementById('sub-kiwify-url-pro').value.trim(),
+    kiwifyUrlPA:document.getElementById('sub-kiwify-url-pa').value.trim(),
     whatsapp:document.getElementById('sub-whatsapp').value.trim(),
   };
   if(!sub.expiresAt){toast('Defina a data de validade','err');return;}
@@ -2004,13 +2015,32 @@ function saveSubscription(){
   setTimeout(()=>{document.getElementById('sub-admin-fb').innerHTML='';},3000);
 }
 
+let _planPeriod='monthly';
+function setPlanPeriod(p){
+  _planPeriod=p;
+  const tm=document.getElementById('toggle-monthly');
+  const ta=document.getElementById('toggle-annual');
+  if(tm){tm.style.background=p==='monthly'?'var(--orange)':'transparent';tm.style.color=p==='monthly'?'#000':'var(--muted)';}
+  if(ta){ta.style.background=p==='annual'?'var(--orange)':'transparent';ta.style.color=p==='annual'?'#000':'var(--muted)';}
+  const pe=document.getElementById('price-essencial');
+  const pes=document.getElementById('price-essencial-sub');
+  const pp=document.getElementById('price-pro');
+  const pps=document.getElementById('price-pro-sub');
+  if(pe) pe.innerHTML=p==='monthly'?'R$&nbsp;249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span>':'R$&nbsp;2.490<span style="font-size:1rem;font-weight:400;color:var(--muted)">/ano</span>';
+  if(pes) pes.innerHTML=p==='monthly'?'cobrado mensalmente':'<span style="color:#4ade80;font-weight:600">16% off</span> — equivale a R$207/mês';
+  if(pp) pp.innerHTML=p==='monthly'?'R$&nbsp;449<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span>':'R$&nbsp;3.990<span style="font-size:1rem;font-weight:400;color:var(--muted)">/ano</span>';
+  if(pps) pps.innerHTML=p==='monthly'?'cobrado mensalmente':'<span style="color:#4ade80;font-weight:600">25% off</span> — equivale a R$332/mês';
+  updatePlansLinks();
+}
+
 function updatePlansLinks(sub){
   sub=sub||getObj('mundi:subscription');
+  const annual=_planPeriod==='annual';
   const el=document.getElementById('plans-link-essencial');
   const ep=document.getElementById('plans-link-pro');
   const ew=document.getElementById('plans-whatsapp');
-  if(el&&sub.kiwifyUrl) el.href=sub.kiwifyUrl;
-  if(ep&&sub.kiwifyUrlPro) ep.href=sub.kiwifyUrlPro;
+  if(el) el.href=(annual?sub.kiwifyUrlEA:sub.kiwifyUrl)||'#';
+  if(ep) ep.href=(annual?sub.kiwifyUrlPA:sub.kiwifyUrlPro)||'#';
   if(ew&&sub.whatsapp) ew.href=`https://wa.me/${sub.whatsapp}`;
 }
 
