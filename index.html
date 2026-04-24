@@ -566,44 +566,77 @@ input,select,textarea{font-family:var(--fb)}
 }
 
 @media(max-width:640px){
-  .hero-wrap{padding:14px 10px}
-  .hero-card{padding:18px 14px;gap:12px}
+  /* ── GERAL ── */
+  *{-webkit-tap-highlight-color:transparent}
+  .hero-wrap{padding:10px 8px}
+  .hero-card{padding:16px 12px;gap:10px}
   .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
-  .stat{padding:12px}
-  h1[style*="clamp"]{font-size:clamp(2.2rem,11vw,3.2rem) !important}
+  .stat{padding:10px}
+  h1[style*="clamp"]{font-size:clamp(2rem,10vw,3rem) !important}
   .home-cat-grid{grid-template-columns:1fr !important}
-  .prod-inner{grid-template-columns:1fr}
-  .prod-media{min-height:180px}
   .brands-grid{grid-template-columns:1fr}
-  .admin-stat-grid{grid-template-columns:repeat(2,1fr)}
   .cat-filters{top:0}
   .modal{max-height:96vh;border-radius:20px 20px 0 0}
   .modal-ov{padding:0;align-items:flex-end}
+
+  /* ── TOPBAR ── */
+  .topbar{padding:10px 12px;gap:6px;flex-wrap:nowrap}
   .topbar-sub{display:none}
-  .dash-wrap,.dash-body,.admin-body{padding:12px 10px}
-  .login-right{padding:24px 14px}
-  /* topbar: stack logo + buttons */
-  .topbar{padding:10px 12px;gap:6px}
-  .topbar-title{font-size:.82rem;letter-spacing:.02em}
-  /* smaller topbar buttons */
-  .topbar>div:last-child button{font-size:.72rem !important;padding:7px 12px !important}
-  /* catalog PDF block */
+  .topbar-title{font-size:.82rem;letter-spacing:.02em;white-space:nowrap}
+  .topbar>div:last-child{display:flex;gap:5px;flex-shrink:0}
+  .topbar>div:last-child button{font-size:.68rem !important;padding:6px 10px !important;white-space:nowrap}
+
+  /* ── DASH / ADMIN / REP ── */
+  .dash-wrap,.dash-body,.admin-body{padding:10px 10px}
+  .dash-header{flex-direction:column;gap:10px;margin-bottom:16px}
+  .dash-header>div:last-child{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+  .dash-header>div:last-child .btn{flex:1;min-width:0;font-size:.68rem !important;padding:8px 6px !important;text-align:center;white-space:nowrap}
+  .dash-title{font-size:1.2rem;letter-spacing:2px}
+  .dash-welcome{font-size:.76rem}
+
+  /* ── TABS ── */
+  .dash-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding-bottom:2px;width:100%}
+  .dash-tabs::-webkit-scrollbar{display:none}
+  .dash-tab{white-space:nowrap;flex-shrink:0;font-size:.62rem;padding:8px 12px}
+
+  /* ── CARDS & FORMS ── */
+  .card-panel{padding:14px 12px;border-radius:14px}
+  .card-panel-title{font-size:.9rem;letter-spacing:2px;margin-bottom:12px}
+  .form-grid{grid-template-columns:1fr}
+  .admin-stat-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .admin-stat{padding:12px 8px}
+  .admin-stat-n{font-size:1.4rem}
+  .admin-stat-l{font-size:.6rem}
+
+  /* ── TABELAS ── */
+  .admin-table thead th{font-size:.58rem;padding:6px 8px}
+  .admin-table tbody td{padding:8px;font-size:.78rem}
+  .log-time{min-width:unset;font-size:.66rem}
+
+  /* ── CATALOG ── */
   .catalog-wrap{padding-bottom:0}
-  /* product row compact */
+  .prod-inner{grid-template-columns:1fr}
+  .prod-media{min-height:180px}
   .prod-row{gap:8px;padding:8px}
   .prod-row-left{gap:8px}
-  /* home product search card */
+  .prod-row-photo{max-width:80px}
+
+  /* ── HOME SEARCH ── */
   #home-products-grid>div{padding:10px 12px !important}
-  /* dash tabs scroll */
-  .dash-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding-bottom:2px}
-  .dash-tabs::-webkit-scrollbar{display:none}
-  .dash-tab{white-space:nowrap;flex-shrink:0}
-  /* admin stat tighter */
-  .admin-stat{padding:14px 10px}
-  .admin-stat-n{font-size:1.6rem}
-  /* plans page: single column */
+
+  /* ── LOGIN ── */
+  .login-right{padding:20px 14px}
+
+  /* ── PLANOS ── */
   .plans-grid{grid-template-columns:1fr !important}
-  #page-plans .topbar>button{font-size:.72rem;padding:7px 12px}
+  #page-plans>div{padding:20px 12px}
+  #page-plans h2{font-size:1.8rem !important}
+
+  /* ── REP DOWNLOAD GRID ── */
+  .rep-dl-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+
+  /* ── BOTÕES GERAIS MOBILE ── */
+  .btn{min-height:42px}
 }
 
 /* ── PWA INSTALL BANNER ── */
@@ -1000,8 +1033,8 @@ setTimeout(_hideSplash,6000);
   <div class="dash-body">
     <div class="dash-header">
       <div><div class="dash-title">ÁREA DO <span>REPRESENTANTE</span></div><div class="dash-welcome" id="rep-welcome"></div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" id="btn-notif-rep" onclick="ativarNotificacoes()" style="color:#4ade80;border-color:rgba(74,222,128,.3)">🔔 Notificações</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" id="btn-notif-rep" onclick="ativarNotificacoes()" style="color:#4ade80;border-color:rgba(74,222,128,.3)">🔔 Notif.</button>
         <button class="btn btn-ghost btn-sm" onclick="showPage('home')">← App</button>
         <button class="btn btn-outline btn-sm" onclick="doLogout()">Sair</button>
       </div>
