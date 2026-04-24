@@ -1478,6 +1478,11 @@ const K = {
 const _API = 'https://mundi-tkr-api.onrender.com';
 const _AK  = 'mundi_tkr_api_2026';
 const _SK  = ['mundi:reps','mundi:products','mundi:subscription'];
+const KIWIFY_EM = 'https://pay.kiwify.com.br/Fg3dOU7';
+const KIWIFY_EA = 'https://pay.kiwify.com.br/nUrBLSj';
+const KIWIFY_PM = 'https://pay.kiwify.com.br/Y4ESS1y';
+const KIWIFY_PA = 'https://pay.kiwify.com.br/k71mRhm';
+const KIWIFY_PAGE = 'https://kiwify.app/Mphu2dR';
 function _push(k,v){fetch(`${_API}/api/kv/${encodeURIComponent(k)}`,{method:'PUT',headers:{'Content-Type':'application/json','x-api-key':_AK},body:JSON.stringify({value:v})}).catch(()=>{});}
 async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(7000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]!=null)localStorage.setItem(k,JSON.stringify(d[k]));});}catch(e){}}
 // ── end sync ──
@@ -2003,7 +2008,7 @@ function doLogout(){
 // ── ASSINATURA ──
 function checkSubscription(){
   const sub=getObj('mundi:subscription');
-  if(!sub||!sub.expiresAt) return true; // sem data = sem bloqueio (configurar depois)
+  if(!sub||!sub.expiresAt) return false;
   return new Date(sub.expiresAt+'T23:59:59')>new Date();
 }
 
@@ -2013,13 +2018,33 @@ function applySubscriptionGate(){
   const sess=getSession();
   if(sess&&sess.role==='admin'){el.style.display='none';return;}
   if(!checkSubscription()){
-    const sub=getObj('mundi:subscription');
-    const link=document.getElementById('sub-kiwify-link');
-    if(link) link.href=sub.kiwifyUrl||'#';
+    setGatePeriod(_gatePeriod||'monthly');
     el.style.display='flex';
   } else {
     el.style.display='none';
   }
+}
+let _gatePeriod='monthly';
+function setGatePeriod(p){
+  _gatePeriod=p;
+  const sub=getObj('mundi:subscription');
+  const annual=p==='annual';
+  const btnM=document.getElementById('gate-btn-monthly');
+  const btnA=document.getElementById('gate-btn-annual');
+  if(btnM){btnM.style.background=annual?'transparent':'var(--orange)';btnM.style.color=annual?'var(--muted)':'#000';}
+  if(btnA){btnA.style.background=annual?'var(--orange)':'transparent';btnA.style.color=annual?'#000':'var(--muted)';}
+  const pe=document.getElementById('gate-price-e');
+  const pp=document.getElementById('gate-price-p');
+  if(pe) pe.innerHTML=annual?'R$&nbsp;2.249<span style="font-size:.85rem;color:var(--muted)">/ano</span>':'R$&nbsp;249<span style="font-size:.85rem;color:var(--muted)">/mês</span>';
+  if(pp) pp.innerHTML=annual?'R$&nbsp;3.990<span style="font-size:.85rem;color:var(--muted)">/ano</span>':'R$&nbsp;449<span style="font-size:.85rem;color:var(--muted)">/mês</span>';
+  const le=document.getElementById('gate-link-e');
+  const lp=document.getElementById('gate-link-p');
+  if(le) le.href=(annual?sub.kiwifyUrlEA:sub.kiwifyUrl)||(annual?KIWIFY_EA:KIWIFY_EM);
+  if(lp) lp.href=(annual?sub.kiwifyUrlPA:sub.kiwifyUrlPro)||(annual?KIWIFY_PA:KIWIFY_PM);
+  const sub2=document.getElementById('gate-sub-e');
+  const sub3=document.getElementById('gate-sub-p');
+  if(sub2) sub2.textContent=annual?'equivale a R$187/mês':'cobrado mensalmente';
+  if(sub3) sub3.textContent=annual?'equivale a R$332/mês — 26% off':'cobrado mensalmente';
 }
 
 function renderSubscriptionTab(){
@@ -2072,8 +2097,8 @@ function setPlanPeriod(p){
   const pes=document.getElementById('price-essencial-sub');
   const pp=document.getElementById('price-pro');
   const pps=document.getElementById('price-pro-sub');
-  if(pe) pe.innerHTML=p==='monthly'?'R$&nbsp;249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span>':'R$&nbsp;2.490<span style="font-size:1rem;font-weight:400;color:var(--muted)">/ano</span>';
-  if(pes) pes.innerHTML=p==='monthly'?'cobrado mensalmente':'<span style="color:#4ade80;font-weight:600">16% off</span> — equivale a R$207/mês';
+  if(pe) pe.innerHTML=p==='monthly'?'R$&nbsp;249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span>':'R$&nbsp;2.249<span style="font-size:1rem;font-weight:400;color:var(--muted)">/ano</span>';
+  if(pes) pes.innerHTML=p==='monthly'?'cobrado mensalmente':'<span style="color:#4ade80;font-weight:600">25% off</span> — equivale a R$187/mês';
   if(pp) pp.innerHTML=p==='monthly'?'R$&nbsp;449<span style="font-size:1rem;font-weight:400;color:var(--muted)">/mês</span>':'R$&nbsp;3.990<span style="font-size:1rem;font-weight:400;color:var(--muted)">/ano</span>';
   if(pps) pps.innerHTML=p==='monthly'?'cobrado mensalmente':'<span style="color:#4ade80;font-weight:600">25% off</span> — equivale a R$332/mês';
   updatePlansLinks();
@@ -2085,8 +2110,8 @@ function updatePlansLinks(sub){
   const el=document.getElementById('plans-link-essencial');
   const ep=document.getElementById('plans-link-pro');
   const ew=document.getElementById('plans-whatsapp');
-  if(el) el.href=(annual?sub.kiwifyUrlEA:sub.kiwifyUrl)||'#';
-  if(ep) ep.href=(annual?sub.kiwifyUrlPA:sub.kiwifyUrlPro)||'#';
+  if(el) el.href=(annual?sub.kiwifyUrlEA:sub.kiwifyUrl)||(annual?KIWIFY_EA:KIWIFY_EM);
+  if(ep) ep.href=(annual?sub.kiwifyUrlPA:sub.kiwifyUrlPro)||(annual?KIWIFY_PA:KIWIFY_PM);
   if(ew&&sub.whatsapp) ew.href=`https://wa.me/${sub.whatsapp}`;
 }
 
@@ -2900,12 +2925,49 @@ mobNavActive('home');
 </nav>
 
 <!-- SUBSCRIPTION EXPIRED OVERLAY -->
-<div id="sub-expired" style="display:none;position:fixed;inset:0;z-index:98000;background:#0d0d0d;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center">
-  <div style="font-size:3.5rem">⚠️</div>
-  <div style="font-family:var(--fb);font-size:1.8rem;color:var(--orange);letter-spacing:.04em">ASSINATURA EXPIRADA</div>
-  <p style="color:var(--muted);font-size:.9rem;max-width:320px;line-height:1.6">O acesso ao app Mundi TKR Sports está suspenso. Renove a assinatura para continuar usando.</p>
-  <a id="sub-kiwify-link" href="#" target="_blank" class="btn btn-primary" style="text-decoration:none;padding:14px 32px;font-size:1rem;border-radius:10px">Renovar Assinatura</a>
-  <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.78rem;cursor:pointer;text-decoration:underline;margin-top:4px">Acesso Administrador</button>
+<div id="sub-expired" style="display:none;position:fixed;inset:0;z-index:98000;background:#0d0d0d;overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="max-width:500px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px)+28px) 20px calc(env(safe-area-inset-bottom,0px)+32px);text-align:center">
+    <img src="logo-mundi.png" style="height:52px;margin-bottom:18px;filter:brightness(1.1)">
+    <div style="font-family:var(--fb);font-size:1.35rem;font-weight:900;color:var(--text);letter-spacing:.03em;margin-bottom:6px">Catálogos Topper, Kagiva e Rainha</div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:22px;line-height:1.55">Fichas técnicas, fotos HD e materiais prontos para o seu time de vendas.</p>
+    <!-- Toggle mensal/anual -->
+    <div style="display:inline-flex;background:var(--panel2);border-radius:10px;padding:4px;margin-bottom:22px;gap:4px">
+      <button id="gate-btn-monthly" onclick="setGatePeriod('monthly')" style="padding:8px 22px;border-radius:8px;border:none;background:var(--orange);color:#000;font-family:var(--fb);font-weight:800;font-size:.8rem;cursor:pointer;transition:all .2s">MENSAL</button>
+      <button id="gate-btn-annual" onclick="setGatePeriod('annual')" style="padding:8px 22px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-weight:800;font-size:.8rem;cursor:pointer;transition:all .2s">ANUAL <span style="color:#4ade80;font-size:.7rem">−25%</span></button>
+    </div>
+    <!-- Cards -->
+    <div style="display:grid;gap:14px;margin-bottom:20px">
+      <!-- Essencial -->
+      <div style="background:var(--panel);border:1.5px solid var(--line2);border-radius:16px;padding:20px 18px;text-align:left">
+        <div style="font-family:var(--fb);font-size:.7rem;font-weight:800;color:var(--muted);letter-spacing:.12em;margin-bottom:6px">ESSENCIAL</div>
+        <div id="gate-price-e" style="font-family:var(--fb);font-size:2rem;font-weight:900;color:var(--text);line-height:1.1;margin-bottom:4px">R$&nbsp;249<span style="font-size:.85rem;color:var(--muted)">/mês</span></div>
+        <div id="gate-sub-e" style="color:var(--muted);font-size:.78rem;margin-bottom:14px">cobrado mensalmente</div>
+        <ul style="list-style:none;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:7px">
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Catálogos Topper, Kagiva e Rainha</li>
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Fichas técnicas completas</li>
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Fotos HD para download</li>
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Compartilhamento via WhatsApp</li>
+        </ul>
+        <a id="gate-link-e" href="https://pay.kiwify.com.br/Fg3dOU7" target="_blank" style="display:block;text-align:center;padding:12px;background:var(--panel2);border:1.5px solid var(--line2);border-radius:10px;color:var(--text);text-decoration:none;font-family:var(--fb);font-weight:700;font-size:.85rem;letter-spacing:.04em">CONTRATAR ESSENCIAL</a>
+      </div>
+      <!-- Pro -->
+      <div style="background:linear-gradient(145deg,rgba(224,96,32,.08),rgba(224,96,32,.04));border:2px solid var(--orange);border-radius:16px;padding:20px 18px;text-align:left;position:relative">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--orange);color:#000;font-family:var(--fb);font-size:.65rem;font-weight:800;padding:3px 12px;border-radius:20px;letter-spacing:.1em;white-space:nowrap">MAIS POPULAR</div>
+        <div style="font-family:var(--fb);font-size:.7rem;font-weight:800;color:var(--orange);letter-spacing:.12em;margin-bottom:6px">PRO</div>
+        <div id="gate-price-p" style="font-family:var(--fb);font-size:2rem;font-weight:900;color:var(--text);line-height:1.1;margin-bottom:4px">R$&nbsp;449<span style="font-size:.85rem;color:var(--muted)">/mês</span></div>
+        <div id="gate-sub-p" style="color:var(--muted);font-size:.78rem;margin-bottom:14px">cobrado mensalmente</div>
+        <ul style="list-style:none;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:7px">
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Tudo do Essencial</li>
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Catálogos sempre atualizados</li>
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Representantes ilimitados</li>
+          <li style="font-size:.84rem;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="color:#4ade80;flex-shrink:0">✓</span>Suporte prioritário</li>
+        </ul>
+        <a id="gate-link-p" href="https://pay.kiwify.com.br/Y4ESS1y" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;border-radius:10px;color:#000;text-decoration:none;font-family:var(--fb);font-weight:900;font-size:.85rem;letter-spacing:.04em">CONTRATAR PRO</a>
+      </div>
+    </div>
+    <p style="color:var(--muted2);font-size:.78rem;margin-bottom:16px">Após o pagamento, entre em contato para ativar seu acesso.</p>
+    <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.76rem;cursor:pointer;text-decoration:underline">Acesso Administrador</button>
+  </div>
 </div>
 
 <!-- PWA INSTALL BANNER -->
