@@ -1644,31 +1644,35 @@ function shareWA(id){
 // ══════════════════════════════════════════════
 // PDF VIEWER
 // ══════════════════════════════════════════════
+// Default Google Drive preview URLs (hardcoded — admin panel can override)
+const CATALOG_VIEWER_URLS = {
+  'link-kagiva': 'https://drive.google.com/file/d/1SipozEXPw9MV7Xekx_iaHzWmOzdK8Xyq/preview',
+  'link-topper': 'https://drive.google.com/file/d/1h439Yk9mqe1qWJ-avhPoX0KwCe85SXOD/preview'
+};
 function drivePreviewUrl(url){
   if(!url) return '';
-  // Convert any Google Drive share/view link to /preview embed URL
   const m = url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
   if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
-  // Already a preview URL or non-Drive URL — return as-is
   return url;
 }
-function openPdfViewer(fallbackUrl, title, adminKey){
+function openPdfViewer(downloadUrl, title, adminKey){
   const modal = document.getElementById('pdf-viewer-modal');
   const frame = document.getElementById('pdf-viewer-frame');
   const msg = document.getElementById('pdf-viewer-msg');
   document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
+  // Priority: admin panel URL > hardcoded default > nothing
   const links = getObj(K.links);
-  const rawUrl = adminKey ? (links[adminKey]||'') : '';
-  const adminUrl = drivePreviewUrl(rawUrl);
-  if(adminUrl){
+  const adminRaw = adminKey ? (links[adminKey]||'') : '';
+  const viewUrl = drivePreviewUrl(adminRaw) || (adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '');
+  if(viewUrl){
     frame.style.display='';
     if(msg) msg.style.display='none';
-    frame.src = adminUrl;
+    frame.src = viewUrl;
   } else {
     frame.style.display='none';
     if(msg){
       msg.style.display='flex';
-      document.getElementById('pdf-viewer-dl-link').href = fallbackUrl;
+      document.getElementById('pdf-viewer-dl-link').href = downloadUrl;
     }
   }
   modal.style.display = 'flex';
