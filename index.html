@@ -515,8 +515,9 @@ input,select,textarea{font-family:var(--fb)}
 
 /* ── MOBILE NAV BAR ── */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:#111;border-top:1px solid #222;padding:8px 4px;
-  grid-template-columns:repeat(6,1fr);gap:2px;padding-bottom:env(safe-area-inset-bottom,8px)}
+  background:#111;border-top:1px solid #222;
+  padding:8px 4px calc(env(safe-area-inset-bottom,0px) + 8px);
+  grid-template-columns:repeat(6,1fr);gap:2px}
 .mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;
   padding:6px 4px;border:none;background:transparent;color:#666;cursor:pointer;
   font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:var(--fb);transition:color .2s}
@@ -533,8 +534,8 @@ input,select,textarea{font-family:var(--fb)}
   .shell{grid-template-columns:1fr}
   .sidebar{display:none}
   .mob-nav{display:grid}
-  /* add bottom padding so content doesn't hide behind mob-nav */
-  .page.active{padding-bottom:72px}
+  /* add bottom padding so content doesn't hide behind mob-nav + home indicator */
+  .page.active{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
   .hero-grid{grid-template-columns:1fr}
   .brands-grid{grid-template-columns:1fr 1fr}
   .modal-layout{grid-template-columns:1fr}
@@ -1503,19 +1504,21 @@ function ensureAdmin(){
   }
   setData(K.reps,reps);
 }
-// Async init: pull fresh data from Neon, then init app
-(async()=>{
-  await Promise.race([_pull(), new Promise(r=>setTimeout(r,5000))]);
+// Init imediato: mostra app em 800ms, sincroniza Neon em segundo plano
+ensureAdmin();
+try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
+applySubscriptionGate();
+updatePlansLinks();
+const _urlP=new URLSearchParams(location.search).get('p');
+if(_urlP) try{showPage(_urlP);}catch(e){}
+setTimeout(_hideSplash,800);
+// Sincroniza com Neon em background (não bloqueia o app)
+_pull().then(()=>{
   ensureAdmin();
-  // Reload PRODUCTS from localStorage (now synced from server)
   try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
   applySubscriptionGate();
   updatePlansLinks();
-  // Navega direto para página pelo parâmetro URL: ?p=plans
-  const _urlP = new URLSearchParams(location.search).get('p');
-  if(_urlP) try{ showPage(_urlP); }catch(e){}
-  _hideSplash();
-})();
+}).catch(()=>{});
 
 
 
