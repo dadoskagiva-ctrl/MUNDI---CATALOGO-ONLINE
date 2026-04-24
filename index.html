@@ -1049,7 +1049,7 @@ setTimeout(_hideSplash,6000);
     <div id="rep-tab-catalogs">
       <div class="dl-grid">
         <div class="dl-card">
-          <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">Topper + Rainha + QI 2026</div></div>
+          <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">Topper + Rainha + Kagiva 2026</div></div>
           <div class="dl-card-desc">Catálogo completo. Campo, Society, Futsal, Vôlei, Handebol e Beach Soccer.</div>
           <div class="dl-card-meta"><span class="dl-tag">Campo</span><span class="dl-tag">Futsal</span><span class="dl-tag">Vôlei</span><span class="dl-tag">Society</span></div>
           <a class="dl-btn" href="#" onclick="logDownload('PDF Topper 2026');toast('Download registrado!','ok');return false">⬇ Baixar Catálogo PDF</a>
@@ -2338,14 +2338,17 @@ async function sendPushNotif(){
   const url   = document.getElementById('notif-url').value.trim();
   const fb    = document.getElementById('notif-fb');
   if(!title||!body){toast('Preencha título e mensagem','err');return;}
-  fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Enviando...</div>';
+  fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Enviando... (pode demorar até 30s se o servidor estiver dormindo)</div>';
   try{
     const res = await fetch(_API+'/api/notify',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':_AK},
-      body: JSON.stringify({title,body,url})
+      body: JSON.stringify({title,body,url}),
+      signal: AbortSignal.timeout(45000)
     });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try{ data=JSON.parse(text); }catch(e){ throw new Error('Servidor retornou: '+text.slice(0,120)); }
     if(data.ok){
       fb.innerHTML='<div class="fb-msg fb-ok">✅ Enviado para '+( data.recipients||'todos')+'! ID: '+data.id+'</div>';
       const hist=JSON.parse(localStorage.getItem('mundi:notif_hist')||'[]');
