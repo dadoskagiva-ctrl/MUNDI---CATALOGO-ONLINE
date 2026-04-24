@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    { "src": "/api/kiwify-webhook", "dest": "/api/kiwify-webhook.js" },
+    { "src": "/api/notify",         "dest": "/api/notify.js" },
+    { "src": "/api/kv",             "dest": "/api/kv.js" },
+    { "src": "/api/kv/(.*)",        "dest": "/api/kv/[key].js" },
+    { "src": "/api/health",         "dest": "/api/health.js" },
+    { "src": "/(.*)",               "dest": "/$1" }
+  ]
+}
