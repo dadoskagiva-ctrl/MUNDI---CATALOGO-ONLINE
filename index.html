@@ -1142,11 +1142,11 @@ input,select,textarea{font-family:var(--fb)}
     </div>
     <div id="admin-tab-links" style="display:none">
       <div class="card-panel">
-        <div class="card-panel-title">Links de Visualização — PDFs dos Catálogos</div>
-        <p style="color:var(--muted);font-size:.82rem;margin-bottom:4px">Cole o link de <strong style="color:var(--orange)">visualização</strong> do Google Drive (botão "Visualizar" abre dentro do app).</p>
-        <p style="color:#555;font-size:.78rem;margin-bottom:16px">Formato correto: <span style="color:#aaa">https://drive.google.com/file/d/SEU_ID_AQUI/preview</span></p>
-        <div class="field"><label>Link Visualizar — Topper 2026</label><input id="link-topper" placeholder="https://drive.google.com/file/d/SEU_ID/preview" oninput="saveLinks()"/></div>
-        <div class="field"><label>Link Visualizar — Kagiva 2026</label><input id="link-kagiva" placeholder="https://drive.google.com/file/d/SEU_ID/preview" oninput="saveLinks()"/></div>
+        <div class="card-panel-title">Links de Visualização — Catálogos</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-bottom:4px">Cole o link do <strong style="color:var(--orange)">Canva</strong> (recomendado) ou do Google Drive. O botão "Visualizar" abre dentro do app.</p>
+        <p style="color:#555;font-size:.78rem;margin-bottom:16px">Canva: <span style="color:#aaa">canva.com/design/ID/view</span> &nbsp;|&nbsp; Drive: <span style="color:#aaa">drive.google.com/file/d/ID/view</span></p>
+        <div class="field"><label>Catálogo Topper + Rainha — link Canva ou Drive</label><input id="link-topper" placeholder="https://www.canva.com/design/SEU_ID/view" oninput="saveLinks()"/></div>
+        <div class="field"><label>Catálogo Kagiva — link Canva ou Drive</label><input id="link-kagiva" placeholder="https://www.canva.com/design/SEU_ID/view" oninput="saveLinks()"/></div>
         <div class="card-panel-title" style="margin-top:20px">Páginas do Catálogo (PNG)</div>
         <p style="color:var(--muted);font-size:.82rem;margin-bottom:12px">Cole URLs de imagens PNG das páginas do catálogo, separadas por vírgula.</p>
         <div class="field"><label>Páginas PNG — Catálogo Topper (separadas por vírgula)</label><textarea id="link-cat-pages-topper" rows="3" oninput="saveLinks()" style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px 14px;font-size:.85rem;outline:none;resize:vertical" placeholder="https://link-pg1.png, https://link-pg2.png ..."></textarea></div>
@@ -1654,15 +1654,22 @@ const CATALOG_VIEWER_URLS = {
   'link-kagiva': '1SipozEXPw9MV7Xekx_iaHzWmOzdK8Xyq',
   'link-topper': '1h439Yk9mqe1qWJ-avhPoX0KwCe85SXOD'
 };
-function driveEmbedUrl(input){
+function catalogEmbedUrl(input){
   if(!input) return '';
-  // Extract file ID from any Drive URL, or use raw ID if already an ID
+  // ── Canva link → add ?embed for clean full-screen catalog view
+  if(input.includes('canva.com')){
+    const base = input.split('?')[0];
+    return base + '?embed';
+  }
+  // ── Google Drive → extract file ID → Google Docs embedded viewer (no Drive chrome)
   const m = input.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
   const id = m ? m[1] : (input.match(/^[a-zA-Z0-9_-]{20,}$/) ? input : '');
-  if(!id) return input; // not a Drive link — use as-is
-  // Use Google Docs embedded viewer — no Drive chrome, just the document
-  return 'https://docs.google.com/viewer?srcid='+id+'&pid=explorer&efh=false&a=v&chrome=false&embedded=true';
+  if(id) return 'https://docs.google.com/viewer?srcid='+id+'&pid=explorer&efh=false&a=v&chrome=false&embedded=true';
+  // ── Any other URL → use as-is
+  return input;
 }
+// keep old name as alias for backwards compat
+const driveEmbedUrl = catalogEmbedUrl;
 function openPdfViewer(downloadUrl, title, adminKey){
   const modal = document.getElementById('pdf-viewer-modal');
   const frame = document.getElementById('pdf-viewer-frame');
