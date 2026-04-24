@@ -2810,20 +2810,26 @@ function toast(msg,type=''){
 
 async function ativarNotificacoes(){
   const btn=document.getElementById('btn-notif-rep');
-  try{
-    if(typeof OneSignal==='undefined'||!window.OneSignalDeferred){
-      toast('Notificações não disponíveis neste navegador','err'); return;
-    }
-    window.OneSignalDeferred.push(async function(OS){
-      const perm = await Notification.requestPermission();
-      if(perm==='granted'){
-        toast('Notificações ativadas! ✅','ok');
-        if(btn) btn.textContent='🔔 Ativado';
-      } else {
-        toast('Permissão negada. Ative nas configurações do iPhone.','err');
+  if(!window.OneSignalDeferred){toast('Notificações não disponíveis','err');return;}
+  window.OneSignalDeferred.push(async function(OS){
+    try{
+      // Solicita permissão E registra no OneSignal
+      await OS.Notifications.requestPermission();
+      // Garante opt-in na assinatura push
+      if(OS.User&&OS.User.PushSubscription){
+        await OS.User.PushSubscription.optIn();
       }
-    });
-  }catch(e){ toast('Erro ao ativar notificações','err'); }
+      const optedIn = OS.User?.PushSubscription?.optedIn;
+      if(optedIn){
+        toast('Notificações ativadas! ✅','ok');
+        if(btn){btn.textContent='🔔 Ativado';btn.style.color='#4ade80';}
+      } else {
+        toast('Permissão negada. Verifique as configurações do iPhone.','err');
+      }
+    }catch(e){
+      toast('Erro: '+e.message,'err');
+    }
+  });
 }
 
 // ══════════════════════════════════════════════
