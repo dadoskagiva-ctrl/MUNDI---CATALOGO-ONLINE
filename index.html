@@ -1887,15 +1887,21 @@ function catalogEmbedUrl(input){
 }
 const driveEmbedUrl = catalogEmbedUrl;
 function openPdfViewer(downloadUrl, title, adminKey){
-  const modal = document.getElementById('pdf-viewer-modal');
-  const frame = document.getElementById('pdf-viewer-frame');
-  const msg = document.getElementById('pdf-viewer-msg');
-  document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
-  // Priority: admin panel URL > hardcoded default > nothing
   const links = getObj(K.links);
   const adminRaw = adminKey ? (links[adminKey]||'') : '';
   const defaultId = adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '';
   const viewUrl = driveEmbedUrl(adminRaw) || driveEmbedUrl(defaultId);
+  // On mobile/iOS, iframe embeds don't work — open directly in browser
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){
+    const openUrl = viewUrl || downloadUrl;
+    if(openUrl) window.open(openUrl, '_blank');
+    return;
+  }
+  const modal = document.getElementById('pdf-viewer-modal');
+  const frame = document.getElementById('pdf-viewer-frame');
+  const msg = document.getElementById('pdf-viewer-msg');
+  document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
   if(viewUrl){
     frame.style.display='';
     if(msg) msg.style.display='none';
