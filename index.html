@@ -1533,19 +1533,12 @@ function renderCatalog(cat){
 
   let html='', globalIdx=0;
   Object.entries(grouped).forEach(([fam,items])=>{
-    const startIdx=globalIdx; globalIdx+=items.length;
-    const g={brand:brandName,family:fam,items};
-    {
-      const currentBrand=brandName;
-      if(false){html+='</div>';}
-    }
     const startIdx=globalIdx;
-    globalIdx+=g.items.length;
+    globalIdx+=items.length;
     html+=`<div class="family-group-wrap" style="margin-bottom:20px">
-      <div class="family-header">${g.family}</div>
+      <div class="family-header">${fam}</div>
       <div class="catalog-list">${items.map((p,i)=>prodCard(p,startIdx+i,prods.length)).join('')}</div>
     </div>`;
-    }
   });
   body.innerHTML=html;
 }
