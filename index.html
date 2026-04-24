@@ -721,7 +721,7 @@ setTimeout(_hideSplash,6000);
 <div class="page active" id="page-home">
   <header class="topbar">
     <div>
-      <div class="topbar-title">MUNDI <span style="color:var(--orange)">TKR</span></div>
+      <div class="topbar-title" style="display:flex;align-items:center;gap:8px">MUNDI <span style="color:var(--orange)">TKR</span><span class="demo-badge" style="display:none;background:rgba(250,204,21,.15);border:1px solid rgba(250,204,21,.4);color:#fbbf24;font-size:.6rem;padding:2px 7px;border-radius:6px;font-weight:800;letter-spacing:.08em">DEMO</span></div>
       <div class="topbar-sub">Topper · Kagiva · Rainha</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -920,7 +920,7 @@ setTimeout(_hideSplash,6000);
 <div class="page" id="page-plans">
   <header class="topbar">
     <div>
-      <div class="topbar-title">MUNDI <span style="color:var(--orange)">TKR</span></div>
+      <div class="topbar-title" style="display:flex;align-items:center;gap:8px">MUNDI <span style="color:var(--orange)">TKR</span><span class="demo-badge" style="display:none;background:rgba(250,204,21,.15);border:1px solid rgba(250,204,21,.4);color:#fbbf24;font-size:.6rem;padding:2px 7px;border-radius:6px;font-weight:800;letter-spacing:.08em">DEMO</span></div>
       <div class="topbar-sub">Planos e Preços</div>
     </div>
     <button class="btn btn-ghost btn-sm" onclick="showPage('home')">← Voltar</button>
@@ -1518,6 +1518,7 @@ function ensureAdmin(){
 }
 // Init imediato: mostra app em 800ms, sincroniza Neon em segundo plano
 ensureAdmin();
+_checkDemoBadge();
 try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
 applySubscriptionGate();
 updatePlansLinks();
@@ -2012,6 +2013,7 @@ function doLogout(){
 // ── ASSINATURA ──
 function checkSubscription(){
   const sub=getObj('mundi:subscription');
+  if(sessionStorage.getItem('mundi:demo')) return true;
   if(!sub||!sub.expiresAt) return false;
   return new Date(sub.expiresAt+'T23:59:59')>new Date();
 }
@@ -2029,6 +2031,16 @@ function applySubscriptionGate(){
   }
 }
 var _gatePeriod='monthly';
+function startDemo(){
+  sessionStorage.setItem('mundi:demo','1');
+  applySubscriptionGate();
+  // Mostra badge DEMO no topbar
+  document.querySelectorAll('.demo-badge').forEach(b=>b.style.display='inline-flex');
+}
+function _checkDemoBadge(){
+  if(sessionStorage.getItem('mundi:demo'))
+    document.querySelectorAll('.demo-badge').forEach(b=>b.style.display='inline-flex');
+}
 function setGatePeriod(p){
   _gatePeriod=p;
   const sub=getObj('mundi:subscription');
@@ -2969,8 +2981,13 @@ mobNavActive('home');
         <a id="gate-link-p" href="https://pay.kiwify.com.br/Y4ESS1y" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;border-radius:10px;color:#000;text-decoration:none;font-family:var(--fb);font-weight:900;font-size:.85rem;letter-spacing:.04em">CONTRATAR PRO</a>
       </div>
     </div>
-    <p style="color:var(--muted2);font-size:.78rem;margin-bottom:16px">Após o pagamento, entre em contato para ativar seu acesso.</p>
-    <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.76rem;cursor:pointer;text-decoration:underline">Acesso Administrador</button>
+    <p style="color:var(--muted2);font-size:.78rem;margin-bottom:20px">Após o pagamento, entre em contato para ativar seu acesso.</p>
+    <!-- Divider -->
+    <div style="border-top:1px solid var(--line2);padding-top:20px;margin-bottom:4px">
+      <button onclick="startDemo()" style="width:100%;padding:13px;background:transparent;border:1.5px solid var(--line2);border-radius:10px;color:var(--muted);font-family:var(--fb);font-weight:700;font-size:.82rem;letter-spacing:.06em;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--line2)';this.style.color='var(--muted)'">ACESSAR VERSÃO DEMO</button>
+      <p style="color:var(--muted2);font-size:.72rem;margin-top:8px;margin-bottom:20px">Acesso temporário — apenas para demonstração</p>
+    </div>
+    <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.72rem;cursor:pointer;text-decoration:underline">Acesso Administrador</button>
   </div>
 </div>
 
