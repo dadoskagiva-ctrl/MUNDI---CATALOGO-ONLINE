@@ -2024,7 +2024,7 @@ function applySubscriptionGate(){
     el.style.display='none';
   }
 }
-let _gatePeriod='monthly';
+var _gatePeriod='monthly';
 function setGatePeriod(p){
   _gatePeriod=p;
   const sub=getObj('mundi:subscription');
@@ -2086,7 +2086,7 @@ function saveSubscription(){
   setTimeout(()=>{document.getElementById('sub-admin-fb').innerHTML='';},3000);
 }
 
-let _planPeriod='monthly';
+var _planPeriod='monthly';
 function setPlanPeriod(p){
   _planPeriod=p;
   const tm=document.getElementById('toggle-monthly');
