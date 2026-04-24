@@ -959,8 +959,9 @@ input,select,textarea{font-family:var(--fb)}
   <div class="admin-body">
     <div class="dash-header">
       <div><div class="dash-title">ADMIN <span>PANEL</span></div><div class="dash-welcome">Gerenciamento completo da plataforma Mundi TKR Sports</div></div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="showPage('home')">← Site</button>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('rep')" style="color:var(--orange);border-color:rgba(255,106,0,.3)">👤 Área do Rep.</button>
         <button class="btn btn-outline btn-sm" onclick="doLogout()">Sair</button>
       </div>
     </div>
@@ -1680,25 +1681,26 @@ function shareWA(id){
 // PDF VIEWER
 // ══════════════════════════════════════════════
 // Default Google Drive preview URLs (hardcoded — admin panel can override)
+// Direct Google Drive /preview URLs — works with any file size
 const CATALOG_VIEWER_URLS = {
-  'link-kagiva': '1SipozEXPw9MV7Xekx_iaHzWmOzdK8Xyq',
-  'link-topper': '1h439Yk9mqe1qWJ-avhPoX0KwCe85SXOD'
+  'link-topper': 'https://drive.google.com/file/d/1h439Yk9mqe1qWJ-avhPoX0KwCe85SXOD/preview',
+  'link-kagiva': 'https://drive.google.com/file/d/1SipozEXPw9MV7Xekx_iaHzWmOzdK8Xyq/preview'
 };
 function catalogEmbedUrl(input){
   if(!input) return '';
-  // ── Canva link → add ?embed for clean full-screen catalog view
+  // Already a full URL → use as-is (preview, embed, canva, etc.)
+  if(input.startsWith('http')) return input;
+  // Canva short/design ID
   if(input.includes('canva.com')){
     const base = input.split('?')[0];
     return base + '?embed';
   }
-  // ── Google Drive → extract file ID → Google Docs embedded viewer (no Drive chrome)
-  const m = input.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
-  const id = m ? m[1] : (input.match(/^[a-zA-Z0-9_-]{20,}$/) ? input : '');
-  if(id) return 'https://docs.google.com/viewer?srcid='+id+'&pid=explorer&efh=false&a=v&chrome=false&embedded=true';
-  // ── Any other URL → use as-is
+  // Raw Google Drive file ID → build /preview URL
+  if(/^[a-zA-Z0-9_-]{25,}$/.test(input)){
+    return 'https://drive.google.com/file/d/'+input+'/preview';
+  }
   return input;
 }
-// keep old name as alias for backwards compat
 const driveEmbedUrl = catalogEmbedUrl;
 function openPdfViewer(downloadUrl, title, adminKey){
   const modal = document.getElementById('pdf-viewer-modal');
