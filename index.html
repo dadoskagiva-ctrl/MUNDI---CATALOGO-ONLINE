@@ -14,16 +14,14 @@
 <!-- OneSignal Web Push SDK -->
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
-  const _osAppId = localStorage.getItem('mundi:os_id');
-  if(_osAppId){
-    const s = document.createElement('script');
-    s.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
-    s.defer = true;
-    document.head.appendChild(s);
-    OneSignalDeferred.push(function(OneSignal){
-      OneSignal.init({appId: _osAppId, serviceWorkerPath: 'sw.js', notifyButton:{enable:false}});
-    });
-  }
+  const _osAppId = 'e7024ef4-2ee4-4fd4-bc99-dbe3b981e64b';
+  const s = document.createElement('script');
+  s.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+  s.defer = true;
+  document.head.appendChild(s);
+  OneSignalDeferred.push(function(OneSignal){
+    OneSignal.init({appId: _osAppId, serviceWorkerPath: 'sw.js', notifyButton:{enable:false}});
+  });
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
@@ -2084,14 +2082,13 @@ async function sendPushNotif(){
   const title = document.getElementById('notif-title').value.trim();
   const body  = document.getElementById('notif-body').value.trim();
   const url   = document.getElementById('notif-url').value.trim();
-  const appId = localStorage.getItem('mundi:os_id');
   const apiKey= localStorage.getItem('mundi:os_key');
   const fb    = document.getElementById('notif-fb');
   if(!title||!body){toast('Preencha título e mensagem','err');return;}
-  if(!appId||!apiKey){fb.innerHTML='<div class="fb-msg fb-err">❌ Configure o OneSignal primeiro (App ID + REST API Key)</div>';return;}
+  if(!apiKey){fb.innerHTML='<div class="fb-msg fb-err">❌ Configure a REST API Key do OneSignal</div>';return;}
   fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Enviando...</div>';
   const payload = {
-    app_id: appId,
+    app_id: _osAppId,
     included_segments: ['All'],
     headings: {en: title, pt: title},
     contents: {en: body,  pt: body},
