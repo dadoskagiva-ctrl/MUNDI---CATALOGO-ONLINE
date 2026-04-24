@@ -601,6 +601,9 @@ input,select,textarea{font-family:var(--fb)}
   /* admin stat tighter */
   .admin-stat{padding:14px 10px}
   .admin-stat-n{font-size:1.6rem}
+  /* plans page: single column */
+  .plans-grid{grid-template-columns:1fr !important}
+  #page-plans .topbar>button{font-size:.72rem;padding:7px 12px}
 }
 
 /* ── PWA INSTALL BANNER ── */
@@ -896,7 +899,7 @@ setTimeout(_hideSplash,6000);
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="plans-grid">
 
       <!-- ESSENCIAL -->
       <div style="background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:0">
@@ -2876,6 +2879,28 @@ function dismissPWA(){
 window.addEventListener('appinstalled',function(){
   dismissPWA();
 });
+</script>
+
+<!-- AUTO-UPDATE: detecta nova versão e mostra banner -->
+<div id="update-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:97000;background:linear-gradient(135deg,#1a2a1a,#111);border-top:1px solid rgba(74,222,128,.3);padding:14px 18px;display:none;align-items:center;gap:12px;justify-content:space-between">
+  <div style="font-size:.85rem;color:#e0e0e0;font-weight:500">🔄 Nova versão disponível</div>
+  <button onclick="location.reload(true)" style="background:#4ade80;color:#000;border:none;padding:8px 18px;border-radius:8px;font-family:var(--fb);font-weight:800;font-size:.8rem;cursor:pointer">ATUALIZAR</button>
+</div>
+<script>
+(function(){
+  var _v=localStorage.getItem('mundi:version');
+  function _chk(){
+    fetch('/version.json?_='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!_v){localStorage.setItem('mundi:version',d.v);_v=d.v;return;}
+        if(d.v!==_v){document.getElementById('update-bar').style.display='flex';}
+      }).catch(function(){});
+  }
+  setTimeout(_chk,5000);
+  setInterval(_chk,5*60*1000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)_chk();});
+})();
 </script>
 
 </body>
