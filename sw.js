@@ -1,6 +1,5 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v2';
-// Tempo máximo para esperar o servidor (Render free tier pode dormir)
+const CACHE = 'mundi-shell-v3';
 const NETWORK_TIMEOUT_MS = 3000;
 
 // Cache index.html na instalação
@@ -20,6 +19,11 @@ self.addEventListener('activate', function(e) {
         keys.filter(function(k){ return k !== CACHE; }).map(function(k){ return caches.delete(k); })
       );
     }).then(function() { return self.clients.claim(); })
+      .then(function() {
+        return self.clients.matchAll({type:'window'}).then(function(clients) {
+          clients.forEach(function(c) { c.postMessage({type:'SW_UPDATED'}); });
+        });
+      })
   );
 });
 

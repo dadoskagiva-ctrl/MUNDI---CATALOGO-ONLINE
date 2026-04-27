@@ -11,24 +11,25 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg"/>
 <link rel="apple-touch-icon" href="icon.svg"/>
 <title>Mundi TKR Sports</title>
-<!-- Service Worker + verificador de versão automático -->
+<!-- Service Worker + auto-update -->
 <script>
-  var _APP_V = '20260427-02';
+  var _APP_V = '20260427-03';
   if('serviceWorker' in navigator){
+    // Recarrega automaticamente quando o SW se atualiza
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      location.reload(true);
+    });
+    // Escuta mensagem do SW pedindo reload
+    navigator.serviceWorker.addEventListener('message', function(e){
+      if(e.data && e.data.type==='SW_UPDATED') location.reload(true);
+    });
     navigator.serviceWorker.register('/sw.js',{scope:'/'}).then(function(reg){
-      reg.update();
+      reg.update(); // força verificação imediata de novo SW
     }).catch(function(){});
-    // Força reload se houver nova versão no servidor
+    // Verificação de versão como camada extra de segurança
     fetch('/version.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
       if(d.v && d.v !== _APP_V){
-        if('serviceWorker' in navigator){
-          navigator.serviceWorker.getRegistration().then(function(reg){
-            if(reg) reg.unregister();
-          });
-        }
-        caches.keys().then(function(keys){
-          keys.forEach(function(k){caches.delete(k);});
-        });
+        caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});
         location.reload(true);
       }
     }).catch(function(){});
