@@ -1,7 +1,9 @@
 // Mundi TKR Sports — Service Worker
 const CACHE = 'mundi-shell-v1';
+// Tempo máximo para esperar o servidor (Render free tier pode dormir)
+const NETWORK_TIMEOUT_MS = 3000;
 
-// Cache index.html na instalação para carregamento instantâneo offline/cold-start
+// Cache index.html na instalação
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE)
@@ -21,19 +23,24 @@ self.addEventListener('activate', function(e) {
   );
 });
 
-// Cache-first para navegação: serve do cache imediatamente, atualiza em background
+// Network-first com timeout:
+// - Servidor responde em <3s → entrega HTML atualizado (deploys chegam imediatamente)
+// - Servidor demora >3s (Render adormecido) → fallback para cache (app abre na hora)
 self.addEventListener('fetch', function(e) {
   if (e.request.mode !== 'navigate') return;
   e.respondWith(
     caches.open(CACHE).then(function(cache) {
-      return cache.match('/index.html').then(function(cached) {
-        var networkFetch = fetch(e.request).then(function(res) {
-          if (res && res.ok) cache.put('/index.html', res.clone());
-          return res;
-        }).catch(function() { return cached; });
-        // Serve cache imediatamente; se não tiver cache, espera a rede
-        return cached || networkFetch;
+      var networkPromise = fetch(e.request).then(function(res) {
+        if (res && res.ok) cache.put('/index.html', res.clone());
+        return res;
       });
+      var timeoutPromise = new Promise(function(_, reject) {
+        setTimeout(reject, NETWORK_TIMEOUT_MS, 'timeout');
+      });
+      return Promise.race([networkPromise, timeoutPromise])
+        .catch(function() {
+          return cache.match('/index.html');
+        });
     })
   );
 });
