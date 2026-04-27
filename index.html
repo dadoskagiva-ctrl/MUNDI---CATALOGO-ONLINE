@@ -11,10 +11,27 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg"/>
 <link rel="apple-touch-icon" href="icon.svg"/>
 <title>Mundi TKR Sports</title>
-<!-- Service Worker — registra independente do OneSignal -->
+<!-- Service Worker + verificador de versão automático -->
 <script>
+  var _APP_V = '20260427-02';
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+    navigator.serviceWorker.register('/sw.js',{scope:'/'}).then(function(reg){
+      reg.update();
+    }).catch(function(){});
+    // Força reload se houver nova versão no servidor
+    fetch('/version.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(d.v && d.v !== _APP_V){
+        if('serviceWorker' in navigator){
+          navigator.serviceWorker.getRegistration().then(function(reg){
+            if(reg) reg.unregister();
+          });
+        }
+        caches.keys().then(function(keys){
+          keys.forEach(function(k){caches.delete(k);});
+        });
+        location.reload(true);
+      }
+    }).catch(function(){});
   }
 </script>
 <!-- OneSignal Web Push SDK -->
