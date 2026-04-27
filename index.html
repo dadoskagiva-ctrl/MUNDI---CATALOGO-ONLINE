@@ -717,7 +717,7 @@ setTimeout(_hideSplash,3000);
     <button class="nav-link" id="nav-admin-btn" onclick="showPage('admin')" style="display:none">Admin Panel</button>
   </div>
 
-  <div class="sb-section-title">Marcas nesta demo</div>
+  <div class="sb-section-title">Marcas disponíveis</div>
   <div class="sb-nav">
     <div class="sb-brand-chip" onclick="showPage('catalog-topper')"><span class="sb-dot-gray"></span>Topper</div>
     <div class="sb-brand-chip" onclick="showPage('catalog-kagiva')"><span class="sb-dot-gray"></span>Kagiva</div>
@@ -725,7 +725,7 @@ setTimeout(_hideSplash,3000);
   </div>
 
   <div class="sb-footer">
-    <div class="sb-chip"><span class="sb-dot"></span>Demo alinhada para apresentação</div>
+    <div class="sb-chip"><span class="sb-dot"></span>Plano Pro — acesso completo</div>
     <div style="font-size:.68rem;color:#444;padding:0 4px">Sem login nesta etapa</div>
     <button class="nav-link" id="nav-logout-btn" onclick="doLogout()" style="display:none;color:var(--red);border-color:rgba(239,68,68,.3)">← Sair</button>
   </div>
@@ -750,7 +750,7 @@ setTimeout(_hideSplash,3000);
   <div class="hero-wrap">
     <!-- HERO -->
     <div class="panel hero-card" style="margin-bottom:32px;padding:36px 32px">
-      <div style="font-size:.68rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#d4a017;font-family:var(--fb);display:flex;align-items:center;gap:8px"><span style="display:block;width:24px;height:2px;background:#d4a017;border-radius:2px"></span>Demo pronta para apresentação</div>
+      <div style="font-size:.68rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);font-family:var(--fb);display:flex;align-items:center;gap:8px"><span style="display:block;width:24px;height:2px;background:var(--orange);border-radius:2px"></span>Plano Pro — acesso completo</div>
       <h1 style="font-family:var(--fb);font-weight:900;font-size:clamp(2.8rem,6vw,4.6rem);line-height:.9;text-transform:uppercase;margin:14px 0 16px;letter-spacing:-.01em">MUNDI <span style="color:var(--orange);text-shadow:0 0 40px var(--glow)">TKR</span></h1>
       <p style="color:#b0b0b0;line-height:1.72;font-size:.97rem;max-width:620px">Catálogos completos Topper, Kagiva e Rainha com foto de cada bola, ficha técnica, download de imagem PNG e catálogo PDF por marca.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
@@ -1531,8 +1531,13 @@ const clearSession = () => sessionStorage.removeItem(K.session);
 // Seed admin — always ensures correct password
 function ensureAdmin(){
   const reps = getData(K.reps);
-  // Admin record
-  const adminData = {id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@CARO26',role:'admin',brands:'todas',status:'ativo'};
+  // Conta Dev (desenvolvedor) — acesso total
+  const devData = {id:'dev-001',name:'Desenvolvedor',cpf:'dev',user:'dev',pass:'@CARO26',role:'dev',brands:'todas',status:'ativo'};
+  const devIdx = reps.findIndex(r=>r.id==='dev-001');
+  if(devIdx>=0){ reps[devIdx]={...reps[devIdx],...devData}; }
+  else { reps.push({...devData,createdAt:new Date().toISOString()}); }
+  // Conta Admin (responsável) — sem controle de assinatura
+  const adminData = {id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@ADM2026',role:'admin',brands:'todas',status:'ativo'};
   const idx = reps.findIndex(r=>r.id==='admin-001');
   if(idx>=0){ reps[idx]={...reps[idx],...adminData}; }
   else { reps.push({...adminData,createdAt:new Date().toISOString()}); }
@@ -1545,7 +1550,6 @@ function ensureAdmin(){
 }
 // Init imediato: mostra app em 800ms, sincroniza Neon em segundo plano
 ensureAdmin();
-_checkDemoBadge();
 try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
 applySubscriptionGate();
 updatePlansLinks();
@@ -1689,7 +1693,7 @@ function updateNavState(page){
     if(loginBtn) loginBtn.style.display='none';
     if(adminLoginBtn) adminLoginBtn.style.display='none';
     if(logoutBtn) logoutBtn.style.display='';
-    if(sess.role==='admin'){if(adminBtn)adminBtn.style.display='';if(repBtn)repBtn.style.display='none';}
+    if(sess.role==='admin'||sess.role==='dev'){if(adminBtn)adminBtn.style.display='';if(repBtn)repBtn.style.display='none';}
     else{if(repBtn)repBtn.style.display='';if(adminBtn)adminBtn.style.display='none';}
   } else {
     if(loginBtn) loginBtn.style.display='';
@@ -2018,7 +2022,7 @@ function doRepLogin(){
   const fb = document.getElementById('login-rep-feedback');
   if(rawCPF.length!==11){fb.innerHTML='<div class="form-err">CPF inválido. Digite os 11 dígitos.</div>';return;}
   const reps = getData(K.reps);
-  const rep = reps.find(r=>r.cpf.replace(/\D/g,'')==rawCPF && r.role!=='admin');
+  const rep = reps.find(r=>r.cpf.replace(/\D/g,'')==rawCPF && r.role!=='admin' && r.role!=='dev');
   if(!rep){fb.innerHTML='<div class="form-err">CPF não cadastrado. Solicite acesso ao administrador.</div>';return;}
   if(rep.status==='inativo'){fb.innerHTML='<div class="form-err">Conta inativa. Entre em contato com o administrador.</div>';return;}
   setSession(rep);
@@ -2034,7 +2038,7 @@ function doAdminLogin(){
   const fb=document.getElementById('login-admin-feedback');
   ensureAdmin(); // always refresh admin record before checking
   const reps=getData(K.reps);
-  const admin=reps.find(r=>r.role==='admin'&&r.user===user&&r.pass===pass);
+  const admin=reps.find(r=>(r.role==='admin'||r.role==='dev')&&r.user===user&&r.pass===pass);
   if(!admin){fb.innerHTML='<div class="form-err">Usuário ou senha incorretos.</div>';return;}
   setSession(admin);
   addLog('Login admin');
@@ -2054,16 +2058,16 @@ function doLogout(){
 // ── ASSINATURA ──
 function checkSubscription(){
   const sub=getObj('mundi:subscription');
-  if(sessionStorage.getItem('mundi:demo')) return true;
   if(!sub||!sub.expiresAt) return false;
   return new Date(sub.expiresAt+'T23:59:59')>new Date();
 }
+function isPro(){return getObj('mundi:subscription').plan==='pro';}
 
 function applySubscriptionGate(){
   const el=document.getElementById('sub-expired');
   if(!el) return;
   const sess=getSession();
-  if(sess&&sess.role==='admin'){el.style.display='none';return;}
+  if(sess&&(sess.role==='admin'||sess.role==='dev')){el.style.display='none';return;}
   if(!checkSubscription()){
     setGatePeriod(_gatePeriod||'monthly');
     el.style.display='flex';
@@ -2106,21 +2110,29 @@ function setGatePeriod(p){
 
 function renderSubscriptionTab(){
   const sub=getObj('mundi:subscription');
-  if(sub.clientName) document.getElementById('sub-client-name').value=sub.clientName;
-  if(sub.plan) document.getElementById('sub-plan').value=sub.plan;
-  if(sub.expiresAt) document.getElementById('sub-expires').value=sub.expiresAt;
-  if(sub.kiwifyUrl) document.getElementById('sub-kiwify-url').value=sub.kiwifyUrl;
-  if(sub.kiwifyUrlEA) document.getElementById('sub-kiwify-url-ea').value=sub.kiwifyUrlEA;
-  if(sub.kiwifyUrlPro) document.getElementById('sub-kiwify-url-pro').value=sub.kiwifyUrlPro;
-  if(sub.kiwifyUrlPA) document.getElementById('sub-kiwify-url-pa').value=sub.kiwifyUrlPA;
-  if(sub.whatsapp) document.getElementById('sub-whatsapp').value=sub.whatsapp;
+  const isDev=getSession()?.role==='dev';
   const active=checkSubscription();
   const exp=sub.expiresAt?new Date(sub.expiresAt+'T12:00:00').toLocaleDateString('pt-BR'):'Não definida';
+  const planLabel=(sub.plan==='pro'?'PRO':'ESSENCIAL');
   document.getElementById('sub-status-display').innerHTML=`
     <div style="padding:14px 16px;background:${active?'rgba(74,222,128,.08)':'rgba(248,113,113,.08)'};border:1px solid ${active?'rgba(74,222,128,.25)':'rgba(248,113,113,.25)'};border-radius:10px;margin-bottom:20px">
-      <div style="font-weight:700;font-size:1rem;color:${active?'#4ade80':'#f87171'}">${active?'✅ ATIVA':'❌ EXPIRADA'}</div>
+      <div style="font-weight:700;font-size:1rem;color:${active?'#4ade80':'#f87171'}">${active?'✅ ATIVA':'❌ EXPIRADA'} — Plano <span style="color:var(--orange)">${planLabel}</span></div>
       <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Válido até: <strong>${exp}</strong></div>
+      ${isDev?'':'<div style="color:var(--muted2);font-size:.75rem;margin-top:6px">Entre em contato com o desenvolvedor para alterações.</div>'}
     </div>`;
+  // Controles de edição apenas para dev
+  const controls=document.getElementById('admin-tab-subscription').querySelectorAll('.form-grid,.btn');
+  controls.forEach(el=>el.style.display=isDev?'':'none');
+  if(isDev){
+    if(sub.clientName) document.getElementById('sub-client-name').value=sub.clientName;
+    if(sub.plan) document.getElementById('sub-plan').value=sub.plan;
+    if(sub.expiresAt) document.getElementById('sub-expires').value=sub.expiresAt;
+    if(sub.kiwifyUrl) document.getElementById('sub-kiwify-url').value=sub.kiwifyUrl;
+    if(sub.kiwifyUrlEA) document.getElementById('sub-kiwify-url-ea').value=sub.kiwifyUrlEA;
+    if(sub.kiwifyUrlPro) document.getElementById('sub-kiwify-url-pro').value=sub.kiwifyUrlPro;
+    if(sub.kiwifyUrlPA) document.getElementById('sub-kiwify-url-pa').value=sub.kiwifyUrlPA;
+    if(sub.whatsapp) document.getElementById('sub-whatsapp').value=sub.whatsapp;
+  }
 }
 
 function ativarPlano(dias){
@@ -2464,11 +2476,15 @@ function renderRepFicha(){
 // ══════════════════════════════════════════════
 function renderAdmin(){
   updateAdminStats();
+  // Aba Assinatura visível apenas para dev
+  const isDev = getSession()?.role==='dev';
+  const subTabBtn = document.querySelector('#page-admin .dash-tabs .dash-tab:last-child');
+  if(subTabBtn) subTabBtn.style.display = isDev ? '' : 'none';
   setAdminTab('reps');
 }
 
 function updateAdminStats(){
-  const reps=getData(K.reps).filter(r=>r.role!=='admin');
+  const reps=getData(K.reps).filter(r=>r.role!=='admin'&&r.role!=='dev');
   const logs=getData(K.logs);
   const dls=getData(K.downloads);
   document.getElementById('stat-reps').textContent=reps.length;
@@ -2557,7 +2573,7 @@ function renderNotifHistory(){
 }
 
 function renderAdminReps(){
-  const reps=getData(K.reps).filter(r=>r.role!=='admin');
+  const reps=getData(K.reps).filter(r=>r.role!=='admin'&&r.role!=='dev');
   const el=document.getElementById('admin-reps-list');
   if(!reps.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum representante cadastrado ainda.</p>';return;}
   el.innerHTML=`<table class="admin-table">
@@ -2587,7 +2603,7 @@ function saveRep(){
   if(!name||!cpf){fb.innerHTML='<div class="fb-msg fb-err">Nome e CPF são obrigatórios.</div>';return;}
   const reps=getData(K.reps);
   const rawCPF=cpf.replace(/\D/g,'');
-  if(reps.find(r=>r.cpf.replace(/\D/g,'')==rawCPF&&r.role!=='admin')){fb.innerHTML='<div class="fb-msg fb-err">CPF já cadastrado.</div>';return;}
+  if(reps.find(r=>r.cpf.replace(/\D/g,'')==rawCPF&&r.role!=='admin'&&r.role!=='dev')){fb.innerHTML='<div class="fb-msg fb-err">CPF já cadastrado.</div>';return;}
   reps.push({id:'rep-'+Date.now(),name,cpf,tel,city,brands,status,role:'rep',createdAt:new Date().toISOString()});
   setData(K.reps,reps);
   fb.innerHTML='<div class="fb-msg fb-ok">✅ Representante cadastrado com sucesso!</div>';
@@ -3121,12 +3137,9 @@ mobNavActive('home');
       </div>
     </div>
     <p style="color:var(--muted2);font-size:.78rem;margin-bottom:20px">Após o pagamento, entre em contato para ativar seu acesso.</p>
-    <!-- Divider -->
     <div style="border-top:1px solid var(--line2);padding-top:20px;margin-bottom:4px">
-      <button onclick="startDemo()" style="width:100%;padding:13px;background:transparent;border:1.5px solid var(--line2);border-radius:10px;color:var(--muted);font-family:var(--fb);font-weight:700;font-size:.82rem;letter-spacing:.06em;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--line2)';this.style.color='var(--muted)'">ACESSAR VERSÃO DEMO</button>
-      <p style="color:var(--muted2);font-size:.72rem;margin-top:8px;margin-bottom:20px">Acesso temporário — apenas para demonstração</p>
+      <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.72rem;cursor:pointer;text-decoration:underline">Acesso Administrador</button>
     </div>
-    <button onclick="showLoginAs('admin')" style="background:none;border:none;color:var(--muted2);font-size:.72rem;cursor:pointer;text-decoration:underline">Acesso Administrador</button>
   </div>
 </div>
 
