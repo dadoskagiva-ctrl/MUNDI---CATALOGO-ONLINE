@@ -11,6 +11,12 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg"/>
 <link rel="apple-touch-icon" href="icon.svg"/>
 <title>Mundi TKR Sports</title>
+<!-- Service Worker — registra independente do OneSignal -->
+<script>
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+  }
+</script>
 <!-- OneSignal Web Push SDK -->
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -1541,6 +1547,8 @@ _pull().then(()=>{
 // Ressincroniza ao retornar ao app após ficar em background (ex: após 20+ min parado)
 document.addEventListener('visibilitychange',function(){
   if(document.visibilityState!=='visible')return;
+  // Pré-aquece o servidor em paralelo antes do _pull
+  fetch(_API+'/health',{method:'GET',signal:AbortSignal.timeout(10000)}).catch(function(){});
   _pull().then(function(){
     try{var s=localStorage.getItem('mundi:products');if(s){var a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(function(p){PRODUCTS.push(p);});}}}catch(e){}
     applySubscriptionGate();

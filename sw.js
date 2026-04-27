@@ -1,5 +1,5 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v1';
+const CACHE = 'mundi-shell-v2';
 // Tempo máximo para esperar o servidor (Render free tier pode dormir)
 const NETWORK_TIMEOUT_MS = 3000;
 
