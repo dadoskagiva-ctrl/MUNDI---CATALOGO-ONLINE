@@ -585,6 +585,17 @@ input,select,textarea{font-family:var(--fb)}
   .cat-filters{top:0}
   .modal{max-height:96vh;border-radius:20px 20px 0 0}
   .modal-ov{padding:0;align-items:flex-end}
+  /* Barra sticky de fechar — visível sempre no topo ao rolar */
+  .mob-close-bar{display:flex;flex-direction:column;align-items:center;gap:8px;
+    position:sticky;top:0;z-index:20;background:var(--panel);
+    border-radius:20px 20px 0 0;padding:10px 16px 10px;
+    border-bottom:1px solid var(--line)}
+  .mob-close-handle{width:38px;height:4px;background:#3a3a3a;border-radius:2px;flex-shrink:0}
+  .mob-close-btn{align-self:stretch;padding:9px 0;border-radius:12px;
+    background:rgba(255,255,255,.05);border:1px solid var(--line2);
+    color:var(--text);font-size:.9rem;font-weight:600;cursor:pointer;letter-spacing:.02em}
+  /* Esconde o botão ✕ absoluto no mobile (substituído pela barra) */
+  .modal-close{display:none}
 
   /* ── TOPBAR — mantém safe-area no topo (PWA iOS) ── */
   .topbar{padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;gap:6px;flex-wrap:nowrap}
@@ -1442,6 +1453,10 @@ setTimeout(_hideSplash,3000);
 <!-- MODAL PRODUTO -->
 <div class="modal-ov" id="prod-modal" onclick="closeModal(event)">
   <div class="modal">
+    <div class="mob-close-bar" style="display:none">
+      <div class="mob-close-handle"></div>
+      <button class="mob-close-btn" onclick="closeModalBtn()">✕ Fechar</button>
+    </div>
     <button class="modal-close" onclick="closeModalBtn()">✕</button>
     <div class="modal-layout">
       <div class="modal-left">
@@ -1880,6 +1895,9 @@ function openProductModal(id){
 
   document.getElementById('prod-modal').classList.add('open');
   document.body.style.overflow='hidden';
+  // Mostra barra de fechar sticky no mobile
+  var bar=document.querySelector('.mob-close-bar');
+  if(bar) bar.style.display=window.innerWidth<=640?'flex':'none';
 }
 function closeModalBtn(){document.getElementById('prod-modal').classList.remove('open');document.body.style.overflow='';}
 function closeModal(e){if(e.target===document.getElementById('prod-modal'))closeModalBtn();}
