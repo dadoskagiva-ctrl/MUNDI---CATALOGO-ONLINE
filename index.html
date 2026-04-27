@@ -616,6 +616,7 @@ input,select,textarea{font-family:var(--fb)}
   .modal-close{display:none}
 
   /* ── TOPBAR — mantém safe-area no topo (PWA iOS) ── */
+
   .topbar{padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;gap:6px;flex-wrap:nowrap}
   .topbar-sub{display:none}
   .topbar-title{font-size:.82rem;letter-spacing:.02em;white-space:nowrap}
@@ -696,6 +697,26 @@ input,select,textarea{font-family:var(--fb)}
 #pwa-install-bar .pwa-sub{font-size:.72rem;color:#666;margin-top:1px}
 #pwa-install-bar .pwa-btn{font-family:var(--fb);font-size:.75rem;font-weight:800;padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#000;cursor:pointer;white-space:nowrap;flex-shrink:0}
 #pwa-install-bar .pwa-dismiss{background:none;border:none;color:#555;cursor:pointer;font-size:1.1rem;padding:4px;flex-shrink:0}
+/* ── INBOX OVERLAY ── */
+#inbox-overlay{position:fixed;bottom:0;left:0;right:0;z-index:10000;padding:12px 12px 24px;pointer-events:none}
+#inbox-overlay.visible{pointer-events:all}
+.inbox-bubble{background:#1a1a1a;border:1px solid rgba(255,106,0,.35);border-radius:20px;padding:16px 18px 14px;max-width:480px;margin:0 auto;box-shadow:0 -4px 40px rgba(0,0,0,.7);transform:translateY(110%);transition:transform .35s cubic-bezier(.22,.68,0,1.2)}
+#inbox-overlay.visible .inbox-bubble{transform:translateY(0)}
+.inbox-bubble-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.inbox-bubble-dot{width:9px;height:9px;background:var(--orange);border-radius:50%;flex-shrink:0;animation:pulseDot 1.4s infinite}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.inbox-bubble-brand{font-size:.68rem;font-weight:900;letter-spacing:1.6px;color:var(--orange);text-transform:uppercase}
+.inbox-bubble-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:5px;line-height:1.3}
+.inbox-bubble-body{font-size:.88rem;color:#aaa;line-height:1.5;margin-bottom:14px;white-space:pre-wrap}
+.inbox-bubble-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.inbox-bubble-count{font-size:.72rem;color:#555}
+/* ── NOTIF PROMPT BANNER ── */
+#notif-prompt-bar{position:fixed;bottom:80px;left:12px;right:12px;z-index:9998;background:#1a1a1a;border:1px solid rgba(74,222,128,.3);border-radius:16px;padding:14px 16px;max-width:480px;margin:0 auto;display:flex;align-items:center;gap:12px;box-shadow:0 4px 24px rgba(0,0,0,.6);transform:translateY(20px);opacity:0;transition:all .3s ease;pointer-events:none}
+#notif-prompt-bar.visible{transform:translateY(0);opacity:1;pointer-events:all}
+#notif-prompt-bar .npb-icon{font-size:1.4rem;flex-shrink:0}
+#notif-prompt-bar .npb-text{flex:1;min-width:0}
+#notif-prompt-bar .npb-title{font-size:.82rem;font-weight:700;color:#fff}
+#notif-prompt-bar .npb-sub{font-size:.72rem;color:#666;margin-top:2px}
 </style>
 </head>
 <body>
@@ -1391,7 +1412,22 @@ setTimeout(_hideSplash,3000);
       </div>
 
       <div class="card-panel" style="margin-top:0">
-        <div class="card-panel-title">📲 Enviar Notificação para Todos</div>
+        <div class="card-panel-title">💬 Aviso dentro do App</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">Aparece como um balão na tela do representante enquanto ele estiver com o app aberto. Fica salvo e mostra ao abrir o app.</p>
+        <div class="form-grid">
+          <div class="field"><label>Título</label><input id="inapp-title" placeholder="Ex: Novo produto disponível!"/></div>
+          <div class="field"><label>Mensagem</label><input id="inapp-body" placeholder="Digite a mensagem..."/></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-primary" onclick="sendInAppMsg()">💬 Enviar aviso no app</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearInboxAll()" style="color:#f87171;border-color:rgba(248,113,113,.3)">🗑️ Limpar todos</button>
+        </div>
+        <div id="inapp-fb" style="margin-top:10px"></div>
+        <div id="inapp-history" style="margin-top:14px"></div>
+      </div>
+
+      <div class="card-panel" style="margin-top:0">
+        <div class="card-panel-title">📲 Enviar Push (app fechado)</div>
         <div class="field"><label>Título</label><input id="notif-title" placeholder="Ex: Novo catálogo disponível!"/></div>
         <div class="field"><label>Mensagem</label><textarea id="notif-body" rows="3" placeholder="Digite a mensagem que todos os representantes vão receber..." style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:11px 14px;font-size:.95rem;outline:none;resize:vertical"></textarea></div>
         <div class="field"><label>Link ao clicar (opcional)</label><input id="notif-url" placeholder="https://..."/></div>
@@ -1529,7 +1565,7 @@ const K = {
 // ── Neon sync ──
 const _API = 'https://mundi-tkr-api.vercel.app';
 const _AK  = 'mundi_tkr_api_2026';
-const _SK  = ['mundi:reps','mundi:products','mundi:subscription','mundi:links'];
+const _SK  = ['mundi:reps','mundi:products','mundi:subscription','mundi:links','mundi:inbox'];
 const KIWIFY_EM = 'https://pay.kiwify.com.br/Fg3dOU7';
 const KIWIFY_EA = 'https://pay.kiwify.com.br/nUrBLSj';
 const KIWIFY_PM = 'https://pay.kiwify.com.br/Y4ESS1y';
@@ -1580,6 +1616,7 @@ _pull().then(()=>{
   try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
   applySubscriptionGate();
   updatePlansLinks();
+  checkInbox();
 }).catch(()=>{});
 // Ressincroniza ao retornar ao app após ficar em background (ex: após 20+ min parado)
 document.addEventListener('visibilitychange',function(){
@@ -1590,6 +1627,7 @@ document.addEventListener('visibilitychange',function(){
     try{var s=localStorage.getItem('mundi:products');if(s){var a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(function(p){PRODUCTS.push(p);});}}}catch(e){}
     applySubscriptionGate();
     updatePlansLinks();
+    checkInbox();
   }).catch(function(){});
 });
 
@@ -2297,6 +2335,8 @@ function renderRepDash(){
   const el=document.getElementById('rep-welcome');
   if(el) el.textContent=`Bem-vindo, ${sess.name} — acesso de representante ativo`;
   setRepTab('catalogs');
+  checkInbox();
+  checkAndPromptNotif();
 }
 
 function setRepTab(tab){
@@ -2541,6 +2581,7 @@ function loadNotifTab(){
   document.getElementById('os-app-id').value = id;
   document.getElementById('os-api-key').value = key;
   renderNotifHistory();
+  renderInappHistory();
 }
 
 function saveOSConfig(){
@@ -2597,6 +2638,109 @@ function renderNotifHistory(){
     <span class="log-time">${new Date(n.ts).toLocaleString('pt-BR')}</span>
     <div><strong>${n.title}</strong><br><span style="color:var(--muted);font-size:.78rem">${n.body}</span></div>
   </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// IN-APP INBOX — MENSAGENS PARA REPRESENTANTES
+// ══════════════════════════════════════════════
+function sendInAppMsg(){
+  const title = document.getElementById('inapp-title').value.trim();
+  const body  = document.getElementById('inapp-body').value.trim();
+  const fb    = document.getElementById('inapp-fb');
+  if(!title||!body){toast('Preencha título e mensagem','err');return;}
+  const inbox = getData('mundi:inbox')||[];
+  inbox.unshift({id:'msg-'+Date.now(), title, body, at: new Date().toISOString()});
+  setData('mundi:inbox', inbox.slice(0,50));
+  renderInappHistory();
+  fb.innerHTML='<div class="fb-msg fb-ok">✅ Aviso enviado! Aparecerá para os representantes ao abrir o app.</div>';
+  setTimeout(()=>fb.innerHTML='',4000);
+  document.getElementById('inapp-title').value='';
+  document.getElementById('inapp-body').value='';
+  addLog('Admin enviou aviso no app: '+title);
+}
+
+function clearInboxAll(){
+  if(!confirm('Limpar todos os avisos do inbox?'))return;
+  setData('mundi:inbox',[]);
+  renderInappHistory();
+  toast('Inbox limpo','ok');
+}
+
+function renderInappHistory(){
+  const el=document.getElementById('inapp-history');
+  if(!el) return;
+  const inbox=getData('mundi:inbox')||[];
+  if(!inbox.length){el.innerHTML='<p style="color:#666;font-size:.82rem;margin-top:8px">Nenhum aviso no inbox.</p>';return;}
+  el.innerHTML='<p style="color:var(--muted);font-size:.72rem;margin-bottom:8px;letter-spacing:.5px">AVISOS ATIVOS ('+inbox.length+')</p>'+
+    inbox.map(m=>`<div class="log-item" style="display:flex;align-items:flex-start;gap:10px">
+      <div style="flex:1"><strong style="font-size:.88rem">${m.title}</strong><br><span style="color:var(--muted);font-size:.78rem">${m.body}</span></div>
+      <button onclick="removeInboxMsg('${m.id}')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.9rem;flex-shrink:0;padding:0 4px">✕</button>
+    </div>`).join('');
+}
+
+function removeInboxMsg(id){
+  const inbox=(getData('mundi:inbox')||[]).filter(m=>m.id!==id);
+  setData('mundi:inbox',inbox);
+  renderInappHistory();
+}
+
+// Mostra overlay de mensagem para reps com novas mensagens
+let _inboxQueue=[], _inboxIdx=0;
+
+function checkInbox(){
+  const sess=getSession();
+  if(!sess||sess.role==='admin'||sess.role==='dev') return;
+  const inbox=getData('mundi:inbox')||[];
+  if(!inbox.length) return;
+  const seen=JSON.parse(localStorage.getItem('mundi:inbox_seen')||'[]');
+  _inboxQueue=inbox.filter(m=>!seen.includes(m.id));
+  _inboxIdx=0;
+  if(_inboxQueue.length) showNextInboxMsg();
+}
+
+function showNextInboxMsg(){
+  const ov=document.getElementById('inbox-overlay');
+  if(!ov) return;
+  if(_inboxIdx>=_inboxQueue.length){
+    ov.classList.remove('visible');
+    return;
+  }
+  const msg=_inboxQueue[_inboxIdx];
+  document.getElementById('inbox-bubble-title').textContent=msg.title;
+  document.getElementById('inbox-bubble-body').textContent=msg.body;
+  const cnt=_inboxQueue.length>1?`${_inboxIdx+1} de ${_inboxQueue.length} mensagens`:'';
+  document.getElementById('inbox-bubble-count').textContent=cnt;
+  ov.classList.add('visible');
+}
+
+function dismissInboxMsg(){
+  if(_inboxIdx>=_inboxQueue.length) return;
+  const msg=_inboxQueue[_inboxIdx];
+  const seen=JSON.parse(localStorage.getItem('mundi:inbox_seen')||'[]');
+  seen.push(msg.id);
+  localStorage.setItem('mundi:inbox_seen',JSON.stringify(seen.slice(-200)));
+  _inboxIdx++;
+  showNextInboxMsg();
+}
+
+// Auto-prompt de notificações — 1x por dia
+function checkAndPromptNotif(){
+  const sess=getSession();
+  if(!sess||sess.role==='admin'||sess.role==='dev') return;
+  if(typeof Notification==='undefined') return;
+  if(Notification.permission==='granted') return; // já ativado
+  if(Notification.permission==='denied') return;  // bloqueado pelo usuário
+  const today=new Date().toISOString().slice(0,10);
+  const lastShown=localStorage.getItem('mundi:notif_ask_date');
+  if(lastShown===today) return; // já mostrou hoje
+  localStorage.setItem('mundi:notif_ask_date',today);
+  const bar=document.getElementById('notif-prompt-bar');
+  if(bar) setTimeout(()=>bar.classList.add('visible'),1500);
+}
+
+function fecharNotifPrompt(){
+  const bar=document.getElementById('notif-prompt-bar');
+  if(bar) bar.classList.remove('visible');
 }
 
 function renderAdminReps(){
@@ -3231,5 +3375,30 @@ window.addEventListener('appinstalled',function(){
 })();
 </script>
 
+<!-- ── INBOX OVERLAY ── -->
+<div id="inbox-overlay">
+  <div class="inbox-bubble">
+    <div class="inbox-bubble-hd">
+      <span class="inbox-bubble-dot"></span>
+      <span class="inbox-bubble-brand">Mundi TKR Sports</span>
+    </div>
+    <div class="inbox-bubble-title" id="inbox-bubble-title"></div>
+    <div class="inbox-bubble-body" id="inbox-bubble-body"></div>
+    <div class="inbox-bubble-foot">
+      <span class="inbox-bubble-count" id="inbox-bubble-count"></span>
+      <button class="btn btn-primary btn-sm" onclick="dismissInboxMsg()">✓ Li a mensagem</button>
+    </div>
+  </div>
+</div>
+<!-- ── NOTIF PROMPT BANNER ── -->
+<div id="notif-prompt-bar">
+  <span class="npb-icon">🔔</span>
+  <div class="npb-text">
+    <div class="npb-title">Ative as notificações</div>
+    <div class="npb-sub">Receba avisos em tempo real da Mundi TKR Sports</div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="ativarNotificacoes();fecharNotifPrompt()">Ativar</button>
+  <button onclick="fecharNotifPrompt()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.1rem;padding:4px;flex-shrink:0">✕</button>
+</div>
 </body>
 </html>
