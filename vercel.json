@@ -4,7 +4,7 @@
     { "src": "/api/kiwify-webhook", "dest": "/api/kiwify-webhook.js" },
     { "src": "/api/notify",         "dest": "/api/notify.js" },
     { "src": "/api/kv",             "dest": "/api/kv.js" },
-    { "src": "/api/kv/(.*)",        "dest": "/api/kv/[key].js" },
+    { "src": "/api/kv/(.*)",        "dest": "/api/kv/[key].js?key=$1" },
     { "src": "/api/health",         "dest": "/api/health.js" },
     { "src": "/(.*)",               "dest": "/$1" }
   ]
