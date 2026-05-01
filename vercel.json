@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "node -e \"const fs=require('fs');const d=new Date();const p=n=>String(n).padStart(2,'0');const v=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());fs.writeFileSync('version.json',JSON.stringify({v}));\"",
   "routes": [
+    { "src": "/version.json",       "dest": "/api/version.js" },
     { "src": "/api/kiwify-webhook", "dest": "/api/kiwify-webhook.js" },
     { "src": "/api/notify",         "dest": "/api/notify.js" },
     { "src": "/api/kv",             "dest": "/api/kv.js" },
