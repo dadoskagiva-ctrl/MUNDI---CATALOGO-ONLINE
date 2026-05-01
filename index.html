@@ -2451,19 +2451,35 @@ function canvaEmbedUrl(url){
 }
 
 function renderRepTabelas(){
-  const globalLinks=getObj(K.links);
   const sess=getSession();
-  const repLinks=sess?.repLinks||{};
-  const links=Object.assign({},globalLinks,repLinks);
+  const grid=document.getElementById('rep-tabelas-grid');
+  if(!grid)return;
+
+  // Catálogos personalizados do rep (os 10 slots)
+  const repCatalogs=(sess?.repCatalogs||[]).filter(c=>c.name&&c.url);
+  if(repCatalogs.length){
+    grid.innerHTML='<div class="dl-grid">'+repCatalogs.map(c=>{
+      const safeTitle=c.name.replace(/'/g,"\\'");
+      const safeUrl=c.url.replace(/'/g,"\\'");
+      return `<div class="dl-card">
+        <div class="dl-card-header"><span class="dl-card-icon">📅</span><div class="dl-card-title">${c.name}</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <button class="dl-btn" style="flex:1" onclick="openRepCustomCatalog('${safeUrl}','${safeTitle}')">👁 Visualizar</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+    return;
+  }
+
+  // Fallback: tabelas globais
+  const globalLinks=getObj(K.links);
   const allowedKagiva=sess?.brands==='kagiva';
   const allowedTopper=!sess?.brands||sess?.brands==='topper'||sess?.brands==='todas';
   const tabelas=[
     {key:'tab-topper', label:'Tabela Topper + Rainha', show: allowedTopper},
     {key:'tab-kagiva', label:'Tabela Kagiva', show: allowedKagiva||allowedTopper},
     {key:'tab-geral',  label:'Tabela Geral', show: true}
-  ].filter(t=>t.show && links[t.key]);
-  const grid=document.getElementById('rep-tabelas-grid');
-  if(!grid)return;
+  ].filter(t=>t.show && globalLinks[t.key]);
   if(!tabelas.length){
     grid.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:2.5rem;margin-bottom:12px">📅</div><p>Nenhuma tabela de prazo disponível ainda.</p></div>';
     return;
