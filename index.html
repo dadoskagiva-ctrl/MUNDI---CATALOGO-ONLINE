@@ -11,24 +11,23 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg"/>
 <link rel="apple-touch-icon" href="icon.svg"/>
 <title>Mundi TKR Sports</title>
-<!-- Service Worker + auto-update -->
+<!-- Service Worker + auto-update silencioso -->
 <script>
-  var _APP_V = '20260427-03';
   if('serviceWorker' in navigator){
-    // Recarrega automaticamente quando o SW se atualiza
     navigator.serviceWorker.addEventListener('controllerchange', function(){
       location.reload(true);
     });
-    // Escuta mensagem do SW pedindo reload
     navigator.serviceWorker.addEventListener('message', function(e){
       if(e.data && e.data.type==='SW_UPDATED') location.reload(true);
     });
     navigator.serviceWorker.register('/sw.js',{scope:'/'}).then(function(reg){
-      reg.update(); // força verificação imediata de novo SW
+      reg.update();
     }).catch(function(){});
-    // Verificação de versão como camada extra de segurança
     fetch('/version.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
-      if(d.v && d.v !== _APP_V){
+      var stored = localStorage.getItem('mundi:version');
+      if(!stored){ localStorage.setItem('mundi:version', d.v); return; }
+      if(d.v && d.v !== stored){
+        localStorage.setItem('mundi:version', d.v);
         caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});
         location.reload(true);
       }
@@ -49,7 +48,7 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#080808;--panel:#121212;--panel2:#181818;--line:#2a2a2a;--line2:#333;
   --text:#f3f3f3;--muted:#a2a2a2;--muted2:#666;
@@ -70,7 +69,7 @@ body{
   color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 a{color:inherit;text-decoration:none}
-button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit;touch-action:manipulation}
 input,select,textarea{font-family:var(--fb)}
 .page{display:none}.page.active{display:block}
 
@@ -560,6 +559,7 @@ input,select,textarea{font-family:var(--fb)}
   .mob-nav{display:grid}
   /* add bottom padding so content doesn't hide behind mob-nav + home indicator */
   .page.active{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(72px + env(safe-area-inset-bottom,0px) + 8px);left:12px;right:12px;text-align:center}
   .hero-grid{grid-template-columns:1fr}
   .brands-grid{grid-template-columns:1fr 1fr}
   .modal-layout{grid-template-columns:1fr}
@@ -591,8 +591,6 @@ input,select,textarea{font-family:var(--fb)}
 }
 
 @media(max-width:640px){
-  /* ── GERAL ── */
-  *{-webkit-tap-highlight-color:transparent}
   .hero-wrap{padding:10px 8px}
   .hero-card{padding:16px 12px;gap:10px}
   .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
@@ -631,7 +629,8 @@ input,select,textarea{font-family:var(--fb)}
   .dash-title{font-size:1.1rem;letter-spacing:1.5px}
   .dash-welcome{font-size:.74rem}
   .field label{font-size:.76rem}
-  .field input,.field textarea,.field select{font-size:.85rem}
+  .field input,.field textarea,.field select{font-size:16px}
+  .search-wrap input,#rep-png-search,#adm-ps,.admin-prod-toolbar input,.admin-prod-toolbar select,#home-search-text,#search-topper,#search-kagiva,#search-rainha{font-size:16px}
 
   /* ── TABS ── */
   .dash-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding-bottom:2px;width:100%}
@@ -1401,14 +1400,15 @@ setTimeout(_hideSplash,3000);
       <div class="card-panel">
         <div class="card-panel-title">⚙️ Configuração OneSignal</div>
         <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">
-          Crie uma conta gratuita em <strong style="color:var(--orange)">onesignal.com</strong>, crie um app Web Push e cole o App ID e a REST API Key abaixo.
+          App ID já configurado: <strong style="color:var(--orange)">e7024ef4-2ee4-4fd4-bc99-dbe3b981e64b</strong><br>
+          Cole a <strong>REST API Key</strong> do seu painel OneSignal → Settings → Keys &amp; IDs.
         </p>
         <div class="form-grid">
-          <div class="field"><label>App ID</label><input id="os-app-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/></div>
-          <div class="field"><label>REST API Key</label><input id="os-api-key" type="password" placeholder="REST API Key do OneSignal"/></div>
+          <div class="field"><label>REST API Key (OneSignal)</label><input id="os-api-key" type="password" placeholder="Chave REST do OneSignal..."/></div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="saveOSConfig()">Salvar Configuração</button>
+        <button class="btn btn-primary btn-sm" onclick="saveOSConfig()">💾 Salvar e Ativar Push</button>
         <div id="os-cfg-fb" style="margin-top:8px"></div>
+        <div id="os-cfg-status" style="margin-top:8px"></div>
       </div>
 
       <div class="card-panel" style="margin-top:0">
@@ -1602,10 +1602,13 @@ function ensureAdmin(){
   }
   setData(K.reps,reps);
 }
-// Init imediato: mostra app em 800ms, sincroniza Neon em segundo plano
+// Init: sincroniza com Neon; aplica gate apenas se já há dados em cache
 ensureAdmin();
 try{const s=localStorage.getItem('mundi:products');if(s){const a=JSON.parse(s);if(a&&a.length){PRODUCTS.length=0;a.forEach(p=>PRODUCTS.push(p));}}}catch(e){}
-applySubscriptionGate();
+// Só aplica o gate imediatamente se já existe dado de assinatura em cache
+// (evita "página preta" quando o Render está dormindo e não há cache local)
+const _cachedSubObj=getObj('mundi:subscription');
+if(_cachedSubObj&&_cachedSubObj.expiresAt) applySubscriptionGate();
 updatePlansLinks();
 const _urlP=new URLSearchParams(location.search).get('p');
 if(_urlP) try{showPage(_urlP);}catch(e){}
@@ -1617,7 +1620,7 @@ _pull().then(()=>{
   applySubscriptionGate();
   updatePlansLinks();
   checkInbox();
-}).catch(()=>{});
+}).catch(()=>{applySubscriptionGate();});
 // Ressincroniza ao retornar ao app após ficar em background (ex: após 20+ min parado)
 document.addEventListener('visibilitychange',function(){
   if(document.visibilityState!=='visible')return;
@@ -2576,22 +2579,50 @@ function setAdminTab(tab){
 // WEB PUSH — ONESIGNAL
 // ══════════════════════════════════════════════
 function loadNotifTab(){
-  const id = localStorage.getItem('mundi:os_id')||'';
   const key = localStorage.getItem('mundi:os_key')||'';
-  document.getElementById('os-app-id').value = id;
-  document.getElementById('os-api-key').value = key;
+  if(key) document.getElementById('os-api-key').value = key;
+  checkOsStatus();
   renderNotifHistory();
   renderInappHistory();
 }
 
-function saveOSConfig(){
-  const id = document.getElementById('os-app-id').value.trim();
+async function checkOsStatus(){
+  const el=document.getElementById('os-cfg-status');
+  if(!el) return;
+  try{
+    const r=await fetch(_API+'/api/health',{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      const key=localStorage.getItem('mundi:os_key');
+      if(key) el.innerHTML='<div class="fb-msg fb-ok">✅ API online — Push configurado.</div>';
+      else el.innerHTML='<div class="fb-msg" style="color:var(--orange)">⚠️ API online, mas REST API Key do OneSignal ainda não salva.</div>';
+    }
+  }catch(e){el.innerHTML='<div class="fb-msg fb-err">❌ API offline ou erro de rede.</div>';}
+}
+
+async function saveOSConfig(){
   const key = document.getElementById('os-api-key').value.trim();
-  if(!id||!key){toast('Preencha App ID e REST API Key','err');return;}
-  localStorage.setItem('mundi:os_id', id);
+  if(!key){toast('Cole a REST API Key do OneSignal','err');return;}
+  const fb  = document.getElementById('os-cfg-fb');
+  fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Salvando...</div>';
+  // Salva localmente
   localStorage.setItem('mundi:os_key', key);
-  document.getElementById('os-cfg-fb').innerHTML='<div class="fb-msg fb-ok">✅ Configuração salva! Recarregue o app para ativar as notificações.</div>';
-  toast('OneSignal configurado!','ok');
+  // Salva no KV (servidor usa para enviar push sem env var)
+  try{
+    const r=await fetch(`${_API}/api/kv/${encodeURIComponent('mundi:os_api_key')}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','x-api-key':_AK},
+      body:JSON.stringify({value:key})
+    });
+    if(r.ok){
+      fb.innerHTML='<div class="fb-msg fb-ok">✅ REST API Key salva! Push notifications prontas para envio.</div>';
+      toast('OneSignal configurado!','ok');
+      checkOsStatus();
+    } else {
+      fb.innerHTML='<div class="fb-msg fb-err">❌ Erro ao salvar no servidor. Tente novamente.</div>';
+    }
+  }catch(e){
+    fb.innerHTML='<div class="fb-msg fb-err">❌ Erro de rede: '+e.message+'</div>';
+  }
 }
 
 async function sendPushNotif(){
@@ -3248,22 +3279,22 @@ mobNavActive('home');
 <!-- MOBILE NAV BAR -->
 <nav class="mob-nav" id="mob-nav">
   <button class="mob-nav-btn mn-home active" onclick="showPage('home')">
-    <span class="mn-ico">⚽</span>Início
+    <span class="mn-ico">🏠</span>Início
   </button>
   <button class="mob-nav-btn mn-cat-topper" onclick="showPage('catalog-topper')">
     <span class="mn-ico">⚽</span>Topper
   </button>
   <button class="mob-nav-btn mn-cat-kagiva" onclick="showPage('catalog-kagiva')">
-    <span class="mn-ico">⚽</span>Kagiva
+    <span class="mn-ico">🏃</span>Kagiva
   </button>
   <button class="mob-nav-btn mn-cat-rainha" onclick="showPage('catalog-rainha')">
-    <span class="mn-ico">⚽</span>Rainha
+    <span class="mn-ico">🏐</span>Rainha
   </button>
   <button class="mob-nav-btn mn-login mn-rep" id="mob-nav-rep" onclick="(function(){const s=getSession();s&&s.role!=='admin'?showPage('rep'):showLoginAs('rep')})()">
-    <span class="mn-ico">⚽</span>Rep
+    <span class="mn-ico">👤</span>Rep
   </button>
   <button class="mob-nav-btn mn-login mn-admin" id="mob-nav-adm" onclick="(function(){const s=getSession();s&&s.role==='admin'?showPage('admin'):showLoginAs('admin')})()">
-    <span class="mn-ico">⚽</span>ADM
+    <span class="mn-ico">⚙️</span>ADM
   </button>
 </nav>
 
@@ -3353,20 +3384,18 @@ window.addEventListener('appinstalled',function(){
 });
 </script>
 
-<!-- AUTO-UPDATE: detecta nova versão e mostra banner -->
-<div id="update-bar" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 72px);left:10px;right:10px;z-index:97000;background:linear-gradient(135deg,#1a2a1a,#111);border:1px solid rgba(74,222,128,.3);border-radius:14px;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between;box-shadow:0 4px 24px rgba(0,0,0,.5)">
-  <div style="font-size:.83rem;color:#e0e0e0;font-weight:500">🔄 Nova versão disponível</div>
-  <button onclick="location.reload(true)" style="background:#4ade80;color:#000;border:none;padding:8px 16px;border-radius:8px;font-family:var(--fb);font-weight:800;font-size:.78rem;cursor:pointer;flex-shrink:0">ATUALIZAR</button>
-</div>
 <script>
 (function(){
-  var _v=localStorage.getItem('mundi:version');
   function _chk(){
     fetch('/version.json?_='+Date.now())
       .then(function(r){return r.json();})
       .then(function(d){
-        if(!_v){localStorage.setItem('mundi:version',d.v);_v=d.v;return;}
-        if(d.v!==_v){document.getElementById('update-bar').style.display='flex';}
+        var stored=localStorage.getItem('mundi:version');
+        if(!stored){localStorage.setItem('mundi:version',d.v);return;}
+        if(d.v && d.v!==stored){
+          localStorage.setItem('mundi:version',d.v);
+          location.reload(true);
+        }
       }).catch(function(){});
   }
   setTimeout(_chk,5000);

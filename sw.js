@@ -1,5 +1,5 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v3';
+const CACHE = 'mundi-shell-v4';
 const NETWORK_TIMEOUT_MS = 3000;
 
 // Cache index.html na instalação

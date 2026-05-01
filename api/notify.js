@@ -1,6 +1,20 @@
 'use strict';
-const API_KEY = process.env.API_KEY || 'mundi_tkr_api_2026';
+const { Pool } = require('pg');
+const API_KEY  = process.env.API_KEY  || 'mundi_tkr_api_2026';
 const OS_APP_ID = process.env.OS_APP_ID || 'e7024ef4-2ee4-4fd4-bc99-dbe3b981e64b';
+
+async function getOsApiKey() {
+  // 1) env var (Vercel dashboard)
+  if (process.env.OS_API_KEY) return process.env.OS_API_KEY;
+  // 2) KV store — admin salva via painel
+  try {
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false }, max: 1 });
+    const { rows } = await pool.query("SELECT value FROM kv_store WHERE key='mundi:os_api_key'");
+    await pool.end();
+    if (rows.length && rows[0].value) return String(rows[0].value).replace(/^"|"$/g, '');
+  } catch (_) {}
+  return null;
+}
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,9 +25,10 @@ module.exports = async (req, res) => {
   if (req.headers['x-api-key'] !== API_KEY) return res.status(401).json({ error: 'unauthorized' });
 
   const { title, body, url } = req.body || {};
-  const osApiKey = process.env.OS_API_KEY;
-  if (!osApiKey) return res.status(500).json({ error: 'OS_API_KEY não configurada no servidor' });
   if (!title || !body) return res.status(400).json({ error: 'title e body são obrigatórios' });
+
+  const osApiKey = await getOsApiKey();
+  if (!osApiKey) return res.status(500).json({ error: 'OS_API_KEY não configurada. Configure no painel Admin → Notificações.' });
 
   const payload = {
     app_id: OS_APP_ID,
@@ -25,10 +40,7 @@ module.exports = async (req, res) => {
 
   const r = await fetch('https://onesignal.com/api/v1/notifications', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Key ' + osApiKey
-    },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Key ' + osApiKey },
     body: JSON.stringify(payload)
   });
   const data = await r.json();
