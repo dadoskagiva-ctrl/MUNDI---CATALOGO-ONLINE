@@ -1169,11 +1169,13 @@ setTimeout(_hideSplash,3000);
       <button class="dash-tab" onclick="setAdminTab('products')">📦 Produtos</button>
       <button class="dash-tab" onclick="setAdminTab('videos')">Vídeos</button>
       <button class="dash-tab" onclick="setAdminTab('links')">Links Drive</button>
-      <button class="dash-tab" onclick="setAdminTab('logs')">Logs</button>
       <button class="dash-tab" onclick="setAdminTab('notifs')">📲 Notificações</button>
       <button class="dash-tab" onclick="setAdminTab('subscription')">💳 Assinatura</button>
     </div>
-    <div id="admin-tab-reps"><div class="card-panel"><div class="card-panel-title">Representantes Cadastrados</div><div id="admin-reps-list"></div></div></div>
+    <div id="admin-tab-reps">
+      <div class="card-panel"><div class="card-panel-title">Representantes Cadastrados</div><div id="admin-reps-list"></div></div>
+      <div class="card-panel" style="margin-top:0"><div class="card-panel-title">Últimos Acessos dos Representantes</div><div id="admin-rep-logs"></div></div>
+    </div>
     <div id="admin-tab-add-rep" style="display:none">
       <div class="card-panel">
         <div class="card-panel-title">Cadastrar Novo Representante</div>
@@ -2563,14 +2565,14 @@ function updateAdminStats(){
 }
 
 function setAdminTab(tab){
-  const tabs=['reps','add-rep','products','videos','links','logs','notifs','subscription'];
+  const tabs=['reps','add-rep','products','videos','links','notifs','subscription'];
   tabs.forEach(t=>document.getElementById('admin-tab-'+t).style.display=t===tab?'':'none');
+  document.getElementById('admin-tab-logs').style.display='none';
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
   if(tab==='products') renderAdminProducts();
   if(tab==='videos'){renderAdminVideos();loadVideoForm();}
   if(tab==='links') loadLinks();
-  if(tab==='logs') renderLogs();
   if(tab==='notifs') loadNotifTab();
   if(tab==='subscription') renderSubscriptionTab();
 }
@@ -2724,7 +2726,7 @@ function checkInbox(){
   const inbox=getData('mundi:inbox')||[];
   if(!inbox.length) return;
   const seen=JSON.parse(localStorage.getItem('mundi:inbox_seen')||'[]');
-  _inboxQueue=inbox.filter(m=>!seen.includes(m.id));
+  _inboxQueue=inbox.filter(m=>!seen.includes(m.id)&&(m.title||m.body));
   _inboxIdx=0;
   if(_inboxQueue.length) showNextInboxMsg();
 }
@@ -2777,8 +2779,8 @@ function fecharNotifPrompt(){
 function renderAdminReps(){
   const reps=getData(K.reps).filter(r=>r.role!=='admin'&&r.role!=='dev');
   const el=document.getElementById('admin-reps-list');
-  if(!reps.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum representante cadastrado ainda.</p>';return;}
-  el.innerHTML=`<table class="admin-table">
+  if(!reps.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum representante cadastrado ainda.</p>';}
+  else el.innerHTML=`<table class="admin-table">
     <thead><tr><th>Nome</th><th>CPF</th><th>Marcas</th><th>Cidade</th><th>Status</th><th>Ação</th></tr></thead>
     <tbody>${reps.map(r=>`<tr>
       <td style="font-weight:700">${r.name}</td>
@@ -2792,6 +2794,15 @@ function renderAdminReps(){
       </td>
     </tr>`).join('')}</tbody>
   </table>`;
+  // Logs filtrados: apenas logins e downloads de representantes
+  const logEl=document.getElementById('admin-rep-logs');
+  if(logEl){
+    const repLogs=getData(K.logs)
+      .filter(l=>l.action&&(l.action.startsWith('Login representante')||l.action.startsWith('Download:')))
+      .slice(-50).reverse();
+    if(!repLogs.length){logEl.innerHTML='<p style="color:var(--muted);font-size:.84rem">Nenhum acesso registrado ainda.</p>';}
+    else logEl.innerHTML=repLogs.map(l=>`<div class="log-item"><span class="log-time">${new Date(l.at).toLocaleString('pt-BR')}</span><span>${l.action}</span></div>`).join('');
+  }
 }
 
 function saveRep(){
