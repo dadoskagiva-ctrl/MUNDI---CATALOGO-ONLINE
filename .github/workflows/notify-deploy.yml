@@ -1,0 +1,39 @@
+name: Push — Nova Atualização
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aguarda deploy do Vercel concluir
+        run: sleep 90
+
+      - name: Verifica se o deploy está no ar
+        id: health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://mundi-tkr-api.vercel.app/api/health)
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          if [ "$STATUS" != "200" ]; then
+            echo "Servidor não respondeu (status $STATUS) — aguardando mais 60s"
+            sleep 60
+          fi
+
+      - name: Envia push de nova atualização para todos os representantes
+        run: |
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            https://mundi-tkr-api.vercel.app/api/notify \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.MUNDI_API_KEY }}" \
+            -d '{
+              "title": "Nova atualização disponível",
+              "body": "O catálogo foi atualizado. Toque para abrir a versão mais recente."
+            }')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          echo "Resposta ($HTTP_CODE): $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Aviso: push não enviado (código $HTTP_CODE)"
+          fi
