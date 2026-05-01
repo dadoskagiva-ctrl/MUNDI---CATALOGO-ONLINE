@@ -1198,13 +1198,10 @@ setTimeout(_hideSplash,3000);
           </div>
         </div>
         <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
-          <div style="font-size:.74rem;font-weight:900;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;margin-bottom:10px">Catálogos e Tabelas Personalizados <span style="font-weight:400;color:var(--muted);letter-spacing:0;text-transform:none">(opcional — substitui os links globais para este rep)</span></div>
-          <div class="form-grid">
-            <div class="field"><label>📋 Catálogo Topper + Rainha</label><input id="rep-link-topper" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
-            <div class="field"><label>📋 Catálogo Kagiva</label><input id="rep-link-kagiva" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
-            <div class="field"><label>📅 Tabela Topper + Rainha</label><input id="rep-link-tab-topper" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
-            <div class="field"><label>📅 Tabela Kagiva</label><input id="rep-link-tab-kagiva" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
-            <div class="field"><label>📅 Tabela Geral</label><input id="rep-link-tab-geral" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
+          <div style="font-size:.74rem;font-weight:900;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Catálogos Personalizados</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Adicione até 10 catálogos exclusivos para este representante (nome + link). Deixe em branco os que não usar.</div>
+          <div id="rep-catalogs-slots">
+            <!-- slots gerados por JS -->
           </div>
         </div>
         <div id="add-rep-fb"></div>
@@ -2383,21 +2380,36 @@ function setRepTab(tab){
 }
 
 function renderRepCatalogs(){
-  const globalLinks=getObj(K.links);
   const sess=getSession();
-  const repLinks=sess?.repLinks||{};
-  // per-rep links override global links
-  const links=Object.assign({},globalLinks,repLinks);
+  const grid=document.getElementById('rep-catalogs-grid');
+  if(!grid)return;
+
+  // Se o rep tem catálogos personalizados, mostra só eles
+  const repCatalogs=(sess?.repCatalogs||[]).filter(c=>c.name&&c.url);
+  if(repCatalogs.length){
+    grid.innerHTML='<div class="dl-grid">'+repCatalogs.map((c,i)=>{
+      const safeTitle=c.name.replace(/'/g,"\\'");
+      const safeUrl=c.url.replace(/'/g,"\\'");
+      return `<div class="dl-card">
+        <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">${c.name}</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <button class="dl-btn" style="flex:1" onclick="openRepCustomCatalog('${safeUrl}','${safeTitle}')">👁 Visualizar</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+    return;
+  }
+
+  // Fallback: catálogos globais por marca (comportamento original)
+  const globalLinks=getObj(K.links);
   const allowed=sess?.brands==='kagiva'?['kagiva']:sess?.brands==='topper'?['topper','rainha']:['topper','kagiva','rainha'];
   const catalogs=[
     {key:'topper', label:'Topper + Rainha 2026', desc:'Catálogo completo. Campo, Society, Futsal, Vôlei, Handebol e Beach Soccer.', tags:['Campo','Futsal','Vôlei','Society']},
     {key:'kagiva', label:'Kagiva 2026', desc:'Catálogo completo Kagiva. Campo, Society, Futsal, Vôlei, Handebol, Basquete, Luvas e Acessórios.', tags:['Campo','Futsal','Basquete','Luvas']}
   ].filter(c=>allowed.includes(c.key));
-  const grid=document.getElementById('rep-catalogs-grid');
-  if(!grid)return;
   if(!catalogs.length){grid.innerHTML='<p style="color:var(--muted);padding:20px">Nenhum catálogo disponível para sua conta.</p>';return;}
   grid.innerHTML='<div class="dl-grid">'+catalogs.map(c=>{
-    const url=links[c.key]||CATALOG_VIEWER_URLS['link-'+c.key]||'';
+    const url=globalLinks[c.key]||CATALOG_VIEWER_URLS['link-'+c.key]||'';
     return `<div class="dl-card">
       <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">${c.label}</div></div>
       <div class="dl-card-desc">${c.desc}</div>
@@ -2407,6 +2419,35 @@ function renderRepCatalogs(){
       </div>
     </div>`;
   }).join('')+'</div>';
+}
+
+function openRepCustomCatalog(url, title){
+  const modal=document.getElementById('pdf-viewer-modal');
+  const frame=document.getElementById('pdf-viewer-frame');
+  const msg=document.getElementById('pdf-viewer-msg');
+  const extLink=document.getElementById('pdf-viewer-ext');
+  document.getElementById('pdf-viewer-title').textContent=title||'Catálogo';
+  if(extLink) extLink.href=url;
+  const embedUrl=catalogEmbedUrl(url)||canvaEmbedUrl(url)||url;
+  if(embedUrl){
+    frame.style.display='';frame.style.flex='1';
+    if(msg) msg.style.display='none';
+    const loader=document.getElementById('pdf-viewer-loading');
+    if(loader) loader.style.display='flex';
+    frame.src=embedUrl;
+  } else {
+    frame.style.display='none';
+    if(msg){msg.style.display='flex';msg.innerHTML=`<div style="text-align:center"><p style="color:var(--muted);margin-bottom:14px">Não foi possível carregar.</p><a href="${url}" target="_blank" class="dl-btn">↗ Abrir link</a></div>`;}
+  }
+  modal.style.display='flex';document.body.style.overflow='hidden';
+}
+
+function canvaEmbedUrl(url){
+  if(!url) return '';
+  // https://www.canva.com/design/XXXX/view → embed
+  const m=url.match(/canva\.com\/design\/([^/]+)/);
+  if(m) return `https://www.canva.com/design/${m[1]}/view?embed`;
+  return '';
 }
 
 function renderRepTabelas(){
@@ -2602,6 +2643,7 @@ function setAdminTab(tab){
   document.getElementById('admin-tab-logs').style.display='none';
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
+  if(tab==='add-rep') _renderRepCatalogSlots();
   if(tab==='products') renderAdminProducts();
   if(tab==='videos'){renderAdminVideos();loadVideoForm();}
   if(tab==='links') loadLinks();
@@ -2838,11 +2880,25 @@ function renderAdminReps(){
   }
 }
 
-function _collectRepLinks(){
-  const keys=['topper','kagiva','tab-topper','tab-kagiva','tab-geral'];
-  const obj={};
-  keys.forEach(k=>{const v=(document.getElementById('rep-link-'+k)||{}).value?.trim();if(v)obj[k]=v;});
-  return obj;
+function _renderRepCatalogSlots(existing){
+  const wrap=document.getElementById('rep-catalogs-slots');
+  if(!wrap)return;
+  const cats=existing||Array(10).fill(null).map(()=>({name:'',url:''}));
+  wrap.innerHTML=cats.map((c,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-bottom:8px;align-items:center">
+      <input id="rep-cat-name-${i}" value="${(c.name||'').replace(/"/g,'&quot;')}" placeholder="Nome do catálogo ${i+1}" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.8rem;outline:none;width:100%;box-sizing:border-box"/>
+      <input id="rep-cat-url-${i}" value="${(c.url||'').replace(/"/g,'&quot;')}" placeholder="https://drive.google.com/..." style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.8rem;outline:none;width:100%;box-sizing:border-box"/>
+    </div>`).join('');
+}
+
+function _collectRepCatalogs(){
+  const list=[];
+  for(let i=0;i<10;i++){
+    const name=(document.getElementById('rep-cat-name-'+i)||{}).value?.trim()||'';
+    const url=(document.getElementById('rep-cat-url-'+i)||{}).value?.trim()||'';
+    list.push({name,url});
+  }
+  return list;
 }
 
 function saveRep(){
@@ -2857,15 +2913,13 @@ function saveRep(){
   if(!name||!cpf){fb.innerHTML='<div class="fb-msg fb-err">Nome e CPF são obrigatórios.</div>';return;}
   const reps=getData(K.reps);
   const rawCPF=cpf.replace(/\D/g,'');
-  const repLinks=_collectRepLinks();
+  const repCatalogs=_collectRepCatalogs();
 
   if(editId){
-    // Editing existing rep
     const idx=reps.findIndex(r=>r.id===editId);
     if(idx<0){fb.innerHTML='<div class="fb-msg fb-err">Representante não encontrado.</div>';return;}
-    Object.assign(reps[idx],{name,cpf,tel,city,brands,status,repLinks});
+    Object.assign(reps[idx],{name,cpf,tel,city,brands,status,repCatalogs});
     setData(K.reps,reps);
-    // Update session if this rep is the logged-in one
     const sess=getSession();
     if(sess&&sess.id===editId) setData(K.session,reps[idx]);
     fb.innerHTML='<div class="fb-msg fb-ok">✅ Representante atualizado com sucesso!</div>';
@@ -2877,14 +2931,14 @@ function saveRep(){
   }
 
   if(reps.find(r=>r.cpf.replace(/\D/g,'')==rawCPF&&r.role!=='admin'&&r.role!=='dev')){fb.innerHTML='<div class="fb-msg fb-err">CPF já cadastrado.</div>';return;}
-  reps.push({id:'rep-'+Date.now(),name,cpf,tel,city,brands,status,role:'rep',repLinks,createdAt:new Date().toISOString()});
+  reps.push({id:'rep-'+Date.now(),name,cpf,tel,city,brands,status,role:'rep',repCatalogs,createdAt:new Date().toISOString()});
   setData(K.reps,reps);
   fb.innerHTML='<div class="fb-msg fb-ok">✅ Representante cadastrado com sucesso!</div>';
   addLog(`Admin cadastrou representante: ${name} (${cpf})`);
   updateAdminStats();
   toast('Representante cadastrado!','ok');
   ['rep-name','rep-cpf','rep-tel','rep-city'].forEach(id=>document.getElementById(id).value='');
-  ['rep-link-topper','rep-link-kagiva','rep-link-tab-topper','rep-link-tab-kagiva','rep-link-tab-geral'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  _renderRepCatalogSlots();
 }
 
 function openEditRep(id){
@@ -2899,8 +2953,8 @@ function openEditRep(id){
   document.getElementById('rep-city').value=rep.city||'';
   document.getElementById('rep-brands').value=rep.brands||'todas';
   document.getElementById('rep-status').value=rep.status||'ativo';
-  const rl=rep.repLinks||{};
-  ['topper','kagiva','tab-topper','tab-kagiva','tab-geral'].forEach(k=>{const el=document.getElementById('rep-link-'+k);if(el)el.value=rl[k]||'';});
+  const existing=rep.repCatalogs&&rep.repCatalogs.length?rep.repCatalogs:Array(10).fill(null).map(()=>({name:'',url:''}));
+  _renderRepCatalogSlots(existing.length<10?[...existing,...Array(10-existing.length).fill({name:'',url:''})]:existing);
   document.getElementById('save-rep-btn').textContent='Salvar Alterações';
   document.getElementById('cancel-edit-rep-btn').style.display='';
   document.getElementById('add-rep-fb').innerHTML='';
@@ -2916,7 +2970,7 @@ function cancelEditRep(){
   ['rep-name','rep-cpf','rep-tel','rep-city'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('rep-brands').value='todas';
   document.getElementById('rep-status').value='ativo';
-  ['rep-link-topper','rep-link-kagiva','rep-link-tab-topper','rep-link-tab-kagiva','rep-link-tab-geral'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  _renderRepCatalogSlots();
 }
 
 function toggleRepStatus(id){
