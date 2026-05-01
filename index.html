@@ -13,6 +13,8 @@
 <title>Mundi TKR Sports</title>
 <!-- Service Worker + auto-update silencioso -->
 <script>
+(function(){
+  // Força reload quando um novo SW assume o controle
   if('serviceWorker' in navigator){
     navigator.serviceWorker.addEventListener('controllerchange', function(){
       location.reload(true);
@@ -23,16 +25,36 @@
     navigator.serviceWorker.register('/sw.js',{scope:'/'}).then(function(reg){
       reg.update();
     }).catch(function(){});
-    fetch('/version.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
-      var stored = localStorage.getItem('mundi:version');
-      if(!stored){ localStorage.setItem('mundi:version', d.v); return; }
-      if(d.v && d.v !== stored){
-        localStorage.setItem('mundi:version', d.v);
-        caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});});
-        location.reload(true);
-      }
-    }).catch(function(){});
   }
+
+  // Verificação de versão — limpa cache e recarrega se deploy novo detectado
+  function _checkVersion(){
+    fetch('/version.json?_='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.v) return;
+        var stored=localStorage.getItem('mundi:version');
+        if(!stored){localStorage.setItem('mundi:version',d.v);return;}
+        if(d.v!==stored){
+          localStorage.setItem('mundi:version',d.v);
+          // Limpa todos os caches do SW antes de recarregar
+          var clear='caches' in window
+            ? caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));})
+            : Promise.resolve();
+          clear.then(function(){location.reload(true);});
+        }
+      }).catch(function(){});
+  }
+
+  // 1. Na abertura
+  _checkVersion();
+  // 2. Quando o app volta ao primeiro plano (PWA instalado saindo do background)
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible') _checkVersion();
+  });
+  // 3. A cada 5 minutos (sessões longas abertas)
+  setInterval(_checkVersion, 5*60*1000);
+})();
 </script>
 <!-- OneSignal Web Push SDK -->
 <script>
