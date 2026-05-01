@@ -1183,7 +1183,8 @@ setTimeout(_hideSplash,3000);
     </div>
     <div id="admin-tab-add-rep" style="display:none">
       <div class="card-panel">
-        <div class="card-panel-title">Cadastrar Novo Representante</div>
+        <div class="card-panel-title" id="add-rep-title">Cadastrar Novo Representante</div>
+        <input type="hidden" id="rep-edit-id" value=""/>
         <div class="form-grid">
           <div class="field"><label>Nome Completo *</label><input id="rep-name" placeholder="João da Silva"/></div>
           <div class="field"><label>CPF *</label><input id="rep-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"/></div>
@@ -1196,8 +1197,21 @@ setTimeout(_hideSplash,3000);
             <select id="rep-status"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select>
           </div>
         </div>
+        <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+          <div style="font-size:.74rem;font-weight:900;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;margin-bottom:10px">Catálogos e Tabelas Personalizados <span style="font-weight:400;color:var(--muted);letter-spacing:0;text-transform:none">(opcional — substitui os links globais para este rep)</span></div>
+          <div class="form-grid">
+            <div class="field"><label>📋 Catálogo Topper + Rainha</label><input id="rep-link-topper" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
+            <div class="field"><label>📋 Catálogo Kagiva</label><input id="rep-link-kagiva" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
+            <div class="field"><label>📅 Tabela Topper + Rainha</label><input id="rep-link-tab-topper" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
+            <div class="field"><label>📅 Tabela Kagiva</label><input id="rep-link-tab-kagiva" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
+            <div class="field"><label>📅 Tabela Geral</label><input id="rep-link-tab-geral" placeholder="https://drive.google.com/..." style="font-size:.8rem"/></div>
+          </div>
+        </div>
         <div id="add-rep-fb"></div>
-        <button class="btn btn-primary" onclick="saveRep()">Salvar Representante</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+          <button class="btn btn-primary" id="save-rep-btn" onclick="saveRep()">Salvar Representante</button>
+          <button class="btn btn-ghost btn-sm" id="cancel-edit-rep-btn" style="display:none" onclick="cancelEditRep()">Cancelar</button>
+        </div>
       </div>
     </div>
     <!-- PRODUTOS TAB -->
@@ -2014,8 +2028,13 @@ function catalogEmbedUrl(input){
 }
 const driveEmbedUrl = catalogEmbedUrl;
 function openPdfViewer(downloadUrl, title, adminKey){
-  const links = getObj(K.links);
-  const adminRaw = adminKey ? (links[adminKey]||'') : '';
+  const globalLinks = getObj(K.links);
+  const sess = getSession();
+  const repLinks = sess?.repLinks||{};
+  const links = Object.assign({},globalLinks,repLinks);
+  // adminKey can be 'link-topper' or 'topper' — normalise
+  const normKey = adminKey ? adminKey.replace(/^link-/,'') : '';
+  const adminRaw = normKey ? (links[normKey]||links[adminKey]||'') : '';
   const defaultId = adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '';
   const viewUrl = driveEmbedUrl(adminRaw) || driveEmbedUrl(defaultId);
   const modal = document.getElementById('pdf-viewer-modal');
@@ -2364,8 +2383,11 @@ function setRepTab(tab){
 }
 
 function renderRepCatalogs(){
-  const links=getObj(K.links);
+  const globalLinks=getObj(K.links);
   const sess=getSession();
+  const repLinks=sess?.repLinks||{};
+  // per-rep links override global links
+  const links=Object.assign({},globalLinks,repLinks);
   const allowed=sess?.brands==='kagiva'?['kagiva']:sess?.brands==='topper'?['topper','rainha']:['topper','kagiva','rainha'];
   const catalogs=[
     {key:'topper', label:'Topper + Rainha 2026', desc:'Catálogo completo. Campo, Society, Futsal, Vôlei, Handebol e Beach Soccer.', tags:['Campo','Futsal','Vôlei','Society']},
@@ -2388,8 +2410,10 @@ function renderRepCatalogs(){
 }
 
 function renderRepTabelas(){
-  const links=getObj(K.links);
+  const globalLinks=getObj(K.links);
   const sess=getSession();
+  const repLinks=sess?.repLinks||{};
+  const links=Object.assign({},globalLinks,repLinks);
   const allowedKagiva=sess?.brands==='kagiva';
   const allowedTopper=!sess?.brands||sess?.brands==='topper'||sess?.brands==='todas';
   const tabelas=[
@@ -2796,7 +2820,8 @@ function renderAdminReps(){
       <td><span class="badge badge-admin">${r.brands||'todas'}</span></td>
       <td style="color:var(--muted2);font-size:.82rem">${r.city||'—'}</td>
       <td><span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}">${r.status}</span></td>
-      <td style="display:flex;gap:6px">
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="openEditRep('${r.id}')">✏️ Editar</button>
         <button class="btn btn-ghost btn-sm" onclick="toggleRepStatus('${r.id}')">${r.status==='ativo'?'Suspender':'Ativar'}</button>
         <button class="btn btn-danger btn-sm" onclick="deleteRep('${r.id}')">Remover</button>
       </td>
@@ -2813,6 +2838,13 @@ function renderAdminReps(){
   }
 }
 
+function _collectRepLinks(){
+  const keys=['topper','kagiva','tab-topper','tab-kagiva','tab-geral'];
+  const obj={};
+  keys.forEach(k=>{const v=(document.getElementById('rep-link-'+k)||{}).value?.trim();if(v)obj[k]=v;});
+  return obj;
+}
+
 function saveRep(){
   const name=document.getElementById('rep-name').value.trim();
   const cpf=document.getElementById('rep-cpf').value.trim();
@@ -2821,17 +2853,70 @@ function saveRep(){
   const brands=document.getElementById('rep-brands').value;
   const status=document.getElementById('rep-status').value;
   const fb=document.getElementById('add-rep-fb');
+  const editId=document.getElementById('rep-edit-id')?.value||'';
   if(!name||!cpf){fb.innerHTML='<div class="fb-msg fb-err">Nome e CPF são obrigatórios.</div>';return;}
   const reps=getData(K.reps);
   const rawCPF=cpf.replace(/\D/g,'');
+  const repLinks=_collectRepLinks();
+
+  if(editId){
+    // Editing existing rep
+    const idx=reps.findIndex(r=>r.id===editId);
+    if(idx<0){fb.innerHTML='<div class="fb-msg fb-err">Representante não encontrado.</div>';return;}
+    Object.assign(reps[idx],{name,cpf,tel,city,brands,status,repLinks});
+    setData(K.reps,reps);
+    // Update session if this rep is the logged-in one
+    const sess=getSession();
+    if(sess&&sess.id===editId) setData(K.session,reps[idx]);
+    fb.innerHTML='<div class="fb-msg fb-ok">✅ Representante atualizado com sucesso!</div>';
+    addLog(`Admin editou representante: ${name} (${cpf})`);
+    updateAdminStats(); renderAdminReps();
+    toast('Representante atualizado!','ok');
+    cancelEditRep();
+    return;
+  }
+
   if(reps.find(r=>r.cpf.replace(/\D/g,'')==rawCPF&&r.role!=='admin'&&r.role!=='dev')){fb.innerHTML='<div class="fb-msg fb-err">CPF já cadastrado.</div>';return;}
-  reps.push({id:'rep-'+Date.now(),name,cpf,tel,city,brands,status,role:'rep',createdAt:new Date().toISOString()});
+  reps.push({id:'rep-'+Date.now(),name,cpf,tel,city,brands,status,role:'rep',repLinks,createdAt:new Date().toISOString()});
   setData(K.reps,reps);
   fb.innerHTML='<div class="fb-msg fb-ok">✅ Representante cadastrado com sucesso!</div>';
   addLog(`Admin cadastrou representante: ${name} (${cpf})`);
   updateAdminStats();
   toast('Representante cadastrado!','ok');
   ['rep-name','rep-cpf','rep-tel','rep-city'].forEach(id=>document.getElementById(id).value='');
+  ['rep-link-topper','rep-link-kagiva','rep-link-tab-topper','rep-link-tab-kagiva','rep-link-tab-geral'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+function openEditRep(id){
+  const rep=getData(K.reps).find(r=>r.id===id);
+  if(!rep)return;
+  setAdminTab('add-rep');
+  document.getElementById('add-rep-title').textContent='Editar Representante';
+  document.getElementById('rep-edit-id').value=rep.id;
+  document.getElementById('rep-name').value=rep.name||'';
+  document.getElementById('rep-cpf').value=rep.cpf||'';
+  document.getElementById('rep-tel').value=rep.tel||'';
+  document.getElementById('rep-city').value=rep.city||'';
+  document.getElementById('rep-brands').value=rep.brands||'todas';
+  document.getElementById('rep-status').value=rep.status||'ativo';
+  const rl=rep.repLinks||{};
+  ['topper','kagiva','tab-topper','tab-kagiva','tab-geral'].forEach(k=>{const el=document.getElementById('rep-link-'+k);if(el)el.value=rl[k]||'';});
+  document.getElementById('save-rep-btn').textContent='Salvar Alterações';
+  document.getElementById('cancel-edit-rep-btn').style.display='';
+  document.getElementById('add-rep-fb').innerHTML='';
+  window.scrollTo(0,0);
+}
+
+function cancelEditRep(){
+  document.getElementById('add-rep-title').textContent='Cadastrar Novo Representante';
+  document.getElementById('rep-edit-id').value='';
+  document.getElementById('save-rep-btn').textContent='Salvar Representante';
+  document.getElementById('cancel-edit-rep-btn').style.display='none';
+  document.getElementById('add-rep-fb').innerHTML='';
+  ['rep-name','rep-cpf','rep-tel','rep-city'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rep-brands').value='todas';
+  document.getElementById('rep-status').value='ativo';
+  ['rep-link-topper','rep-link-kagiva','rep-link-tab-topper','rep-link-tab-kagiva','rep-link-tab-geral'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
 function toggleRepStatus(id){
