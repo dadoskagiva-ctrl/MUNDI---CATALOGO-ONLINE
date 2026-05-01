@@ -46,7 +46,13 @@
     OneSignal.init({appId: _osAppId, serviceWorkerPath: 'sw.js', notifyButton:{enable:false}});
   });
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<!-- Preconnect para acelerar recursos externos -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://mundi-tkr-api.vercel.app"/>
+<!-- Fontes carregadas de forma não-bloqueante -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -1573,7 +1579,7 @@ const KIWIFY_PM = 'https://pay.kiwify.com.br/Y4ESS1y';
 const KIWIFY_PA = 'https://pay.kiwify.com.br/k71mRhm';
 const KIWIFY_PAGE = 'https://kiwify.app/Mphu2dR';
 function _push(k,v){fetch(`${_API}/api/kv/${encodeURIComponent(k)}`,{method:'PUT',headers:{'Content-Type':'application/json','x-api-key':_AK},body:JSON.stringify({value:v})}).catch(()=>{});}
-async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(7000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]!=null)localStorage.setItem(k,JSON.stringify(d[k]));});}catch(e){}}
+async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(4000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]!=null)localStorage.setItem(k,JSON.stringify(d[k]));});}catch(e){}}
 // ── end sync ──
 
 const getData = k => { try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]} };

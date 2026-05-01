@@ -1,6 +1,6 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v4';
-const NETWORK_TIMEOUT_MS = 3000;
+const CACHE = 'mundi-shell-v5';
+const NETWORK_TIMEOUT_MS = 5000;
 
 // Cache index.html na instalação
 self.addEventListener('install', function(e) {
@@ -27,24 +27,37 @@ self.addEventListener('activate', function(e) {
   );
 });
 
-// Network-first com timeout:
-// - Servidor responde em <3s → entrega HTML atualizado (deploys chegam imediatamente)
-// - Servidor demora >3s (Render adormecido) → fallback para cache (app abre na hora)
+// Cache-first para visitas seguintes (app abre instantaneamente),
+// atualiza cache em background quando a rede responde.
+// Primeira visita (sem cache): vai direto para a rede.
 self.addEventListener('fetch', function(e) {
   if (e.request.mode !== 'navigate') return;
   e.respondWith(
     caches.open(CACHE).then(function(cache) {
-      var networkPromise = fetch(e.request).then(function(res) {
-        if (res && res.ok) cache.put('/index.html', res.clone());
-        return res;
-      });
-      var timeoutPromise = new Promise(function(_, reject) {
-        setTimeout(reject, NETWORK_TIMEOUT_MS, 'timeout');
-      });
-      return Promise.race([networkPromise, timeoutPromise])
-        .catch(function() {
-          return cache.match('/index.html');
+      return cache.match('/index.html').then(function(cached) {
+        // Busca versão fresca na rede em background
+        var networkFetch = fetch(e.request).then(function(res) {
+          if (res && res.ok) cache.put('/index.html', res.clone());
+          return res;
+        }).catch(function() { return null; });
+
+        if (cached) {
+          // Tem cache: entrega imediatamente, atualiza em background
+          networkFetch.then(function(fresh) {
+            if (fresh) {
+              // SW vai notificar o cliente ao ativar nova versão
+            }
+          });
+          return cached;
+        }
+        // Sem cache: aguarda a rede (primeira visita)
+        return networkFetch.then(function(res) {
+          return res || new Response('Sem conexão. Abra o app online primeiro.', {
+            status: 503,
+            headers: {'Content-Type': 'text/plain;charset=utf-8'}
+          });
         });
+      });
     })
   );
 });
