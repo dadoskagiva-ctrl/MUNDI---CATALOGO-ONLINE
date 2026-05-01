@@ -1622,7 +1622,10 @@ _pull().then(()=>{
   applySubscriptionGate();
   updatePlansLinks();
   checkInbox();
-}).catch(()=>{applySubscriptionGate();});
+}).catch(()=>{
+  const _cso=getObj('mundi:subscription');
+  if(_cso&&_cso.expiresAt) applySubscriptionGate();
+});
 // Ressincroniza ao retornar ao app após ficar em background (ex: após 20+ min parado)
 document.addEventListener('visibilitychange',function(){
   if(document.visibilityState!=='visible')return;
@@ -3296,10 +3299,10 @@ mobNavActive('home');
     <span class="mn-ico">⚽</span>Topper
   </button>
   <button class="mob-nav-btn mn-cat-kagiva" onclick="showPage('catalog-kagiva')">
-    <span class="mn-ico">🏃</span>Kagiva
+    <span class="mn-ico">⚽</span>Kagiva
   </button>
   <button class="mob-nav-btn mn-cat-rainha" onclick="showPage('catalog-rainha')">
-    <span class="mn-ico">🏐</span>Rainha
+    <span class="mn-ico">⚽</span>Rainha
   </button>
   <button class="mob-nav-btn mn-login mn-rep" id="mob-nav-rep" onclick="(function(){const s=getSession();s&&s.role!=='admin'?showPage('rep'):showLoginAs('rep')})()">
     <span class="mn-ico">👤</span>Rep
