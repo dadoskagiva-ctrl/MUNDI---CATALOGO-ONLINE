@@ -1200,8 +1200,34 @@ setTimeout(_hideSplash,3000);
       <button class="dash-tab" onclick="setAdminTab('subscription')">💳 Assinatura</button>
     </div>
     <div id="admin-tab-reps">
-      <div class="card-panel"><div class="card-panel-title">Representantes Cadastrados</div><div id="admin-reps-list"></div></div>
-      <div class="card-panel" style="margin-top:0"><div class="card-panel-title">Últimos Acessos dos Representantes</div><div id="admin-rep-logs"></div></div>
+      <!-- Lista de representantes -->
+      <div id="admin-reps-list-view">
+        <div class="card-panel"><div class="card-panel-title">Representantes Cadastrados</div><div id="admin-reps-list"></div></div>
+        <div class="card-panel" style="margin-top:0"><div class="card-panel-title">Últimos Acessos dos Representantes</div><div id="admin-rep-logs"></div></div>
+      </div>
+      <!-- Espaço individual do representante (abre ao clicar no nome) -->
+      <div id="admin-rep-detail" style="display:none">
+        <div class="card-panel">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="closeRepDetail()">← Voltar</button>
+            <div>
+              <div class="card-panel-title" id="rep-detail-name" style="margin:0;border:none;padding:0"></div>
+              <div id="rep-detail-info" style="font-size:.78rem;color:var(--muted);margin-top:2px"></div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" id="rep-detail-toggle-btn" onclick="toggleRepDetailStatus()"></button>
+              <button class="btn btn-danger btn-sm" onclick="deleteRepDetail()">Remover</button>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--line);padding-top:16px">
+            <div style="font-size:.74rem;font-weight:900;letter-spacing:.13em;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Catálogos e Tabelas de Prazo</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Cole o link do Canva ou Drive em cada linha. O representante verá em <strong style="color:var(--text)">Tabelas e Prazos</strong>.</div>
+            <div id="rep-detail-slots"></div>
+            <button class="btn btn-primary" style="margin-top:12px" onclick="saveRepDetail()">💾 Salvar catálogos</button>
+            <div id="rep-detail-fb" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="admin-tab-add-rep" style="display:none">
       <div class="card-panel">
@@ -2904,46 +2930,26 @@ function fecharNotifPrompt(){
   if(bar) bar.classList.remove('visible');
 }
 
+let _repDetailId = null;
+
 function renderAdminReps(){
   const reps=getData(K.reps).filter(r=>r.role!=='admin'&&r.role!=='dev');
   const el=document.getElementById('admin-reps-list');
   if(!reps.length){
     el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum representante cadastrado ainda.</p>';
   } else {
-    el.innerHTML=reps.map(r=>{
-      const cats=Array.from({length:10},(_,i)=>r.repCatalogs?.[i]||{name:'',url:''});
-      const slotsHtml=cats.map((c,i)=>`
-        <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:7px">
-          <input id="rc-name-${r.id}-${i}" value="${(c.name||'').replace(/"/g,'&quot;')}" placeholder="Nome ${i+1}" style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:9px 12px;font-size:.82rem;outline:none;width:100%;box-sizing:border-box"/>
-          <input id="rc-url-${r.id}-${i}" value="${(c.url||'').replace(/"/g,'&quot;')}" placeholder="https://www.canva.com/design/..." style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:9px 12px;font-size:.82rem;outline:none;width:100%;box-sizing:border-box"/>
-        </div>`).join('');
-      return `<div style="border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden">
-        <!-- Info do rep -->
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:var(--panel);flex-wrap:wrap">
-          <div>
-            <div style="font-weight:800;font-size:.95rem;color:var(--text)">${r.name}</div>
-            <div style="font-size:.75rem;color:var(--muted);margin-top:3px">${r.cpf}${r.city?' · '+r.city:''} · <span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}" style="font-size:.68rem">${r.status}</span></div>
-          </div>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ghost btn-sm" onclick="toggleRepStatus('${r.id}')">${r.status==='ativo'?'Suspender':'Ativar'}</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteRep('${r.id}')">Remover</button>
-          </div>
+    el.innerHTML=reps.map(r=>`
+      <div onclick="openRepDetail('${r.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;background:var(--panel);transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--line)'">
+        <div>
+          <div style="font-weight:800;font-size:.93rem;color:var(--text)">${r.name}</div>
+          <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${r.cpf}${r.city?' · '+r.city:''}</div>
         </div>
-        <!-- Catálogos sempre visíveis -->
-        <div style="padding:14px 16px;border-top:1px solid var(--line)">
-          <div style="font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:8px">📅 Catálogos e Tabelas — cole o link do Canva ou Drive</div>
-          <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-            <span style="font-size:.68rem;color:var(--muted);font-weight:700">NOME</span>
-            <span style="font-size:.68rem;color:var(--muted);font-weight:700">LINK</span>
-          </div>
-          ${slotsHtml}
-          <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="saveRepCatalogs('${r.id}')">💾 Salvar</button>
-          <div id="rep-card-fb-${r.id}" style="margin-top:6px"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}">${r.status}</span>
+          <span style="color:var(--orange);font-size:1rem">›</span>
         </div>
-      </div>`;
-    }).join('');
+      </div>`).join('');
   }
-  // Logs filtrados
   const logEl=document.getElementById('admin-rep-logs');
   if(logEl){
     const repLogs=getData(K.logs)
@@ -2952,6 +2958,79 @@ function renderAdminReps(){
     if(!repLogs.length){logEl.innerHTML='<p style="color:var(--muted);font-size:.84rem">Nenhum acesso registrado ainda.</p>';}
     else logEl.innerHTML=repLogs.map(l=>`<div class="log-item"><span class="log-time">${new Date(l.at).toLocaleString('pt-BR')}</span><span>${l.action}</span></div>`).join('');
   }
+}
+
+function openRepDetail(id){
+  const rep=getData(K.reps).find(r=>r.id===id);
+  if(!rep) return;
+  _repDetailId=id;
+  document.getElementById('admin-reps-list-view').style.display='none';
+  document.getElementById('admin-rep-detail').style.display='';
+  document.getElementById('rep-detail-name').textContent=rep.name;
+  document.getElementById('rep-detail-info').textContent=rep.cpf+(rep.city?' · '+rep.city:'')+(rep.tel?' · '+rep.tel:'');
+  const tb=document.getElementById('rep-detail-toggle-btn');
+  if(tb){tb.textContent=rep.status==='ativo'?'Suspender':'Ativar';}
+  const cats=Array.from({length:10},(_,i)=>rep.repCatalogs?.[i]||{name:'',url:''});
+  const slots=document.getElementById('rep-detail-slots');
+  slots.innerHTML=
+    `<div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+       <span style="font-size:.68rem;color:var(--muted);font-weight:700">NOME DO CATÁLOGO</span>
+       <span style="font-size:.68rem;color:var(--muted);font-weight:700">LINK (Canva ou Drive)</span>
+     </div>`+
+    cats.map((c,i)=>`
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-bottom:8px">
+        <input id="rd-name-${i}" value="${(c.name||'').replace(/"/g,'&quot;')}" placeholder="Ex: Tabela Kagiva 2026" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:9px;padding:10px 13px;font-size:.84rem;outline:none;width:100%;box-sizing:border-box"/>
+        <input id="rd-url-${i}" value="${(c.url||'').replace(/"/g,'&quot;')}" placeholder="https://www.canva.com/design/..." style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:9px;padding:10px 13px;font-size:.84rem;outline:none;width:100%;box-sizing:border-box"/>
+      </div>`).join('');
+  document.getElementById('rep-detail-fb').innerHTML='';
+  window.scrollTo(0,0);
+}
+
+function closeRepDetail(){
+  _repDetailId=null;
+  document.getElementById('admin-rep-detail').style.display='none';
+  document.getElementById('admin-reps-list-view').style.display='';
+  renderAdminReps();
+}
+
+function saveRepDetail(){
+  if(!_repDetailId) return;
+  const reps=getData(K.reps);
+  const rep=reps.find(r=>r.id===_repDetailId);
+  if(!rep) return;
+  const cats=Array.from({length:10},(_,i)=>({
+    name:(document.getElementById('rd-name-'+i)||{}).value?.trim()||'',
+    url:(document.getElementById('rd-url-'+i)||{}).value?.trim()||''
+  }));
+  rep.repCatalogs=cats;
+  setData(K.reps,reps);
+  const sess=getSession();
+  if(sess&&sess.id===_repDetailId) setData(K.session,rep);
+  const fb=document.getElementById('rep-detail-fb');
+  if(fb){fb.innerHTML='<div class="fb-msg fb-ok">✅ Catálogos salvos!</div>';setTimeout(()=>{fb.innerHTML='';},2500);}
+  toast('Catálogos de '+rep.name+' salvos!','ok');
+}
+
+function toggleRepDetailStatus(){
+  if(!_repDetailId) return;
+  const reps=getData(K.reps);
+  const rep=reps.find(r=>r.id===_repDetailId);
+  if(!rep) return;
+  rep.status=rep.status==='ativo'?'inativo':'ativo';
+  setData(K.reps,reps);
+  const tb=document.getElementById('rep-detail-toggle-btn');
+  if(tb) tb.textContent=rep.status==='ativo'?'Suspender':'Ativar';
+  document.getElementById('rep-detail-info').textContent=rep.cpf+(rep.city?' · '+rep.city:'')+(rep.tel?' · '+rep.tel:'');
+  toast(rep.status==='ativo'?'Rep ativado!':'Rep suspenso!','ok');
+}
+
+function deleteRepDetail(){
+  if(!_repDetailId) return;
+  if(!confirm('Remover este representante?')) return;
+  setData(K.reps,getData(K.reps).filter(r=>r.id!==_repDetailId));
+  updateAdminStats();
+  closeRepDetail();
+  toast('Representante removido.');
 }
 
 function saveRepCatalogs(id){
