@@ -1557,7 +1557,7 @@ setTimeout(_hideSplash,3000);
 </div><!-- /shell -->
 
 <!-- PDF VIEWER MODAL -->
-<div id="pdf-viewer-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);flex-direction:column">
+<div id="pdf-viewer-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);flex-direction:column" onclick="if(event.target===this)closePdfViewer()">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#111;border-bottom:1px solid #222;flex-shrink:0;gap:10px">
     <div id="pdf-viewer-title" style="font-family:var(--fb);font-weight:800;color:#fff;font-size:.88rem;letter-spacing:.05em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
     <div style="display:flex;gap:8px;flex-shrink:0">
@@ -2066,16 +2066,13 @@ const CATALOG_VIEWER_URLS = {
   'link-topper': 'https://www.canva.com/design/DAHB3ljx2Fs/w16oEiBrgUEzcKxytVPX0Q/view?embed',
   'link-kagiva': 'https://www.canva.com/design/DAHB-dKercM/qjr4QyQ69m4ojyWZqOMWcQ/view?embed'
 };
+function isCanvaUrl(url){ return url&&url.includes('canva.com'); }
+
 function catalogEmbedUrl(input){
   if(!input) return '';
-  // Canva: converte qualquer link do Canva para modo embed
-  if(input.includes('canva.com')){
-    const m=input.match(/canva\.com\/design\/([^/?#]+)/);
-    if(m) return 'https://www.canva.com/design/'+m[1]+'/view?embed';
-    // já é embed
-    if(input.includes('?embed')||input.includes('/view')) return input;
-  }
-  // Google Drive: /file/d/ID/view ou /file/d/ID/edit → /preview
+  // Canva NÃO permite iframe — retorna vazio para usar abertura externa
+  if(input.includes('canva.com')) return '';
+  // Google Drive: /file/d/ID/... → /preview (suporta iframe)
   if(input.includes('drive.google.com')){
     const m=input.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
@@ -2084,7 +2081,6 @@ function catalogEmbedUrl(input){
   if(/^[a-zA-Z0-9_-]{25,}$/.test(input)){
     return 'https://drive.google.com/file/d/'+input+'/preview';
   }
-  // Qualquer outra URL — usa diretamente
   return input;
 }
 const driveEmbedUrl = catalogEmbedUrl;
@@ -2486,13 +2482,20 @@ function renderRepCatalogs(){
 }
 
 function openRepCustomCatalog(url, title){
+  if(!url) return;
+  // Canva não permite iframe — abre direto em nova aba
+  if(isCanvaUrl(url)){
+    window.open(url,'_blank','noopener');
+    return;
+  }
+  // Outros links (Drive, etc.) — abre no visualizador
+  const embedUrl=catalogEmbedUrl(url)||url;
   const modal=document.getElementById('pdf-viewer-modal');
   const frame=document.getElementById('pdf-viewer-frame');
   const msg=document.getElementById('pdf-viewer-msg');
   const extLink=document.getElementById('pdf-viewer-ext');
   document.getElementById('pdf-viewer-title').textContent=title||'Catálogo';
   if(extLink) extLink.href=url;
-  const embedUrl=catalogEmbedUrl(url)||url;
   if(embedUrl){
     frame.style.display='';frame.style.flex='1';
     if(msg) msg.style.display='none';
@@ -2506,14 +2509,6 @@ function openRepCustomCatalog(url, title){
   modal.style.display='flex';document.body.style.overflow='hidden';
 }
 
-function canvaEmbedUrl(url){
-  if(!url) return '';
-  // https://www.canva.com/design/XXXX/view → embed
-  const m=url.match(/canva\.com\/design\/([^/]+)/);
-  if(m) return `https://www.canva.com/design/${m[1]}/view?embed`;
-  return '';
-}
-
 function renderRepTabelas(){
   const sess=getSession();
   const grid=document.getElementById('rep-tabelas-grid');
@@ -2525,10 +2520,13 @@ function renderRepTabelas(){
     grid.innerHTML='<div class="dl-grid">'+repCatalogs.map(c=>{
       const safeTitle=c.name.replace(/'/g,"\\'");
       const safeUrl=c.url.replace(/'/g,"\\'");
+      const isCanva=isCanvaUrl(c.url);
+      const btnLabel=isCanva?'↗ Abrir Canva':'👁 Visualizar';
       return `<div class="dl-card">
         <div class="dl-card-header"><span class="dl-card-icon">📅</span><div class="dl-card-title">${c.name}</div></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-          <button class="dl-btn" style="flex:1" onclick="openRepCustomCatalog('${safeUrl}','${safeTitle}')">👁 Visualizar</button>
+        ${isCanva?`<div style="font-size:.72rem;color:var(--muted);margin-top:6px">Abre no Canva</div>`:''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="dl-btn" style="flex:1" onclick="openRepCustomCatalog('${safeUrl}','${safeTitle}')">${btnLabel}</button>
         </div>
       </div>`;
     }).join('')+'</div>';
