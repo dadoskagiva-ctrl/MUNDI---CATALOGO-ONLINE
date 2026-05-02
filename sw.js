@@ -1,8 +1,7 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v6';
-const NETWORK_TIMEOUT_MS = 5000;
+const CACHE = 'mundi-shell-v7';
 
-// Cache index.html na instalação
+// Pré-cacheia index.html na instalação
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE)
@@ -11,54 +10,45 @@ self.addEventListener('install', function(e) {
   );
 });
 
-// Limpa caches antigos na ativação
+// Limpa caches antigos e assume controle imediato
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
         keys.filter(function(k){ return k !== CACHE; }).map(function(k){ return caches.delete(k); })
       );
-    }).then(function() { return self.clients.claim(); })
-      .then(function() {
-        return self.clients.matchAll({type:'window'}).then(function(clients) {
-          clients.forEach(function(c) { c.postMessage({type:'SW_UPDATED'}); });
-        });
-      })
+    })
+    .then(function() { return self.clients.claim(); })
+    .then(function() {
+      return self.clients.matchAll({type:'window'}).then(function(clients) {
+        clients.forEach(function(c) { c.postMessage({type:'SW_UPDATED'}); });
+      });
+    })
   );
 });
 
-// Cache-first para visitas seguintes (app abre instantaneamente),
-// atualiza cache em background quando a rede responde.
-// Primeira visita (sem cache): vai direto para a rede.
+// Network-first: sempre busca a versão mais recente da rede.
+// Se a rede falhar (offline), serve do cache como fallback.
 self.addEventListener('fetch', function(e) {
   if (e.request.mode !== 'navigate') return;
   e.respondWith(
-    caches.open(CACHE).then(function(cache) {
-      return cache.match('/index.html').then(function(cached) {
-        // Busca versão fresca na rede em background
-        var networkFetch = fetch(e.request).then(function(res) {
-          if (res && res.ok) cache.put('/index.html', res.clone());
-          return res;
-        }).catch(function() { return null; });
-
-        if (cached) {
-          // Tem cache: entrega imediatamente, atualiza em background
-          networkFetch.then(function(fresh) {
-            if (fresh) {
-              // SW vai notificar o cliente ao ativar nova versão
-            }
-          });
-          return cached;
+    fetch(e.request)
+      .then(function(res) {
+        if (res && res.ok) {
+          // Atualiza o cache com a versão nova
+          caches.open(CACHE).then(function(cache) { cache.put('/index.html', res.clone()); });
         }
-        // Sem cache: aguarda a rede (primeira visita)
-        return networkFetch.then(function(res) {
-          return res || new Response('Sem conexão. Abra o app online primeiro.', {
+        return res;
+      })
+      .catch(function() {
+        // Sem rede — serve do cache (modo offline)
+        return caches.match('/index.html').then(function(cached) {
+          return cached || new Response('Sem conexão. Abra o app online primeiro.', {
             status: 503,
             headers: {'Content-Type': 'text/plain;charset=utf-8'}
           });
         });
-      });
-    })
+      })
   );
 });
 
