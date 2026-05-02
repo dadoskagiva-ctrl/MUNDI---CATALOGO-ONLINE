@@ -2042,17 +2042,23 @@ const CATALOG_VIEWER_URLS = {
 };
 function catalogEmbedUrl(input){
   if(!input) return '';
-  // Already a full URL → use as-is (preview, embed, canva, etc.)
-  if(input.startsWith('http')) return input;
-  // Canva short/design ID
+  // Canva: converte qualquer link do Canva para modo embed
   if(input.includes('canva.com')){
-    const base = input.split('?')[0];
-    return base + '?embed';
+    const m=input.match(/canva\.com\/design\/([^/?#]+)/);
+    if(m) return 'https://www.canva.com/design/'+m[1]+'/view?embed';
+    // já é embed
+    if(input.includes('?embed')||input.includes('/view')) return input;
   }
-  // Raw Google Drive file ID → build /preview URL
+  // Google Drive: /file/d/ID/view ou /file/d/ID/edit → /preview
+  if(input.includes('drive.google.com')){
+    const m=input.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  }
+  // Raw Google Drive file ID
   if(/^[a-zA-Z0-9_-]{25,}$/.test(input)){
     return 'https://drive.google.com/file/d/'+input+'/preview';
   }
+  // Qualquer outra URL — usa diretamente
   return input;
 }
 const driveEmbedUrl = catalogEmbedUrl;
@@ -2460,7 +2466,7 @@ function openRepCustomCatalog(url, title){
   const extLink=document.getElementById('pdf-viewer-ext');
   document.getElementById('pdf-viewer-title').textContent=title||'Catálogo';
   if(extLink) extLink.href=url;
-  const embedUrl=catalogEmbedUrl(url)||canvaEmbedUrl(url)||url;
+  const embedUrl=catalogEmbedUrl(url)||url;
   if(embedUrl){
     frame.style.display='';frame.style.flex='1';
     if(msg) msg.style.display='none';
@@ -2907,33 +2913,32 @@ function renderAdminReps(){
     el.innerHTML=reps.map(r=>{
       const cats=Array.from({length:10},(_,i)=>r.repCatalogs?.[i]||{name:'',url:''});
       const slotsHtml=cats.map((c,i)=>`
-        <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-          <input id="rc-name-${r.id}-${i}" value="${(c.name||'').replace(/"/g,'&quot;')}" placeholder="Nome ${i+1}" style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:7px;padding:7px 10px;font-size:.78rem;outline:none;width:100%;box-sizing:border-box"/>
-          <input id="rc-url-${r.id}-${i}" value="${(c.url||'').replace(/"/g,'&quot;')}" placeholder="https://www.canva.com/..." style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:7px;padding:7px 10px;font-size:.78rem;outline:none;width:100%;box-sizing:border-box"/>
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:7px">
+          <input id="rc-name-${r.id}-${i}" value="${(c.name||'').replace(/"/g,'&quot;')}" placeholder="Nome ${i+1}" style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:9px 12px;font-size:.82rem;outline:none;width:100%;box-sizing:border-box"/>
+          <input id="rc-url-${r.id}-${i}" value="${(c.url||'').replace(/"/g,'&quot;')}" placeholder="https://www.canva.com/design/..." style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:9px 12px;font-size:.82rem;outline:none;width:100%;box-sizing:border-box"/>
         </div>`).join('');
-      return `<div style="border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden">
-        <!-- Cabeçalho do rep -->
-        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--panel);cursor:pointer" onclick="toggleRepCard('${r.id}')">
-          <div style="flex:1;min-width:0">
+      return `<div style="border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden">
+        <!-- Info do rep -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:var(--panel);flex-wrap:wrap">
+          <div>
             <div style="font-weight:800;font-size:.95rem;color:var(--text)">${r.name}</div>
-            <div style="font-size:.75rem;color:var(--muted);margin-top:2px">${r.cpf} · ${r.city||'—'} · <span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}" style="font-size:.68rem">${r.status}</span></div>
+            <div style="font-size:.75rem;color:var(--muted);margin-top:3px">${r.cpf}${r.city?' · '+r.city:''} · <span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}" style="font-size:.68rem">${r.status}</span></div>
           </div>
-          <span id="rep-card-arrow-${r.id}" style="color:var(--muted);font-size:1rem;transition:transform .2s">▼</span>
-        </div>
-        <!-- Conteúdo expandível -->
-        <div id="rep-card-body-${r.id}" style="display:none;padding:14px 16px;border-top:1px solid var(--line)">
-          <div style="font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:10px">📅 Catálogos e Tabelas de Prazo</div>
-          <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-            <span style="font-size:.68rem;color:var(--muted);font-weight:700;padding:0 2px">NOME</span>
-            <span style="font-size:.68rem;color:var(--muted);font-weight:700;padding:0 2px">LINK (Canva, Drive…)</span>
-          </div>
-          ${slotsHtml}
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-            <button class="btn btn-primary btn-sm" onclick="saveRepCatalogs('${r.id}')">💾 Salvar catálogos</button>
+          <div style="display:flex;gap:6px">
             <button class="btn btn-ghost btn-sm" onclick="toggleRepStatus('${r.id}')">${r.status==='ativo'?'Suspender':'Ativar'}</button>
             <button class="btn btn-danger btn-sm" onclick="deleteRep('${r.id}')">Remover</button>
           </div>
-          <div id="rep-card-fb-${r.id}" style="margin-top:8px"></div>
+        </div>
+        <!-- Catálogos sempre visíveis -->
+        <div style="padding:14px 16px;border-top:1px solid var(--line)">
+          <div style="font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:8px">📅 Catálogos e Tabelas — cole o link do Canva ou Drive</div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+            <span style="font-size:.68rem;color:var(--muted);font-weight:700">NOME</span>
+            <span style="font-size:.68rem;color:var(--muted);font-weight:700">LINK</span>
+          </div>
+          ${slotsHtml}
+          <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="saveRepCatalogs('${r.id}')">💾 Salvar</button>
+          <div id="rep-card-fb-${r.id}" style="margin-top:6px"></div>
         </div>
       </div>`;
     }).join('');
@@ -2947,15 +2952,6 @@ function renderAdminReps(){
     if(!repLogs.length){logEl.innerHTML='<p style="color:var(--muted);font-size:.84rem">Nenhum acesso registrado ainda.</p>';}
     else logEl.innerHTML=repLogs.map(l=>`<div class="log-item"><span class="log-time">${new Date(l.at).toLocaleString('pt-BR')}</span><span>${l.action}</span></div>`).join('');
   }
-}
-
-function toggleRepCard(id){
-  const body=document.getElementById('rep-card-body-'+id);
-  const arrow=document.getElementById('rep-card-arrow-'+id);
-  if(!body)return;
-  const open=body.style.display==='none';
-  body.style.display=open?'':'none';
-  if(arrow) arrow.style.transform=open?'rotate(180deg)':'';
 }
 
 function saveRepCatalogs(id){
