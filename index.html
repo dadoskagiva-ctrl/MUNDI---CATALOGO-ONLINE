@@ -2089,18 +2089,24 @@ function openPdfViewer(downloadUrl, title, adminKey){
   const sess = getSession();
   const repLinks = sess?.repLinks||{};
   const links = Object.assign({},globalLinks,repLinks);
-  // adminKey can be 'link-topper' or 'topper' — normalise
   const normKey = adminKey ? adminKey.replace(/^link-/,'') : '';
   const adminRaw = normKey ? (links[normKey]||links[adminKey]||'') : '';
-  const defaultId = adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '';
-  const viewUrl = driveEmbedUrl(adminRaw) || driveEmbedUrl(defaultId);
+  const defaultRaw = adminKey ? CATALOG_VIEWER_URLS[adminKey]||'' : '';
+  // Escolhe a URL fonte: admin-configurado tem prioridade
+  const sourceUrl = adminRaw || defaultRaw || downloadUrl || '';
+  // Canva não permite iframe — abre direto em nova aba
+  if(isCanvaUrl(sourceUrl)){
+    const cleanUrl=sourceUrl.replace('?embed','');
+    window.open(cleanUrl,'_blank','noopener');
+    return;
+  }
+  const viewUrl = catalogEmbedUrl(sourceUrl);
   const modal = document.getElementById('pdf-viewer-modal');
   const frame = document.getElementById('pdf-viewer-frame');
   const msg = document.getElementById('pdf-viewer-msg');
   const extLink = document.getElementById('pdf-viewer-ext');
   document.getElementById('pdf-viewer-title').textContent = title || 'Catálogo PDF';
-  // "Abrir" button: use clean URL (strip ?embed) for external open
-  const extUrl = viewUrl ? viewUrl.replace('?embed','').replace('/preview','') : downloadUrl;
+  const extUrl = sourceUrl.replace('?embed','').replace('/preview','');
   if(extLink) extLink.href = extUrl || '#';
   if(viewUrl){
     frame.style.display='';
@@ -2470,12 +2476,14 @@ function renderRepCatalogs(){
   if(!catalogs.length){grid.innerHTML='<p style="color:var(--muted);padding:20px">Nenhum catálogo disponível para sua conta.</p>';return;}
   grid.innerHTML='<div class="dl-grid">'+catalogs.map(c=>{
     const url=globalLinks[c.key]||CATALOG_VIEWER_URLS['link-'+c.key]||'';
+    const isCanva=isCanvaUrl(url);
+    const btnLabel=isCanva?'↗ Abrir Canva':'👁 Visualizar';
     return `<div class="dl-card">
       <div class="dl-card-header"><span class="dl-card-icon">📋</span><div class="dl-card-title">${c.label}</div></div>
       <div class="dl-card-desc">${c.desc}</div>
       <div class="dl-card-meta">${c.tags.map(t=>`<span class="dl-tag">${t}</span>`).join('')}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-        ${url?`<button class="dl-btn" style="flex:1" onclick="openPdfViewer('','${c.label}','link-${c.key}')">👁 Visualizar</button>`:'<span style="color:var(--muted);font-size:.8rem">Catálogo não configurado ainda.</span>'}
+        ${url?`<button class="dl-btn" style="flex:1" onclick="openPdfViewer('','${c.label}','link-${c.key}')">${btnLabel}</button>`:'<span style="color:var(--muted);font-size:.8rem">Catálogo não configurado ainda.</span>'}
       </div>
     </div>`;
   }).join('')+'</div>';
