@@ -1660,23 +1660,24 @@ const getSession = () => { try{return JSON.parse(sessionStorage.getItem(K.sessio
 const setSession = u => sessionStorage.setItem(K.session,JSON.stringify(u));
 const clearSession = () => sessionStorage.removeItem(K.session);
 
-// Seed admin — always ensures correct password
+// Garante que as contas admin e dev existem — NÃO sobrescreve senha se já existe
 function ensureAdmin(){
   const reps = getData(K.reps);
-  // Conta Dev (desenvolvedor) — acesso total
-  const devData = {id:'dev-001',name:'Desenvolvedor',cpf:'dev',user:'dev',pass:'@CARO26',role:'dev',brands:'todas',status:'ativo'};
-  const devIdx = reps.findIndex(r=>r.id==='dev-001');
-  if(devIdx>=0){ reps[devIdx]={...reps[devIdx],...devData}; }
-  else { reps.push({...devData,createdAt:new Date().toISOString()}); }
-  // Conta Admin (responsável) — sem controle de assinatura
-  const adminData = {id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@ADM2026',role:'admin',brands:'todas',status:'ativo'};
-  const idx = reps.findIndex(r=>r.id==='admin-001');
-  if(idx>=0){ reps[idx]={...reps[idx],...adminData}; }
-  else { reps.push({...adminData,createdAt:new Date().toISOString()}); }
-  // Test representative
-  const testCPF = '05941417101';
-  if(!reps.find(r=>r.cpf.replace(/\D/g,'')=== testCPF)){
-    reps.push({id:'rep-teste-001',name:'Representante Teste',cpf:'059.414.171.01',role:'rep',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+  // Dev
+  if(!reps.find(r=>r.id==='dev-001')){
+    reps.push({id:'dev-001',name:'Desenvolvedor',cpf:'dev',user:'dev',pass:'@CARO26',role:'dev',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+  } else {
+    const d=reps.find(r=>r.id==='dev-001');
+    if(!d.role) d.role='dev';
+  }
+  // Admin
+  if(!reps.find(r=>r.id==='admin-001')){
+    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@MUNDITKR',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+  } else {
+    const a=reps.find(r=>r.id==='admin-001');
+    // Migra senha antiga → nova apenas uma vez
+    if(a.pass==='@ADM2026') a.pass='@MUNDITKR';
+    if(!a.role) a.role='admin';
   }
   setData(K.reps,reps);
 }
