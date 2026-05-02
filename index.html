@@ -2901,23 +2901,44 @@ function fecharNotifPrompt(){
 function renderAdminReps(){
   const reps=getData(K.reps).filter(r=>r.role!=='admin'&&r.role!=='dev');
   const el=document.getElementById('admin-reps-list');
-  if(!reps.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum representante cadastrado ainda.</p>';}
-  else el.innerHTML=`<table class="admin-table">
-    <thead><tr><th>Nome</th><th>CPF</th><th>Marcas</th><th>Cidade</th><th>Status</th><th>Ação</th></tr></thead>
-    <tbody>${reps.map(r=>`<tr>
-      <td style="font-weight:700">${r.name}</td>
-      <td style="font-family:var(--fc);font-size:.82rem;color:var(--muted2)">${r.cpf}</td>
-      <td><span class="badge badge-admin">${r.brands||'todas'}</span></td>
-      <td style="color:var(--muted2);font-size:.82rem">${r.city||'—'}</td>
-      <td><span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}">${r.status}</span></td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="openEditRep('${r.id}')">✏️ Editar</button>
-        <button class="btn btn-ghost btn-sm" onclick="toggleRepStatus('${r.id}')">${r.status==='ativo'?'Suspender':'Ativar'}</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteRep('${r.id}')">Remover</button>
-      </td>
-    </tr>`).join('')}</tbody>
-  </table>`;
-  // Logs filtrados: apenas logins e downloads de representantes
+  if(!reps.length){
+    el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum representante cadastrado ainda.</p>';
+  } else {
+    el.innerHTML=reps.map(r=>{
+      const cats=Array.from({length:10},(_,i)=>r.repCatalogs?.[i]||{name:'',url:''});
+      const slotsHtml=cats.map((c,i)=>`
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+          <input id="rc-name-${r.id}-${i}" value="${(c.name||'').replace(/"/g,'&quot;')}" placeholder="Nome ${i+1}" style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:7px;padding:7px 10px;font-size:.78rem;outline:none;width:100%;box-sizing:border-box"/>
+          <input id="rc-url-${r.id}-${i}" value="${(c.url||'').replace(/"/g,'&quot;')}" placeholder="https://www.canva.com/..." style="background:var(--bg);border:1px solid var(--line2);color:var(--text);border-radius:7px;padding:7px 10px;font-size:.78rem;outline:none;width:100%;box-sizing:border-box"/>
+        </div>`).join('');
+      return `<div style="border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden">
+        <!-- Cabeçalho do rep -->
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--panel);cursor:pointer" onclick="toggleRepCard('${r.id}')">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:.95rem;color:var(--text)">${r.name}</div>
+            <div style="font-size:.75rem;color:var(--muted);margin-top:2px">${r.cpf} · ${r.city||'—'} · <span class="badge ${r.status==='ativo'?'badge-on':'badge-off'}" style="font-size:.68rem">${r.status}</span></div>
+          </div>
+          <span id="rep-card-arrow-${r.id}" style="color:var(--muted);font-size:1rem;transition:transform .2s">▼</span>
+        </div>
+        <!-- Conteúdo expandível -->
+        <div id="rep-card-body-${r.id}" style="display:none;padding:14px 16px;border-top:1px solid var(--line)">
+          <div style="font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:10px">📅 Catálogos e Tabelas de Prazo</div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+            <span style="font-size:.68rem;color:var(--muted);font-weight:700;padding:0 2px">NOME</span>
+            <span style="font-size:.68rem;color:var(--muted);font-weight:700;padding:0 2px">LINK (Canva, Drive…)</span>
+          </div>
+          ${slotsHtml}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn btn-primary btn-sm" onclick="saveRepCatalogs('${r.id}')">💾 Salvar catálogos</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleRepStatus('${r.id}')">${r.status==='ativo'?'Suspender':'Ativar'}</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteRep('${r.id}')">Remover</button>
+          </div>
+          <div id="rep-card-fb-${r.id}" style="margin-top:8px"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // Logs filtrados
   const logEl=document.getElementById('admin-rep-logs');
   if(logEl){
     const repLogs=getData(K.logs)
@@ -2926,6 +2947,35 @@ function renderAdminReps(){
     if(!repLogs.length){logEl.innerHTML='<p style="color:var(--muted);font-size:.84rem">Nenhum acesso registrado ainda.</p>';}
     else logEl.innerHTML=repLogs.map(l=>`<div class="log-item"><span class="log-time">${new Date(l.at).toLocaleString('pt-BR')}</span><span>${l.action}</span></div>`).join('');
   }
+}
+
+function toggleRepCard(id){
+  const body=document.getElementById('rep-card-body-'+id);
+  const arrow=document.getElementById('rep-card-arrow-'+id);
+  if(!body)return;
+  const open=body.style.display==='none';
+  body.style.display=open?'':'none';
+  if(arrow) arrow.style.transform=open?'rotate(180deg)':'';
+}
+
+function saveRepCatalogs(id){
+  const reps=getData(K.reps);
+  const rep=reps.find(r=>r.id===id);
+  if(!rep)return;
+  const cats=[];
+  for(let i=0;i<10;i++){
+    const name=(document.getElementById(`rc-name-${id}-${i}`)||{}).value?.trim()||'';
+    const url=(document.getElementById(`rc-url-${id}-${i}`)||{}).value?.trim()||'';
+    cats.push({name,url});
+  }
+  rep.repCatalogs=cats;
+  setData(K.reps,reps);
+  // Atualiza sessão se for o rep logado
+  const sess=getSession();
+  if(sess&&sess.id===id) setData(K.session,rep);
+  const fb=document.getElementById('rep-card-fb-'+id);
+  if(fb){fb.innerHTML='<div class="fb-msg fb-ok" style="font-size:.8rem">✅ Catálogos salvos!</div>';setTimeout(()=>{fb.innerHTML='';},2500);}
+  toast('Catálogos salvos!','ok');
 }
 
 function _renderRepCatalogSlots(existing){
