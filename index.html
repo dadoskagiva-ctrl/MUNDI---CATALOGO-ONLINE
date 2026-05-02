@@ -1559,11 +1559,11 @@ setTimeout(_hideSplash,3000);
 <!-- PDF VIEWER MODAL -->
 <div id="pdf-viewer-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column">
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-  <!-- Barra superior: só título + abrir externo -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#111;border-bottom:1px solid #222;flex-shrink:0;gap:8px;min-height:48px">
-    <div id="pdf-viewer-title" style="font-family:var(--fb);font-weight:800;color:#fff;font-size:.84rem;letter-spacing:.04em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-    <a id="pdf-viewer-ext" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,106,0,.12);border:1px solid var(--orange);color:var(--orange);font-size:.74rem;padding:6px 10px;border-radius:7px;font-family:var(--fb);font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">↗ Abrir</a>
+  <!-- Barra superior: só título -->
+  <div style="padding:12px 16px;background:#111;border-bottom:1px solid #222;flex-shrink:0;min-height:48px;display:flex;align-items:center">
+    <div id="pdf-viewer-title" style="font-family:var(--fb);font-weight:800;color:#fff;font-size:.84rem;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
   </div>
+  <a id="pdf-viewer-ext" href="#" target="_blank" style="display:none"></a>
   <!-- Loading -->
   <div id="pdf-viewer-loading" style="display:none;position:absolute;top:48px;left:0;right:0;bottom:64px;background:#0d0d0d;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none">
     <div style="width:44px;height:44px;border:3px solid #222;border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite"></div>
