@@ -1207,8 +1207,9 @@ setTimeout(_hideSplash,4000);
       <div class="admin-stat"><div class="admin-stat-n" id="stat-dls">0</div><div class="admin-stat-l">Downloads</div></div>
       <div class="admin-stat"><div class="admin-stat-n" id="stat-logs">0</div><div class="admin-stat-l">Acessos Log</div></div>
     </div>
-    <div class="dash-tabs">
+  <div class="dash-tabs">
       <button class="dash-tab active" onclick="setAdminTab('reps')">Representantes</button>
+      <button class="dash-tab" onclick="setAdminTab('downloads')">⬇ Downloads</button>
       <button class="dash-tab" onclick="setAdminTab('add-rep')">+ Cadastrar Rep</button>
       <button class="dash-tab" onclick="setAdminTab('products')">📦 Produtos</button>
       <button class="dash-tab" onclick="setAdminTab('videos')">Vídeos</button>
@@ -1693,8 +1694,8 @@ function ensureAdmin(){
     reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'MUNDITKR',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
   } else {
     const a=reps.find(r=>r.id==='admin-001');
-    // Migra senha antiga → nova apenas uma vez
-    if(a.pass==='@ADM2026') a.pass='MUNDITKR';
+    // Forçar nova senha conforme solicitação
+    a.pass = 'MUNDITKR';
     if(!a.role) a.role='admin';
   }
   setData(K.reps,reps);
