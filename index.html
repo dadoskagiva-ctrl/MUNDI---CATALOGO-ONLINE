@@ -786,7 +786,6 @@ setTimeout(_hideSplash,4000);
     <button class="nav-link" onclick="showPage('catalog-rainha')">Bolas Rainha</button>
     <button class="nav-link" id="nav-login-btn" onclick="showLoginAs('rep')">Área do representante</button>
     <button class="nav-link" id="nav-admin-login-btn" onclick="showLoginAs('admin')" style="color:var(--orange)">Acesso ADM</button>
-    <button class="nav-link" onclick="showAdminDownloads()">⬇ Downloads PNG</button>
     <button class="nav-link" id="nav-rep-btn" onclick="showPage('rep')" style="display:none">Área do representante</button>
     <button class="nav-link" id="nav-admin-btn" onclick="showPage('admin')" style="display:none">Admin Panel</button>
   </div>
@@ -916,15 +915,7 @@ setTimeout(_hideSplash,4000);
   <footer class="footer"><div class="footer-brand">MUNDI<em>TKR</em></div><p class="footer-copy">© 2026 Mundi TKR Sports</p></footer>
 </div>
 
-  <!-- Admin Downloads - Editor de imagens de download para reps -->
-  <div id="admin-tab-downloads" style="display:none">
-    <div class="card-panel" style="margin-top:0">
-      <div class="card-panel-title" style="margin-bottom:8px">Editar Imagens de Download</div>
-      <div id="admin-product-links"></div>
-      <button class="btn btn-primary btn-sm" id="save-pngs-btn" style="margin-top:8px">Salvar Imagens</button>
-      <div id="pngs-fb" style="margin-top:6px"></div>
-    </div>
-  </div>
+  <!-- Downloads editor removido -->
 
 <!-- CATALOG TOPPER -->
 <div class="page" id="page-catalog-topper">
@@ -1242,34 +1233,7 @@ setTimeout(_hideSplash,4000);
           <div style="border-top:1px solid var(--line);padding-top:16px">
             <div style="font-size:.74rem;font-weight:900;letter-spacing:.13em;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Catálogos e Tabelas de Prazo</div>
             <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Cole o link do Canva ou Drive em cada linha. O representante verá em <strong style="color:var(--text)">Tabelas e Prazos</strong>.</div>
-            <div id="rep-detail-slots"></div>
-            <div id="rep-pngs-editor-block" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
-              <div style="font-size:.74rem;font-weight:900;letter-spacing:.13em;color:var(--orange);text-transform:uppercase;margin-bottom:6px">PNG Downloads do Representante</div>
-              <div id="rep-png-editor" style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-                <input id="rep-png-name-0" placeholder="Nome do PNG 1" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                <input id="rep-png-url-0" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-              </div>
-              <div id="rep-png-editor-rows">
-                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-                  <input id="rep-png-name-1" placeholder="Nome do PNG 2" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                  <input id="rep-png-url-1" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-                  <input id="rep-png-name-2" placeholder="Nome do PNG 3" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                  <input id="rep-png-url-2" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-                  <input id="rep-png-name-3" placeholder="Nome do PNG 4" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                  <input id="rep-png-url-3" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
-                  <input id="rep-png-name-4" placeholder="Nome do PNG 5" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                  <input id="rep-png-url-4" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
-                </div>
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="saveRepPngs()" style="margin-top:6px">💾 Salvar PNGs</button>
-              <div id="rep-pngs-fb" style="margin-top:6px"></div>
-            </div>
+            <!-- PNGs editor foi removido da edição de representante -->
             <button class="btn btn-primary" style="margin-top:12px" onclick="saveRepDetail()">💾 Salvar catálogos</button>
             <div id="rep-detail-fb" style="margin-top:8px"></div>
           </div>
@@ -1719,13 +1683,14 @@ function ensureAdmin(){
   }
   // Admin
   if(!reps.find(r=>r.id==='admin-001')){
-    // Senha ADM atualizada conforme solicitação: usar "MUNDITKR" (sem @)
-    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'MUNDITKR',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'Admin',pass:'@munditkr',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
   } else {
     const a=reps.find(r=>r.id==='admin-001');
-    // Forçar nova senha conforme solicitação
-    a.pass = 'MUNDITKR';
-    if(!a.role) a.role='admin';
+    if(a){
+      if(a.user!=='Admin') a.user='Admin';
+      if(a.pass!=='@munditkr') a.pass='@munditkr';
+      if(!a.role) a.role='admin';
+    }
   }
   setData(K.reps,reps);
 }
