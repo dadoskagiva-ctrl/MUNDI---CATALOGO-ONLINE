@@ -915,6 +915,16 @@ setTimeout(_hideSplash,4000);
   <footer class="footer"><div class="footer-brand">MUNDI<em>TKR</em></div><p class="footer-copy">© 2026 Mundi TKR Sports</p></footer>
 </div>
 
+  <!-- Admin Downloads - Editor de imagens de download para reps -->
+  <div id="admin-tab-downloads" style="display:none">
+    <div class="card-panel" style="margin-top:0">
+      <div class="card-panel-title" style="margin-bottom:8px">Editar Imagens de Download</div>
+      <div id="admin-product-links"></div>
+      <button class="btn btn-primary btn-sm" id="save-pngs-btn" style="margin-top:8px">Salvar Imagens</button>
+      <div id="pngs-fb" style="margin-top:6px"></div>
+    </div>
+  </div>
+
 <!-- CATALOG TOPPER -->
 <div class="page" id="page-catalog-topper">
   <div class="catalog-wrap">
@@ -1679,11 +1689,12 @@ function ensureAdmin(){
   }
   // Admin
   if(!reps.find(r=>r.id==='admin-001')){
-    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'@MUNDITKR',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+    // Senha ADM atualizada conforme solicitação: usar "MUNDITKR" (sem @)
+    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'admin',pass:'MUNDITKR',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
   } else {
     const a=reps.find(r=>r.id==='admin-001');
     // Migra senha antiga → nova apenas uma vez
-    if(a.pass==='@ADM2026') a.pass='@MUNDITKR';
+    if(a.pass==='@ADM2026') a.pass='MUNDITKR';
     if(!a.role) a.role='admin';
   }
   setData(K.reps,reps);
@@ -2707,7 +2718,10 @@ function renderAdmin(){
   // Aba Assinatura visível apenas para dev
   const subTabBtn = document.querySelector('#page-admin .dash-tabs .dash-tab:last-child');
   if(subTabBtn) subTabBtn.style.display = isDev ? '' : 'none';
+  // Carrega a aba de representantes por padrão, mas prepara a aba de downloads
   setAdminTab('reps');
+  // pré-carrega a UI de edição de imagens de download (não mostra até selecionar a aba)
+  if(document.getElementById('admin-tab-downloads')) renderAdminDownloads();
 }
 
 function updateAdminStats(){
@@ -2720,11 +2734,12 @@ function updateAdminStats(){
 }
 
 function setAdminTab(tab){
-  const tabs=['reps','add-rep','products','videos','links','notifs','subscription'];
+  const tabs=['reps','downloads','add-rep','products','videos','links','notifs','subscription'];
   tabs.forEach(t=>document.getElementById('admin-tab-'+t).style.display=t===tab?'':'none');
   document.getElementById('admin-tab-logs').style.display='none';
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
+  if(tab==='downloads') renderAdminDownloads();
   if(tab==='add-rep') _renderRepCatalogSlots();
   if(tab==='products') renderAdminProducts();
   if(tab==='videos'){renderAdminVideos();loadVideoForm();}
@@ -3195,6 +3210,28 @@ function renderAdminVideos(){
       <td><button class="btn btn-danger btn-sm" onclick="deleteVideo('${v.id}')">Remover</button></td>
     </tr>`).join('')}</tbody>
   </table>`;
+}
+
+// Editor: imagens de download para representantes (PNGs)
+function renderAdminDownloads(){
+  const container = document.getElementById('admin-product-links');
+  if(!container) return;
+  const currentImg = getObj(K.imglinks) || {};
+  const list = PRODUCTS.slice(0,20);
+  const html = list.map(p => {
+    const url = currentImg[p.id] || '';
+    return `<div class="field" style="margin-bottom:8px">
+      <label>${p.brand} ${p.name} (${p.code})</label>
+      <input data-pid="${p.id}" value="${url}" placeholder="https://...png" style="width:100%;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.85rem;outline:none"/>
+    </div>`;
+  }).join('');
+  container.innerHTML = html;
+  const btn = document.getElementById('save-pngs-btn');
+  if(btn){ btn.onclick = saveProductLinks; }
+  // Garantir que o container do downloads fica visível
+  const dlDiv = document.getElementById('admin-tab-downloads');
+  if(dlDiv) dlDiv.style.display='';
+  window.scrollTo(0,0);
 }
 
 function deleteVideo(id){setData(K.videos,getData(K.videos).filter(v=>v.id!==id));renderAdminVideos();toast('Vídeo removido.');}
