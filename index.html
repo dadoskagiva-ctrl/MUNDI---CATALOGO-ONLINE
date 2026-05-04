@@ -786,6 +786,7 @@ setTimeout(_hideSplash,4000);
     <button class="nav-link" onclick="showPage('catalog-rainha')">Bolas Rainha</button>
     <button class="nav-link" id="nav-login-btn" onclick="showLoginAs('rep')">Área do representante</button>
     <button class="nav-link" id="nav-admin-login-btn" onclick="showLoginAs('admin')" style="color:var(--orange)">Acesso ADM</button>
+    <button class="nav-link" onclick="showAdminDownloads()">⬇ Downloads PNG</button>
     <button class="nav-link" id="nav-rep-btn" onclick="showPage('rep')" style="display:none">Área do representante</button>
     <button class="nav-link" id="nav-admin-btn" onclick="showPage('admin')" style="display:none">Admin Panel</button>
   </div>
@@ -1241,6 +1242,33 @@ setTimeout(_hideSplash,4000);
             <div style="font-size:.74rem;font-weight:900;letter-spacing:.13em;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Catálogos e Tabelas de Prazo</div>
             <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Cole o link do Canva ou Drive em cada linha. O representante verá em <strong style="color:var(--text)">Tabelas e Prazos</strong>.</div>
             <div id="rep-detail-slots"></div>
+            <div id="rep-pngs-editor-block" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+              <div style="font-size:.74rem;font-weight:900;letter-spacing:.13em;color:var(--orange);text-transform:uppercase;margin-bottom:6px">PNG Downloads do Representante</div>
+              <div id="rep-png-editor" style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+                <input id="rep-png-name-0" placeholder="Nome do PNG 1" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                <input id="rep-png-url-0" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+              </div>
+              <div id="rep-png-editor-rows">
+                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+                  <input id="rep-png-name-1" placeholder="Nome do PNG 2" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                  <input id="rep-png-url-1" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+                  <input id="rep-png-name-2" placeholder="Nome do PNG 3" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                  <input id="rep-png-url-2" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+                  <input id="rep-png-name-3" placeholder="Nome do PNG 4" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                  <input id="rep-png-url-3" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px">
+                  <input id="rep-png-name-4" placeholder="Nome do PNG 5" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                  <input id="rep-png-url-4" placeholder="https://...png" style="background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px"/>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveRepPngs()" style="margin-top:6px">💾 Salvar PNGs</button>
+              <div id="rep-pngs-fb" style="margin-top:6px"></div>
+            </div>
             <button class="btn btn-primary" style="margin-top:12px" onclick="saveRepDetail()">💾 Salvar catálogos</button>
             <div id="rep-detail-fb" style="margin-top:8px"></div>
           </div>
@@ -1837,6 +1865,13 @@ function showPage(name){
   if(name==='catalog-rainha') renderCatalog('rainha');
   if(name==='rep') renderRepDash();
   if(name==='admin') renderAdmin();
+}
+
+// Accessibility helper: abre o Painel Admin e vai direto para Downloads PNG
+function showAdminDownloads(){
+  showPage('admin');
+  // Aguarda a página do admin renderizar, depois muda para a aba de downloads
+  setTimeout(()=>{ setAdminTab('downloads'); }, 50);
 }
 
 function updateNavState(page){
@@ -3233,6 +3268,30 @@ function renderAdminDownloads(){
   const dlDiv = document.getElementById('admin-tab-downloads');
   if(dlDiv) dlDiv.style.display='';
   window.scrollTo(0,0);
+}
+
+function saveRepPngs(){
+  // Guarda PNGs para o representante atual (_repDetailId)
+  if(!_repDetailId) return;
+  const reps=getData(K.reps);
+  const rep=reps.find(r=>r.id===_repDetailId);
+  if(!rep) return;
+  const pngs=[];
+  for(let i=0;i<5;i++){
+    const nEl=document.getElementById(`rep-png-name-${i}`);
+    const uEl=document.getElementById(`rep-png-url-${i}`);
+    if(!nEl && !uEl) continue;
+    const name=nEl?.value?.trim()||'';
+    const url=uEl?.value?.trim()||'';
+    if(name || url) pngs.push({name,url});
+  }
+  rep.pngs=pngs;
+  setData(K.reps,reps);
+  const sess=getSession();
+  if(sess && sess.id===rep.id) setData(K.session, rep);
+  const fb=document.getElementById('rep-pngs-fb');
+  if(fb) fb.innerHTML='<div class="fb-msg fb-ok">✅ PNGs salvos para '+rep.name+'</div>';
+  setTimeout(()=>{ if(fb) fb.innerHTML=''; },2000);
 }
 
 function deleteVideo(id){setData(K.videos,getData(K.videos).filter(v=>v.id!==id));renderAdminVideos();toast('Vídeo removido.');}
