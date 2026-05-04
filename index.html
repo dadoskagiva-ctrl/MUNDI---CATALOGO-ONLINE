@@ -749,16 +749,23 @@ input,select,textarea{font-family:var(--fb)}
 <body>
 
 <!-- SPLASH SCREEN — shown instantly, hidden by JS after load -->
-<div id="app-splash" style="position:fixed;inset:0;z-index:99999;background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .4s">
-  <div style="font-family:'Arial Black',Arial,sans-serif;font-weight:900;font-size:3.2rem;line-height:1;color:#e06020;letter-spacing:-.02em">MUNDI</div>
-  <div style="font-family:'Arial Black',Arial,sans-serif;font-weight:900;font-size:1.8rem;line-height:1;color:#f0ece4;letter-spacing:.15em;margin-top:4px">TKR</div>
-  <div style="margin-top:28px;width:40px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden"><div style="height:100%;background:#e06020;border-radius:2px;animation:splashBar 1.2s ease-in-out infinite"></div></div>
+<div id="app-splash" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .5s;background:radial-gradient(ellipse 90% 65% at 50% 42%,rgba(255,106,0,.20) 0%,rgba(255,80,0,.07) 45%,#090909 100%)">
+  <div style="position:absolute;inset:0;background:radial-gradient(circle at 72% 18%,rgba(255,106,0,.09),transparent 48%),radial-gradient(circle at 18% 82%,rgba(255,149,0,.06),transparent 48%);pointer-events:none"></div>
+  <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:0">
+    <div style="font-family:'Arial Black',Impact,Arial,sans-serif;font-weight:900;font-size:clamp(3.2rem,12vw,5.2rem);line-height:.95;color:#ff6a00;letter-spacing:2px;text-shadow:0 0 55px rgba(255,106,0,.55),0 0 110px rgba(255,106,0,.22)">MUNDI</div>
+    <div style="font-family:'Arial Black',Impact,Arial,sans-serif;font-weight:900;font-size:clamp(1.7rem,6vw,2.8rem);line-height:1;color:#f5f0ea;letter-spacing:.32em;margin-top:3px">TKR</div>
+    <div style="font-family:Arial,sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#ff8c40;margin-top:11px;opacity:.88">Sports Catalog</div>
+    <div style="margin-top:38px;width:130px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden">
+      <div style="height:100%;background:linear-gradient(90deg,#ff6a00,#ff9500);border-radius:2px;animation:splashBar 1.4s cubic-bezier(.4,0,.2,1) infinite"></div>
+    </div>
+    <div style="margin-top:14px;font-family:Arial,sans-serif;font-size:.62rem;color:rgba(255,255,255,.28);letter-spacing:.16em;text-transform:uppercase">Carregando...</div>
+  </div>
 </div>
-<style>@keyframes splashBar{0%{width:0;margin-left:0}60%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}</style>
+<style>@keyframes splashBar{0%{width:0%;margin-left:0}65%{width:100%;margin-left:0}100%{width:0%;margin-left:100%}}</style>
 <script>
 var _splashHidden=false;
-function _hideSplash(){if(_splashHidden)return;_splashHidden=true;var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},420);}}
-setTimeout(_hideSplash,3000);
+function _hideSplash(){if(_splashHidden)return;_splashHidden=true;var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},520);}}
+setTimeout(_hideSplash,4000);
 </script>
 
 <div class="shell">
