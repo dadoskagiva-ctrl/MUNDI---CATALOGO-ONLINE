@@ -865,9 +865,9 @@ setTimeout(_hideSplash,4000);
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button onclick="openPdfViewer('https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf','CA.RO KAGIVA 2026','link-kagiva')" class="btn btn-outline btn-sm">👁 Visualizar</button>
             <a href="https://github.com/dadoskagiva-ctrl/MUNDI---CATALOGO-ONLINE/releases/download/v2026-catalogos/catalogo-kagiva-2026.pdf" download="CA.RO KAGIVA 2026.pdf" class="btn btn-primary btn-sm">⬇ Download PDF</a>
-          </div>
-        </div>
-      </div>
+</div>
+</div>
+</div>
     </section>
 
     <!-- CENTRAL DE BUSCA -->
@@ -1127,6 +1127,7 @@ setTimeout(_hideSplash,4000);
           <div class="field"><label>Senha</label><input id="admin-pass" type="password" placeholder="senha" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
           <div id="login-admin-feedback"></div>
           <button class="btn-login-full" onclick="doAdminLogin()">Entrar como Admin</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetAdminSeed()" style="margin-left:8px">Reset Admin Seed</button>
         </div>
       </div>
     </div>
@@ -2257,6 +2258,16 @@ function doLogout(){
   applySubscriptionGate();
   showPage('home');
   toast('Até logo!');
+}
+
+// Debug helper: re-seed admin account if needed
+function resetAdminSeed(){
+  // Remove admin reps seed and re-create via ensureAdmin()
+  try{ localStorage.removeItem('mundi:reps'); }catch(e){}
+  try{ localStorage.removeItem('mundi:logs'); }catch(e){}
+  // Force re-seed on next load
+  ensureAdmin();
+  toast('Admin seed resetado. Tente login novamente.','ok');
 }
 
 // ── ASSINATURA ──
