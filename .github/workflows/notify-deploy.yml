@@ -1,27 +1,43 @@
-name: Push — Nova Atualização
+name: Deploy + Notifica Representantes
 
 on:
   push:
     branches: [main]
 
 jobs:
-  notify:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Aguarda deploy do Vercel concluir
-        run: sleep 90
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Verifica se o deploy está no ar
-        id: health
+      - name: Deploy no Vercel (produção)
+        id: deploy
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://mundi-tkr-api.vercel.app/api/health)
-          echo "status=$STATUS" >> $GITHUB_OUTPUT
-          if [ "$STATUS" != "200" ]; then
-            echo "Servidor não respondeu (status $STATUS) — aguardando mais 60s"
-            sleep 60
-          fi
+          npm install -g vercel@latest
+          vercel pull --yes --environment=production \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }}
+          vercel build --prod \
+            --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }} \
+            > deploy-url.txt 2>&1
+          cat deploy-url.txt
+          DEPLOY_URL=$(grep -o 'https://[^[:space:]]*vercel\.app' deploy-url.txt | tail -1)
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
-      - name: Envia push de nova atualização para todos os representantes
+      - name: Aguarda site entrar no ar
+        run: |
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://mundi-tkr-sports.vercel.app/)
+            echo "Tentativa $i — HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then break; fi
+            sleep 10
+          done
+
+      - name: Notifica representantes sobre atualização
         run: |
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             https://mundi-tkr-api.vercel.app/api/notify \
@@ -33,7 +49,4 @@ jobs:
             }')
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n-1)
-          echo "Resposta ($HTTP_CODE): $BODY"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Aviso: push não enviado (código $HTTP_CODE)"
-          fi
+          echo "Notificação ($HTTP_CODE): $BODY"

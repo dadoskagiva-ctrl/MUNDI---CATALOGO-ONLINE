@@ -1,9 +1,9 @@
-name: Keep Render Alive
+name: Keep Vercel Alive
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # a cada 5 minutos
-  workflow_dispatch:         # permite rodar manualmente se precisar
+    - cron: '0 */6 * * *'   # a cada 6 horas (Vercel não dorme, mas mantém o ping de saúde)
+  workflow_dispatch:
 
 jobs:
   ping:
@@ -11,4 +11,7 @@ jobs:
     steps:
       - name: Ping app
         run: |
-          curl -s -o /dev/null -w "%{http_code}" https://mundi-catalogo-online-1.onrender.com/version.json
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://mundi-tkr-sports.vercel.app/)
+          echo "Frontend: HTTP $STATUS"
+          STATUS2=$(curl -s -o /dev/null -w "%{http_code}" https://mundi-tkr-api.vercel.app/api/health)
+          echo "API: HTTP $STATUS2"
