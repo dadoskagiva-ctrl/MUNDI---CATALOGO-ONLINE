@@ -1434,6 +1434,13 @@ setTimeout(_hideSplash,4000);
         </div>
       </div>
     </div>
+    <div id="admin-tab-downloads" style="display:none">
+      <div class="card-panel">
+        <div class="card-panel-title">Log de Downloads</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">Histórico de arquivos baixados pelos representantes.</p>
+        <div id="admin-downloads-list"></div>
+      </div>
+    </div>
 
         <div id="admin-tab-videos" style="display:none">
       <div class="card-panel">
@@ -2747,8 +2754,6 @@ function renderAdmin(){
   if(subTabBtn) subTabBtn.style.display = isDev ? '' : 'none';
   // Carrega a aba de representantes por padrão, mas prepara a aba de downloads
   setAdminTab('reps');
-  // pré-carrega a UI de edição de imagens de download (não mostra até selecionar a aba)
-  if(document.getElementById('admin-tab-downloads')) renderAdminDownloads();
 }
 
 function updateAdminStats(){
@@ -2762,17 +2767,24 @@ function updateAdminStats(){
 
 function setAdminTab(tab){
   const tabs=['reps','downloads','add-rep','products','videos','links','notifs','subscription'];
-  tabs.forEach(t=>document.getElementById('admin-tab-'+t).style.display=t===tab?'':'none');
-  document.getElementById('admin-tab-logs').style.display='none';
+  tabs.forEach(t=>{const el=document.getElementById('admin-tab-'+t);if(el)el.style.display=t===tab?'':'none';});
+  const logsEl=document.getElementById('admin-tab-logs');if(logsEl)logsEl.style.display='none';
   document.querySelectorAll('#page-admin .dash-tabs .dash-tab').forEach((btn,i)=>btn.classList.toggle('active',tabs[i]===tab));
   if(tab==='reps') renderAdminReps();
-  if(tab==='downloads') renderAdminDownloads();
+  if(tab==='downloads') renderAdminDownloadLog();
   if(tab==='add-rep') _renderRepCatalogSlots();
   if(tab==='products') renderAdminProducts();
   if(tab==='videos'){renderAdminVideos();loadVideoForm();}
   if(tab==='links') loadLinks();
   if(tab==='notifs') loadNotifTab();
   if(tab==='subscription') renderSubscriptionTab();
+}
+function renderAdminDownloadLog(){
+  const el=document.getElementById('admin-downloads-list');
+  if(!el)return;
+  const dls=getData(K.downloads).slice().reverse();
+  if(!dls.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum download registrado ainda.</p>';return;}
+  el.innerHTML=dls.map(d=>`<div class="log-item"><span class="log-time">${new Date(d.at).toLocaleString('pt-BR')}</span><span>${d.item} — ${d.who} (${d.cpf})</span></div>`).join('');
 }
 
 // ══════════════════════════════════════════════
