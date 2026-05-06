@@ -872,27 +872,11 @@ setTimeout(_hideSplash,4000);
     <section style="display:grid;gap:16px;margin-bottom:40px" id="busca-central">
       <div>
         <h2 class="section-h2">Central de <span>busca</span></h2>
-        <p class="section-sub">Filtre por modalidade ou marca, e busque por nome, código ou EAN.</p>
-      </div>
-
-      <!-- Sport filter -->
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">
-        <div style="display:flex;gap:8px;flex-wrap:nowrap;min-width:max-content">
-          <button class="filter-pill active sport-pill" data-sport="" onclick="homeSportFilter(this)">Todas as modalidades</button>
-          <button class="filter-pill sport-pill" data-sport="Campo" onclick="homeSportFilter(this)">⚽ Campo</button>
-          <button class="filter-pill sport-pill" data-sport="Society" onclick="homeSportFilter(this)">🏟 Society</button>
-          <button class="filter-pill sport-pill" data-sport="Futsal" onclick="homeSportFilter(this)">🏃 Futsal</button>
-          <button class="filter-pill sport-pill" data-sport="Vôlei" onclick="homeSportFilter(this)">🏐 Vôlei</button>
-          <button class="filter-pill sport-pill" data-sport="Beach Soccer" onclick="homeSportFilter(this)">🏖 Beach Soccer</button>
-          <button class="filter-pill sport-pill" data-sport="Handebol" onclick="homeSportFilter(this)">🤾 Handebol</button>
-          <button class="filter-pill sport-pill" data-sport="Basquete" onclick="homeSportFilter(this)">🏀 Basquete</button>
-          <button class="filter-pill sport-pill" data-sport="Futevôlei" onclick="homeSportFilter(this)">🏐 Futevôlei</button>
-        </div>
+        <p class="section-sub">Filtre por marca ou busque por nome, código ou EAN.</p>
       </div>
 
       <!-- Brand filter -->
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="filter-pill active brand-pill" data-brand="" onclick="homeBrandFilter(this)">Todas as marcas</button>
         <button class="filter-pill brand-pill" data-brand="Topper" onclick="homeBrandFilter(this)">Topper</button>
         <button class="filter-pill brand-pill" data-brand="Kagiva" onclick="homeBrandFilter(this)">Kagiva</button>
         <button class="filter-pill brand-pill" data-brand="Rainha" onclick="homeBrandFilter(this)">Rainha</button>
@@ -2425,9 +2409,9 @@ function homeSportFilter(el){
 }
 
 function homeBrandFilter(el){
-  _homeState.brand = el.dataset.brand||'';
+  const alreadyActive = el.classList.contains('active');
   document.querySelectorAll('#busca-central .brand-pill').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  if(alreadyActive){ _homeState.brand=''; } else { _homeState.brand=el.dataset.brand||''; el.classList.add('active'); }
   homeSearch();
 }
 
