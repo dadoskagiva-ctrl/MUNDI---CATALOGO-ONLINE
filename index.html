@@ -1683,12 +1683,12 @@ function ensureAdmin(){
   }
   // Admin
   if(!reps.find(r=>r.id==='admin-001')){
-    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'Admin',pass:'@munditkr',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+    reps.push({id:'admin-001',name:'Administrador',cpf:'admin',user:'MUNDI',pass:'MUNDITKR',role:'admin',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
   } else {
     const a=reps.find(r=>r.id==='admin-001');
     if(a){
-      if(a.user!=='Admin') a.user='Admin';
-      if(a.pass!=='@munditkr') a.pass='@munditkr';
+      if(a.user!=='MUNDI') a.user='MUNDI';
+      if(a.pass!=='MUNDITKR') a.pass='MUNDITKR';
       if(!a.role) a.role='admin';
     }
   }
@@ -2246,14 +2246,8 @@ function isPro(){return getObj('mundi:subscription').plan==='pro';}
 function applySubscriptionGate(){
   const el=document.getElementById('sub-expired');
   if(!el) return;
-  const sess=getSession();
-  if(sess&&(sess.role==='admin'||sess.role==='dev')){el.style.display='none';return;}
-  if(!checkSubscription()){
-    setGatePeriod(_gatePeriod||'monthly');
-    el.style.display='flex';
-  } else {
-    el.style.display='none';
-  }
+  // Acesso livre — gate desativado
+  el.style.display='none';
 }
 var _gatePeriod='monthly';
 function startDemo(){
