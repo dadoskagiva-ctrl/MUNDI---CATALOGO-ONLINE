@@ -1683,10 +1683,12 @@ function ensureAdmin(){
   const reps = getData(K.reps);
   // Dev
   if(!reps.find(r=>r.id==='dev-001')){
-    reps.push({id:'dev-001',name:'Desenvolvedor',cpf:'dev',user:'dev',pass:'@CARO26',role:'dev',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
+    reps.push({id:'dev-001',name:'Desenvolvedor',cpf:'dev',user:'CARO',pass:'@CARO26',role:'dev',brands:'todas',status:'ativo',createdAt:new Date().toISOString()});
   } else {
     const d=reps.find(r=>r.id==='dev-001');
     if(!d.role) d.role='dev';
+    if(d.user!=='CARO') d.user='CARO';
+    if(d.pass!=='@CARO26') d.pass='@CARO26';
   }
   // Admin
   if(!reps.find(r=>r.id==='admin-001')){
