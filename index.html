@@ -763,8 +763,8 @@ input,select,textarea{font-family:var(--fb)}
 <style>@keyframes splashBar{0%{width:0%;margin-left:0}65%{width:100%;margin-left:0}100%{width:0%;margin-left:100%}}</style>
 <script>
 var _splashHidden=false;
-function _hideSplash(){if(_splashHidden)return;_splashHidden=true;var s=document.getElementById('app-splash');if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},520);}}
-setTimeout(_hideSplash,4000);
+function _hideSplash(){if(_splashHidden)return;_splashHidden=true;var s=document.getElementById('app-splash');if(s){s.style.display='none';}}
+setTimeout(_hideSplash,2500);
 </script>
 
 <div class="shell">
@@ -1697,7 +1697,7 @@ if(_cachedSubObj&&_cachedSubObj.expiresAt) applySubscriptionGate();
 updatePlansLinks();
 const _urlP=new URLSearchParams(location.search).get('p');
 if(_urlP) try{showPage(_urlP);}catch(e){}
-setTimeout(_hideSplash,800);
+_hideSplash();
 // Sincroniza com Neon em background (não bloqueia o app)
 _pull().then(()=>{
   ensureAdmin();

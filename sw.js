@@ -1,5 +1,5 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v7';
+const CACHE = 'mundi-shell-v8';
 
 // Pré-cacheia index.html na instalação
 self.addEventListener('install', function(e) {
