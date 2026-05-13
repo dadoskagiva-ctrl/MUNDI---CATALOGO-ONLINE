@@ -1,5 +1,5 @@
 // Mundi TKR Sports — Service Worker
-const CACHE = 'mundi-shell-v8';
+const CACHE = 'mundi-shell-v9';
 
 // Pré-cacheia index.html na instalação
 self.addEventListener('install', function(e) {
@@ -32,16 +32,14 @@ self.addEventListener('activate', function(e) {
 self.addEventListener('fetch', function(e) {
   if (e.request.mode !== 'navigate') return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, {cache:'no-store'})
       .then(function(res) {
         if (res && res.ok) {
-          // Atualiza o cache com a versão nova
           caches.open(CACHE).then(function(cache) { cache.put('/index.html', res.clone()); });
         }
         return res;
       })
       .catch(function() {
-        // Sem rede — serve do cache (modo offline)
         return caches.match('/index.html').then(function(cached) {
           return cached || new Response('Sem conexão. Abra o app online primeiro.', {
             status: 503,
