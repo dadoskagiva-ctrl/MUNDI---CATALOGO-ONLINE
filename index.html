@@ -3588,7 +3588,7 @@ function saveProdEditor(){
     const idx=PRODUCTS.findIndex(p=>p.id===id);
     if(idx>=0) PRODUCTS[idx]=updated;
   }
-  localStorage.setItem('mundi:products',JSON.stringify(PRODUCTS));
+  setData('mundi:products',PRODUCTS);
 
   document.getElementById('pe-fb').innerHTML='<div class="fb-msg fb-ok">✅ Produto salvo com sucesso!</div>';
   addLog((isNew?'Admin criou produto: ':'Admin editou produto: ')+name+' ('+code+')');
@@ -3604,7 +3604,7 @@ function deleteProdEditor(){
   if(!confirm('Remover produto '+p.name+'? Esta ação não pode ser desfeita.')) return;
   const idx=PRODUCTS.findIndex(x=>x.id===_peId);
   if(idx>=0) PRODUCTS.splice(idx,1);
-  localStorage.setItem('mundi:products',JSON.stringify(PRODUCTS));
+  setData('mundi:products',PRODUCTS);
   // Remove images
   const il=getObj(K.imglinks);
   for(let i=1;i<=4;i++){delete il[_peId+(i>1?'_'+i:'')];}
