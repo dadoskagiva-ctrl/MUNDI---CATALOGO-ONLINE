@@ -1652,15 +1652,16 @@ const KIWIFY_PM = 'https://pay.kiwify.com.br/Y4ESS1y';
 const KIWIFY_PA = 'https://pay.kiwify.com.br/k71mRhm';
 const KIWIFY_PAGE = 'https://kiwify.app/Mphu2dR';
 function _push(k,v){fetch(`${_API}/api/kv/${encodeURIComponent(k)}`,{method:'PUT',headers:{'Content-Type':'application/json','x-api-key':_AK},body:JSON.stringify({value:v})}).catch(()=>{});}
-async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(4000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]==null)return;if(Array.isArray(d[k])){let local=[];try{local=JSON.parse(localStorage.getItem(k)||'[]');}catch{}if(!Array.isArray(local)||d[k].length>local.length)localStorage.setItem(k,JSON.stringify(d[k]));}else{localStorage.setItem(k,JSON.stringify(d[k]));}});}catch(e){}}
+async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(4000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]==null)return;if(Array.isArray(d[k])){let local=[];try{local=JSON.parse(localStorage.getItem(k)||'[]');}catch{}if(!Array.isArray(local)){localStorage.setItem(k,JSON.stringify(d[k]));return;}// Merge por ID: local vence em conflito, remoto adiciona entradas novas
+const merged=[...local];d[k].forEach(ri=>{if(!ri||!ri.id)return;if(!merged.find(li=>li.id===ri.id))merged.push(ri);});localStorage.setItem(k,JSON.stringify(merged));}else{localStorage.setItem(k,JSON.stringify(d[k]));}});}catch(e){}}
 // ── end sync ──
 
 const getData = k => { try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]} };
 const getObj  = k => { try{return JSON.parse(localStorage.getItem(k)||'{}')}catch{return{}} };
 const setData = (k,v) => { localStorage.setItem(k,JSON.stringify(v)); if(_SK.includes(k)) _push(k,v); };
-const getSession = () => { try{return JSON.parse(sessionStorage.getItem(K.session)||'null')}catch{return null} };
-const setSession = u => sessionStorage.setItem(K.session,JSON.stringify(u));
-const clearSession = () => sessionStorage.removeItem(K.session);
+const getSession = () => { try{return JSON.parse(localStorage.getItem(K.session)||'null')}catch{return null} };
+const setSession = u => localStorage.setItem(K.session,JSON.stringify(u));
+const clearSession = () => localStorage.removeItem(K.session);
 
 // Garante que as contas admin e dev existem — NÃO sobrescreve senha se já existe
 function ensureAdmin(){
