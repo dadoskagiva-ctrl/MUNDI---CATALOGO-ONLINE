@@ -1652,8 +1652,7 @@ const KIWIFY_PM = 'https://pay.kiwify.com.br/Y4ESS1y';
 const KIWIFY_PA = 'https://pay.kiwify.com.br/k71mRhm';
 const KIWIFY_PAGE = 'https://kiwify.app/Mphu2dR';
 function _push(k,v){fetch(`${_API}/api/kv/${encodeURIComponent(k)}`,{method:'PUT',headers:{'Content-Type':'application/json','x-api-key':_AK},body:JSON.stringify({value:v})}).catch(()=>{});}
-async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(4000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]==null)return;if(Array.isArray(d[k])){let local=[];try{local=JSON.parse(localStorage.getItem(k)||'[]');}catch{}if(!Array.isArray(local)){localStorage.setItem(k,JSON.stringify(d[k]));return;}// Merge por ID: local vence em conflito, remoto adiciona entradas novas
-const merged=[...local];d[k].forEach(ri=>{if(!ri||!ri.id)return;if(!merged.find(li=>li.id===ri.id))merged.push(ri);});localStorage.setItem(k,JSON.stringify(merged));}else{localStorage.setItem(k,JSON.stringify(d[k]));}});}catch(e){}}
+async function _pull(){try{const r=await fetch(`${_API}/api/kv?keys=${_SK.join(',')}`,{headers:{'x-api-key':_AK},signal:AbortSignal.timeout(6000)});if(!r.ok)return;const d=await r.json();_SK.forEach(k=>{if(d[k]==null)return;localStorage.setItem(k,JSON.stringify(d[k]));});}catch(e){}}
 // ── end sync ──
 
 const getData = k => { try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]} };
@@ -2804,7 +2803,7 @@ async function saveOSConfig(){
   const fb  = document.getElementById('os-cfg-fb');
   fb.innerHTML='<div class="fb-msg" style="color:var(--muted)">Salvando...</div>';
   // Salva localmente
-  localStorage.setItem('mundi:os_key', key);
+  setData('mundi:os_key', key);
   // Salva no KV (servidor usa para enviar push sem env var)
   try{
     const r=await fetch(`${_API}/api/kv/${encodeURIComponent('mundi:os_api_key')}`,{
@@ -2845,7 +2844,7 @@ async function sendPushNotif(){
       fb.innerHTML='<div class="fb-msg fb-ok">✅ Enviado para '+( data.recipients||'todos')+'! ID: '+data.id+'</div>';
       const hist=JSON.parse(localStorage.getItem('mundi:notif_hist')||'[]');
       hist.unshift({id:data.id,title,body,url,ts:new Date().toISOString()});
-      localStorage.setItem('mundi:notif_hist',JSON.stringify(hist.slice(0,30)));
+      setData('mundi:notif_hist',hist.slice(0,30));
       renderNotifHistory();
       document.getElementById('notif-title').value='';
       document.getElementById('notif-body').value='';
